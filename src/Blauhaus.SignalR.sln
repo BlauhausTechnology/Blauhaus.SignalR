@@ -13,6 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blauhaus.SignalR.TestHelper
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blauhaus.SignalR.Tests", "Blauhaus.SignalR.Tests\Blauhaus.SignalR.Tests.csproj", "{F236B383-5D5C-4B47-A9CA-994030FD41E6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64E440ED-6155-406C-891F-375FB2A1E5CA}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\blauhaus.yml = ..\.github\workflows\blauhaus.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
