@@ -5,6 +5,14 @@ VisualStudioVersion = 16.0.30709.64
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blauhaus.SignalR.Abstractions", "Blauhaus.SignalR.Abstractions\Blauhaus.SignalR.Abstractions.csproj", "{86888FDE-F5BF-44C8-AB94-C109B7ECDDEA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blauhaus.SignalR.Client", "Blauhaus.SignalR.Client\Blauhaus.SignalR.Client.csproj", "{20099903-869A-489F-A1BD-C018A70FD742}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blauhaus.SignalR.Server", "Blauhaus.SignalR.Server\Blauhaus.SignalR.Server.csproj", "{5A86681E-787C-45EF-A2CF-75A4EFC7FC24}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blauhaus.SignalR.TestHelpers", "Blauhaus.SignalR.TestHelpers\Blauhaus.SignalR.TestHelpers.csproj", "{EFC67C0B-8CA4-4D6B-A424-807E1D7BCBFF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blauhaus.SignalR.Tests", "Blauhaus.SignalR.Tests\Blauhaus.SignalR.Tests.csproj", "{F236B383-5D5C-4B47-A9CA-994030FD41E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +23,22 @@ Global
 		{86888FDE-F5BF-44C8-AB94-C109B7ECDDEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86888FDE-F5BF-44C8-AB94-C109B7ECDDEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86888FDE-F5BF-44C8-AB94-C109B7ECDDEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20099903-869A-489F-A1BD-C018A70FD742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20099903-869A-489F-A1BD-C018A70FD742}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20099903-869A-489F-A1BD-C018A70FD742}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20099903-869A-489F-A1BD-C018A70FD742}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A86681E-787C-45EF-A2CF-75A4EFC7FC24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A86681E-787C-45EF-A2CF-75A4EFC7FC24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A86681E-787C-45EF-A2CF-75A4EFC7FC24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A86681E-787C-45EF-A2CF-75A4EFC7FC24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFC67C0B-8CA4-4D6B-A424-807E1D7BCBFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC67C0B-8CA4-4D6B-A424-807E1D7BCBFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC67C0B-8CA4-4D6B-A424-807E1D7BCBFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC67C0B-8CA4-4D6B-A424-807E1D7BCBFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F236B383-5D5C-4B47-A9CA-994030FD41E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F236B383-5D5C-4B47-A9CA-994030FD41E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F236B383-5D5C-4B47-A9CA-994030FD41E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F236B383-5D5C-4B47-A9CA-994030FD41E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
