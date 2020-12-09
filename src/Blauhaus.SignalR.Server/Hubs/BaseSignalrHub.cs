@@ -40,18 +40,11 @@ namespace Blauhaus.SignalR.Server.Hubs
             {
                 try
                 {
-                    var deviceIdentifier = Context.GetHttpContext().Request.Query["device"];
-
-                    var getUserResult = _authenticatedUserFactory.ExtractFromClaimsPrincipal(Context.User);
-                    if (getUserResult.IsFailure) return Response.Failure<TResponse>(getUserResult.Error);
-
-                    var authenticatedUser = getUserResult.Value;
-                    var currentUser = new ConnectedUser(authenticatedUser, deviceIdentifier, Context.ConnectionId);
-                    var id = idResolver.Compile().Invoke(command, currentUser);
-
+                    var connectedUser = GetConnectedUser();
+                    var id = idResolver.Compile().Invoke(command, connectedUser);
                     var handler = handlerResolver.Invoke(id);
 
-                    return await handler.HandleAsync(command, currentUser, Context.ConnectionAborted);
+                    return await handler.HandleAsync(command, connectedUser, Context.ConnectionAborted);
                 }
                 catch (Exception e)
                 {
@@ -61,6 +54,18 @@ namespace Blauhaus.SignalR.Server.Hubs
                     });
                 }
             }
-        } 
+        }
+
+
+        protected IConnectedUser GetConnectedUser()
+        {
+            var deviceIdentifier = Context.GetHttpContext().Request.Query["device"];
+
+            var getUserResult = _authenticatedUserFactory.ExtractFromClaimsPrincipal(Context.User);
+            if (getUserResult.IsFailure) throw new InvalidOperationException("No connected user");
+
+            var authenticatedUser = getUserResult.Value;
+            return new ConnectedUser(authenticatedUser, deviceIdentifier, Context.ConnectionId);
+        }
     }
 }
