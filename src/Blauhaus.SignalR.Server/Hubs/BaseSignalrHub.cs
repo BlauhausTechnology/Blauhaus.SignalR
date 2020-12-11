@@ -17,7 +17,7 @@ namespace Blauhaus.SignalR.Server.Hubs
     public abstract class BaseSignalrHub : Hub
     {
         protected readonly IServiceLocator ServiceLocator;
-        private readonly IAnalyticsService _analyticsService;
+        protected readonly IAnalyticsService AnalyticsService;
         private readonly IAuthenticatedUserFactory _authenticatedUserFactory; 
 
         protected BaseSignalrHub(
@@ -26,7 +26,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             IAuthenticatedUserFactory authenticatedUserFactory)
         {
             ServiceLocator = serviceLocator;
-            _analyticsService = analyticsService;
+            AnalyticsService = analyticsService;
             _authenticatedUserFactory = authenticatedUserFactory; 
         }
 
@@ -36,7 +36,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,
             Func<Guid, IAuthenticatedCommandHandler<TResponse, TCommand, IConnectedUser>> handlerResolver)  
         {
-            using (var _ = _analyticsService.StartRequestOperation(this, typeof(TCommand).Name, headers))
+            using (var _ = AnalyticsService.StartRequestOperation(this, typeof(TCommand).Name, headers))
             {
                 try
                 {
@@ -48,7 +48,7 @@ namespace Blauhaus.SignalR.Server.Hubs
                 }
                 catch (Exception e)
                 {
-                    return _analyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), new Dictionary<string, object>
+                    return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), new Dictionary<string, object>
                     {
                         ["Command"] = command
                     });
