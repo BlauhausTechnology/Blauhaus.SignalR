@@ -6,6 +6,7 @@ using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.Services;
 using Blauhaus.Domain.Abstractions.CommandHandlers;
+using Blauhaus.Errors;
 using Blauhaus.Ioc.Abstractions;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Auth;
@@ -46,12 +47,13 @@ namespace Blauhaus.SignalR.Server.Hubs
 
                     return await handler.HandleAsync(command, connectedUser, Context.ConnectionAborted);
                 }
+                catch (ErrorException error)
+                {
+                    return AnalyticsService.TraceErrorResponse<TResponse>(this, error.Error, command.ToObjectDictionary());
+                }
                 catch (Exception e)
                 {
-                    return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), new Dictionary<string, object>
-                    {
-                        ["Command"] = command
-                    });
+                    return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), command.ToObjectDictionary());
                 }
             }
         }
@@ -59,10 +61,18 @@ namespace Blauhaus.SignalR.Server.Hubs
 
         protected IConnectedUser GetConnectedUser()
         {
+            
             var deviceIdentifier = Context.GetHttpContext().Request.Query["device"];
+            if (string.IsNullOrEmpty(deviceIdentifier))
+            {
+                throw new InvalidOperationException("No device identifier");
+            }
 
-            var getUserResult = _authenticatedUserFactory.ExtractFromClaimsPrincipal(Context.User);
-            if (getUserResult.IsFailure) throw new InvalidOperationException("No connected user");
+            var getUserResult = _authenticatedUserFactory.ExtractFromClaimsPrincipal(Context.User ?? throw new InvalidOperationException("Invalid user in Context"));
+            if (getUserResult.IsFailure)
+            {
+                throw new InvalidOperationException("No connected user");
+            }
 
             var authenticatedUser = getUserResult.Value;
             return new ConnectedUser(authenticatedUser, deviceIdentifier, Context.ConnectionId);
