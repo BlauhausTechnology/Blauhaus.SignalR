@@ -67,7 +67,8 @@ namespace Blauhaus.SignalR.Client
             {
                 _analyticsService.TraceWarning(this, $"SignalR client is {_hub.State} so cannot call server. Reconnecting...");
                 await ConnectAsync();
-            }
+            } 
+            
             return await _hub.InvokeAsync<TDto>(methodName, parameter1, parameter2, token);
         }
 

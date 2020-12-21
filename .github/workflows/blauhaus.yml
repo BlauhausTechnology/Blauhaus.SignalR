@@ -1,0 +1,32 @@
+name: Blauhaus Packages
+on:
+  push:
+    branches:
+    - release/*
+
+jobs:
+
+  build:
+     runs-on: ubuntu-latest
+     steps:
+     - uses: actions/setup-dotnet@v1
+       with: 
+         dotnet-version: '5.0.x' 
+     - uses: actions/checkout@v1
+     - name: Set Version
+       run: |
+        npm install @actions/core --save
+        node ./scripts/getversion.js
+     - name: Build NuGet Package
+       run: |
+        dotnet build ./src/Blauhaus.SignalR.sln --configuration Release
+        dotnet pack ./src/Blauhaus.SignalR.Abstractions/Blauhaus.SignalR.Abstractions.csproj -p:PackageVersion=${VERSION_NAME} --no-build --output ./ --configuration Release 
+        dotnet pack ./src/Blauhaus.SignalR.Client/Blauhaus.SignalR.Client.csproj -p:PackageVersion=${VERSION_NAME} --no-build --output ./ --configuration Release 
+        dotnet pack ./src/Blauhaus.SignalR.Server/Blauhaus.SignalR.Server.csproj -p:PackageVersion=${VERSION_NAME} --no-build --output ./ --configuration Release 
+        dotnet pack ./src/Blauhaus.SignalR.TestHelpers/Blauhaus.SignalR.TestHelpers.csproj -p:PackageVersion=${VERSION_NAME} --no-build --output ./ --configuration Release 
+     - name: Deploy NuGet Package
+       run:  |
+        dotnet nuget push /home/runner/work/Blauhaus.SignalR/Blauhaus.SignalR/Blauhaus.Signalr.Server.${VERSION_NAME}.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        dotnet nuget push /home/runner/work/Blauhaus.SignalR/Blauhaus.SignalR/Blauhaus.Signalr.Client.${VERSION_NAME}.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        dotnet nuget push /home/runner/work/Blauhaus.SignalR/Blauhaus.SignalR/Blauhaus.Signalr.TestHelpers.${VERSION_NAME}.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        dotnet nuget push /home/runner/work/Blauhaus.SignalR/Blauhaus.SignalR/Blauhaus.Signalr.Abstractions.${VERSION_NAME}.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
