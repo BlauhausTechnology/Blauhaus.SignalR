@@ -6,6 +6,7 @@ using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.Services;
 using Blauhaus.Domain.Abstractions.CommandHandlers;
+using Blauhaus.Errors;
 using Blauhaus.Ioc.Abstractions;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Auth;
@@ -17,7 +18,7 @@ namespace Blauhaus.SignalR.Server.Hubs
     public abstract class BaseSignalrHub : Hub
     {
         protected readonly IServiceLocator ServiceLocator;
-        private readonly IAnalyticsService _analyticsService;
+        protected readonly IAnalyticsService AnalyticsService;
         private readonly IAuthenticatedUserFactory _authenticatedUserFactory; 
 
         protected BaseSignalrHub(
@@ -26,7 +27,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             IAuthenticatedUserFactory authenticatedUserFactory)
         {
             ServiceLocator = serviceLocator;
-            _analyticsService = analyticsService;
+            AnalyticsService = analyticsService;
             _authenticatedUserFactory = authenticatedUserFactory; 
         }
 
@@ -36,31 +37,45 @@ namespace Blauhaus.SignalR.Server.Hubs
             Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,
             Func<Guid, IAuthenticatedCommandHandler<TResponse, TCommand, IConnectedUser>> handlerResolver)  
         {
-            using (var _ = _analyticsService.StartRequestOperation(this, typeof(TCommand).Name, headers))
+            using (var _ = AnalyticsService.StartRequestOperation(this, typeof(TCommand).Name, headers))
             {
                 try
                 {
-                    var deviceIdentifier = Context.GetHttpContext().Request.Query["device"];
-
-                    var getUserResult = _authenticatedUserFactory.ExtractFromClaimsPrincipal(Context.User);
-                    if (getUserResult.IsFailure) return Response.Failure<TResponse>(getUserResult.Error);
-
-                    var authenticatedUser = getUserResult.Value;
-                    var currentUser = new ConnectedUser(authenticatedUser, deviceIdentifier, Context.ConnectionId);
-                    var id = idResolver.Compile().Invoke(command, currentUser);
-
+                    var connectedUser = GetConnectedUser();
+                    var id = idResolver.Compile().Invoke(command, connectedUser);
                     var handler = handlerResolver.Invoke(id);
 
-                    return await handler.HandleAsync(command, currentUser, Context.ConnectionAborted);
+                    return await handler.HandleAsync(command, connectedUser);
+                }
+                catch (ErrorException error)
+                {
+                    return AnalyticsService.TraceErrorResponse<TResponse>(this, error.Error, command.ToObjectDictionary());
                 }
                 catch (Exception e)
                 {
-                    return _analyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), new Dictionary<string, object>
-                    {
-                        ["Command"] = command
-                    });
+                    return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), command.ToObjectDictionary());
                 }
             }
-        } 
+        }
+
+
+        protected IConnectedUser GetConnectedUser()
+        {
+            
+            var deviceIdentifier = Context.GetHttpContext().Request.Query["device"];
+            if (string.IsNullOrEmpty(deviceIdentifier))
+            {
+                throw new InvalidOperationException("No device identifier");
+            }
+
+            var getUserResult = _authenticatedUserFactory.ExtractFromClaimsPrincipal(Context.User ?? throw new InvalidOperationException("Invalid user in Context"));
+            if (getUserResult.IsFailure)
+            {
+                throw new InvalidOperationException("No connected user");
+            }
+
+            var authenticatedUser = getUserResult.Value;
+            return new ConnectedUser(authenticatedUser, deviceIdentifier, Context.ConnectionId);
+        }
     }
 }
