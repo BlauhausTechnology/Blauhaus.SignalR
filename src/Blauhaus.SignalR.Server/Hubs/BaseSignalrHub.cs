@@ -45,7 +45,7 @@ namespace Blauhaus.SignalR.Server.Hubs
                     var id = idResolver.Compile().Invoke(command, connectedUser);
                     var handler = handlerResolver.Invoke(id);
 
-                    return await handler.HandleAsync(command, connectedUser, Context.ConnectionAborted);
+                    return await handler.HandleAsync(command, connectedUser);
                 }
                 catch (ErrorException error)
                 {
