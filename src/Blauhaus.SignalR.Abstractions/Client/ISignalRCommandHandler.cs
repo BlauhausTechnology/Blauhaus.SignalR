@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Blauhaus.Common.Utils.Contracts;
 using Blauhaus.Responses;
 
 namespace Blauhaus.SignalR.Abstractions.Client
 {
-    public interface ISignalRCommandHandler
+    public interface ISignalRCommandHandler  : IAsyncPublisher<SignalRConnectionState>
     {
-        IObservable<SignalRConnectionState> Monitor();        
-        IObservable<TDto> Connect<TDto>();
+        IDisposable SubscribeToDto<TDto>(Func<TDto, Task> handler);
 
-        Task<Response<TDto>> HandleAsync<TDto, TCommand>(TCommand command, CancellationToken token = default);
-        Task<Response> HandleAsync<TCommand>(TCommand command, CancellationToken token = default);
+        Task<Response<TDto>> HandleAsync<TDto, TCommand>(TCommand command) where TCommand : notnull;
+        Task<Response> HandleAsync<TCommand>(TCommand command) where TCommand : notnull;
 
     }
 }

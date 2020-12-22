@@ -5,8 +5,8 @@
   </PropertyGroup>
 
     <ItemGroup>
-	    <PackageReference Include="Blauhaus.Auth.Abstractions" Version="0.11.0" />
-	    <PackageReference Include="Blauhaus.Domain.Abstractions" Version="0.16.0" />
+	    <PackageReference Include="Blauhaus.Auth.Abstractions" Version="0.11.1" />
+	    <PackageReference Include="Blauhaus.Domain.Abstractions" Version="0.16.1" />
 	    <PackageReference Include="Blauhaus.Ioc.Abstractions" Version="1.2.4" />
 	    <PackageReference Include="Blauhaus.Responses" Version="0.3.5" />
 	    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.6.1" />

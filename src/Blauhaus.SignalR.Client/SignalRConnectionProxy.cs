@@ -51,17 +51,17 @@ namespace Blauhaus.SignalR.Client
             await _hub.StartAsync();
         }
 
-        public async Task<TDto> InvokeAsync<TDto>(string methodName, object parameter, CancellationToken token = default)
+        public async Task<TDto> InvokeAsync<TDto>(string methodName, object parameter)
         {
             if (_hub.State != HubConnectionState.Connected)
             {
                 _analyticsService.TraceWarning(this, $"SignalR client is {_hub.State} so cannot call server. Reconnecting...");
                 await ConnectAsync();
             }
-            return await _hub.InvokeAsync<TDto>(methodName, parameter, token);
+            return await _hub.InvokeAsync<TDto>(methodName, parameter);
         }
 
-        public async Task<TDto> InvokeAsync<TDto>(string methodName, object parameter1, object parameter2, CancellationToken token = default)
+        public async Task<TDto> InvokeAsync<TDto>(string methodName, object parameter1, object parameter2)
         {
             if (_hub.State != HubConnectionState.Connected)
             {
@@ -69,45 +69,37 @@ namespace Blauhaus.SignalR.Client
                 await ConnectAsync();
             } 
             
-            return await _hub.InvokeAsync<TDto>(methodName, parameter1, parameter2, token);
+            return await _hub.InvokeAsync<TDto>(methodName, parameter1, parameter2);
         }
 
-        public async Task InvokeAsync(string methodName, object parameter, CancellationToken token = default)
+        public async Task InvokeAsync(string methodName, object parameter)
         {
             if (_hub.State != HubConnectionState.Connected)
             {
                 _analyticsService.TraceWarning(this, $"SignalR client is {_hub.State} so cannot call server. Reconnecting...");
                 await ConnectAsync();
             }
-            await _hub.InvokeAsync(methodName, parameter, token);
+            await _hub.InvokeAsync(methodName, parameter);
         }
 
-        public async Task InvokeAsync(string methodName, object parameter1, object parameter2, CancellationToken token = default)
+        public async Task InvokeAsync(string methodName, object parameter1, object parameter2)
         {
             if (_hub.State != HubConnectionState.Connected)
             {
                 _analyticsService.TraceWarning(this, $"SignalR client is {_hub.State} so cannot call server. Reconnecting...");
                 await ConnectAsync();
             }
-            await  _hub.InvokeAsync(methodName, parameter1, parameter2, token);
+            await  _hub.InvokeAsync(methodName, parameter1, parameter2);
         }
 
-        public IObservable<TDto> On<TDto>(string methodName)
+        public IDisposable Subscribe<TDto>(string methodName, Func<TDto, Task> handler)
         {
-            return Observable.Create<TDto>(observer =>
+            return _hub.On<TDto>(methodName, async dto =>
             {
-                try
-                {
-                    return _hub.On<TDto>(methodName, observer.OnNext);
-                }
-                catch (Exception e)
-                {
-                    observer.OnError(e);
-                    return Disposable.Empty;
-                }
+                await handler.Invoke(dto);
             });
         }
-
+         
         public IDisposable On<TDto>(string methodName, Action<TDto> handler) => _hub.On(methodName, handler);
 
         public event EventHandler<ClientConnectionStateChangeEventArgs>? StateChanged;
