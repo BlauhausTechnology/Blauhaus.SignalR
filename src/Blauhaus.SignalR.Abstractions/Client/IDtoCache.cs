@@ -1,7 +1,4 @@
-﻿
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Blauhaus.Common.Utils.Contracts;
+﻿using System.Threading.Tasks;
 
 namespace Blauhaus.SignalR.Abstractions.Client
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
@@ -8,12 +8,11 @@ using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Abstractions.Subscriptions;
 
 namespace Blauhaus.SignalR.Client
 {
     
-    public class SignalRClient<TDto> : BasePublisher, ISignalRClient<TDto>
+    public class SignalRClient<TDto, TSubscribeCommand> : BasePublisher, ISignalRClient<TDto, TSubscribeCommand> where TSubscribeCommand : notnull
     {
         private readonly ISignalRConnectionProxy _connection;
         private readonly IDtoCache<TDto> _dtoCache;
@@ -34,8 +33,8 @@ namespace Blauhaus.SignalR.Client
             _analyticsService = analyticsService;
             _connectivityService = connectivityService;
         }
-        
-        public async Task<Response<IDisposable>> SubscribeAsync(Func<TDto, Task> handler, DtoSubscription? dtoSubscription = null)
+
+        public async Task<Response<IDisposable>> SubscribeAsync(TSubscribeCommand command, Func<TDto, Task> handler)  
         {
             await _locker.WaitAsync();
 
@@ -44,6 +43,8 @@ namespace Blauhaus.SignalR.Client
             
             try
             {
+                var token = await SubscribeAsync(handler);
+                
                 if (_connectionSubscription == null)
                 {
                     _connectionSubscription = _connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}", async dto =>
@@ -51,11 +52,19 @@ namespace Blauhaus.SignalR.Client
                         await _dtoCache.SaveAsync(dto);
                         await UpdateSubscribersAsync(dto);
                     });
-                    var subscription = dtoSubscription ?? new DtoSubscription();
-                    await _connection.InvokeAsync($"SubscribeTo{typeof(TDto).Name}", subscription, _analyticsService.AnalyticsOperationHeaders);
+                    var subscribeResult = await _connection.InvokeAsync<Response<List<TDto>>>($"SubscribeTo{typeof(TDto).Name}", command, _analyticsService.AnalyticsOperationHeaders);
+                    if (subscribeResult.IsFailure)
+                    {
+                        return Response.Failure<IDisposable>(subscribeResult.Error);
+                    }
+
+                    foreach (var dto in subscribeResult.Value)
+                    {
+                        await _dtoCache.SaveAsync(dto);
+                        await UpdateSubscribersAsync(dto);
+                    }
                 }
 
-                var token = await base.SubscribeAsync(handler);
                 return Response.Success(token);
             }
             catch (Exception e)
@@ -69,7 +78,7 @@ namespace Blauhaus.SignalR.Client
             }
         }
 
-        public async Task<Response<TDto>> HandleAsync<TCommand>(TCommand command) where TCommand : notnull
+        public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 
             if (!_connectivityService.IsConnectedToInternet)
             {

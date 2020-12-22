@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Service;
-using Blauhaus.Auth.Abstractions.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Tests._Base;
 using Blauhaus.SignalR.Tests.TestObjects;
-using Moq;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.SignlrClientTests
 {
-    public class InvokeAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto>>
+    public class InvokeAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto, MySubscribeCommand>>
     {
         private MyCommand _command;
         private IDictionary<string, string> _headers;
@@ -26,11 +23,12 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
             _command = new MyCommand();
             _headers = new Dictionary<string, string>{["Key"] = "Value"};
             MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
+            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(new List<MyDto>()));
         }
         
         private Task<Response<MyDto>> ExecuteAsync()
         {
-            return Sut.HandleAsync(_command);
+            return Sut.HandleCommandAsync(_command);
         }
 
             [Test]
@@ -72,14 +70,14 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
             }
             
             [Test]
-            public async Task IF_hub_invocation_succeeds_SHOULDupdate_subscribers()
+            public async Task IF_hub_invocation_succeeds_SHOULD_update_subscribers()
             {
                 //Arrange
                 var dto = new MyDto();
                 var publishedDtos = new List<MyDto>();
                 MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
-                await Sut.SubscribeAsync(async dto1 => publishedDtos.Add(dto1));
-                await Sut.SubscribeAsync(async dto2 => publishedDtos.Add(dto2));
+                await Sut.SubscribeAsync(new MySubscribeCommand(), async dto1 => publishedDtos.Add(dto1));
+                await Sut.SubscribeAsync(new MySubscribeCommand(), async dto2 => publishedDtos.Add(dto2));
 
                 //Act
                 await ExecuteAsync();

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.Errors;
@@ -9,7 +8,6 @@ using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Tests._Base;
 using Blauhaus.SignalR.Tests.TestObjects;
-using Moq;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.SignalRCommandHandlerTests

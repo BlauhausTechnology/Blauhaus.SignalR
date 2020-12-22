@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
-using Blauhaus.Responses;
 using Blauhaus.SignalR.Client;
-using Blauhaus.SignalR.Client._Ioc;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Blauhaus.TestHelpers.MockBuilders;
 using Moq;

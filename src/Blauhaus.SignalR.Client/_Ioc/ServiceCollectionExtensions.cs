@@ -6,16 +6,17 @@ namespace Blauhaus.SignalR.Client._Ioc
     public static class ServiceCollectionExtensions
     {
 
-        public static IServiceCollection AddSignalRClient<TDto, TDtoSaver>(this IServiceCollection services) 
-            where TDtoSaver : class, IDtoCache<TDto>
+        public static IServiceCollection AddSignalRClient<TDto, TSubscribeCommand, TDtoCache>(this IServiceCollection services) 
+            where TDtoCache : class, IDtoCache<TDto>
+            where TSubscribeCommand : notnull
         {
-            services.AddSingleton<ISignalRClient<TDto>, SignalRClient<TDto>>();
-            services.AddDtoHandler<TDto, TDtoSaver>();
+            services.AddSingleton<ISignalRClient<TDto, TSubscribeCommand>, SignalRClient<TDto, TSubscribeCommand>>();
+            services.AddDtoCache<TDto, TDtoCache>();
             
             return services;
         }
         
-        public static IServiceCollection AddDtoHandler<TDto, TDtoSaver>(this IServiceCollection services) 
+        public static IServiceCollection AddDtoCache<TDto, TDtoSaver>(this IServiceCollection services) 
             where TDtoSaver : class, IDtoCache<TDto>
         {
             services.AddSingleton<IDtoCache<TDto>, TDtoSaver>();

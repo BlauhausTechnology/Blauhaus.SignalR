@@ -5,14 +5,12 @@ using System.Threading.Tasks;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Abstractions.Subscriptions;
 using Blauhaus.TestHelpers.MockBuilders;
 using Moq;
-using Newtonsoft.Json;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders
 {
-    public class SignalRClientMockBuilder<TDto> : BaseMockBuilder<SignalRClientMockBuilder<TDto>, ISignalRClient<TDto>>
+    public class SignalRClientMockBuilder<TDto, TSubscribeCommand> : BaseMockBuilder<SignalRClientMockBuilder<TDto, TSubscribeCommand>, ISignalRClient<TDto, TSubscribeCommand>>
     {
         private readonly List<Func<TDto, Task>> _handlers = new List<Func<TDto, Task>>();
 
@@ -20,8 +18,8 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
         {
             var mockToken = new Mock<IDisposable>();
 
-            Mock.Setup(x => x.SubscribeAsync(It.IsAny<Func<TDto, Task>>(), It.IsAny<DtoSubscription>()))
-                .Callback((Func<TDto, Task> handler, DtoSubscription dtoSubscription) =>
+            Mock.Setup(x => x.SubscribeAsync(It.IsAny<TSubscribeCommand>(), It.IsAny<Func<TDto, Task>>()))
+                .Callback((TSubscribeCommand command, Func<TDto, Task> handler) =>
                 {
                     handler.Invoke(update);
                 }).ReturnsAsync(Response.Success(mockToken.Object));
@@ -33,9 +31,9 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
         {
             var mockToken = new Mock<IDisposable>();
             var queue = new Queue<TDto>(updates);
-
-            Mock.Setup(x => x.SubscribeAsync(It.IsAny<Func<TDto, Task>>(), It.IsAny<DtoSubscription>()))
-                .Callback((Func<TDto, Task> handler, DtoSubscription dtoSubscription) =>
+            
+            Mock.Setup(x => x.SubscribeAsync(It.IsAny<TSubscribeCommand>(), It.IsAny<Func<TDto, Task>>()))
+                .Callback((TSubscribeCommand command, Func<TDto, Task> handler) =>
                 {
                     handler.Invoke(queue.Dequeue());
                 }).ReturnsAsync(Response.Success(mockToken.Object));
@@ -46,9 +44,9 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
         public Mock<IDisposable> AllowMockSubscriptions()
         {
             var mockToken = new Mock<IDisposable>();
-
-            Mock.Setup(x => x.SubscribeAsync(It.IsAny<Func<TDto, Task>>(), It.IsAny<DtoSubscription>()))
-                .Callback((Func<TDto, Task> handler, DtoSubscription dtoSubscription) =>
+            
+            Mock.Setup(x => x.SubscribeAsync(It.IsAny<TSubscribeCommand>(), It.IsAny<Func<TDto, Task>>()))
+                .Callback((TSubscribeCommand command, Func<TDto, Task> handler) =>
                 {
                     _handlers.Add(handler);
                 }).ReturnsAsync(Response.Success(mockToken.Object));
@@ -64,48 +62,48 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
             }
         }
         
-        public SignalRClientMockBuilder<TDto> Where_HandleAsync_returns<TCommand>(TDto payload)
+        public SignalRClientMockBuilder<TDto, TSubscribeCommand> Where_HandleCommandAsync_returns<TCommand>(TDto payload)
         {
-            Mock.Setup(x => x.HandleAsync(It.IsAny<TCommand>()))
+            Mock.Setup(x => x.HandleCommandAsync(It.IsAny<TCommand>()))
                 .ReturnsAsync(Response.Success(payload));
             return this;
         }
         
-        public SignalRClientMockBuilder<TDto> Where_HandleAsync_returns<TCommand>(List<TDto> payloads)
+        public SignalRClientMockBuilder<TDto, TSubscribeCommand> Where_HandleCommandAsync_returns<TCommand>(List<TDto> payloads)
         {
             var queue = new Queue<Response<TDto>>();
             foreach (var payload in payloads)
             {
                 queue.Enqueue(Response.Success(payload));
             }
-            Mock.Setup(x => x.HandleAsync(It.IsAny<TCommand>()))
+            Mock.Setup(x => x.HandleCommandAsync(It.IsAny<TCommand>()))
                 .ReturnsAsync(queue.Dequeue);
             return this;
         }
         
-        public SignalRClientMockBuilder<TDto> Where_HandleAsync_returns_result<TCommand>(Response<TDto> payload)
+        public SignalRClientMockBuilder<TDto, TSubscribeCommand> Where_HandleCommandAsync_returns_result<TCommand>(Response<TDto> payload)
         {
-            Mock.Setup(x => x.HandleAsync(It.IsAny<TCommand>()))
+            Mock.Setup(x => x.HandleCommandAsync(It.IsAny<TCommand>()))
                 .ReturnsAsync(payload);
             return this;
         }
         
-        public SignalRClientMockBuilder<TDto> Where_HandleAsync_returns_fail<TCommand>(Error error)
+        public SignalRClientMockBuilder<TDto, TSubscribeCommand> Where_HandleCommandAsync_returns_fail<TCommand>(Error error)
         {
-            Mock.Setup(x => x.HandleAsync(It.IsAny<TCommand>()))
+            Mock.Setup(x => x.HandleCommandAsync(It.IsAny<TCommand>()))
                 .ReturnsAsync(Response.Failure<TDto>(error));
             return this;
         }
         
-        public SignalRClientMockBuilder<TDto> Where_HandleAsync_throws<TCommand>(Exception exception)
+        public SignalRClientMockBuilder<TDto, TSubscribeCommand> Where_HandleCommandAsync_throws<TCommand>(Exception exception)
         {
-            Mock.Setup(x => x.HandleAsync(It.IsAny<TCommand>()))
+            Mock.Setup(x => x.HandleCommandAsync(It.IsAny<TCommand>()))
                 .ThrowsAsync(exception);
             return this;
         }
         public void Verify_HandleAsync<TCommand>(Expression<Func<TCommand, bool>> predicate, int times = 1)
         {
-            Mock.Verify(x => x.HandleAsync(It.Is(predicate)), Times.Exactly(times));
+            Mock.Verify(x => x.HandleCommandAsync(It.Is(predicate)), Times.Exactly(times));
         }
          
     }

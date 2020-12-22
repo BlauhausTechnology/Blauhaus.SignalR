@@ -8,7 +8,6 @@ using Blauhaus.SignalR.TestHelpers.MockBuilders;
 using Blauhaus.SignalR.Tests.MockBuilders;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Blauhaus.TestHelpers.BaseTests;
-using Blauhaus.TestHelpers.MockBuilders;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests._Base

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Blauhaus.Responses;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Blauhaus.SignalR.Client

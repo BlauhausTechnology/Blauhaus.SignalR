@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Blauhaus.Common.Utils.Contracts;
 using Blauhaus.Responses;
-using Blauhaus.SignalR.Abstractions.Subscriptions;
 
 namespace Blauhaus.SignalR.Abstractions.Client
 {
-    public interface ISignalRClient<TDto>
+    public interface ISignalRClient<TDto, in TSubscribeCommand> where TSubscribeCommand : notnull
     {
-        Task<Response<TDto>> HandleAsync<TCommand>(TCommand command) where TCommand : notnull;
-        Task<Response<IDisposable>> SubscribeAsync(Func<TDto, Task> handler, DtoSubscription? dtoSubscription = null);
+        Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull;
+        Task<Response<IDisposable>> SubscribeAsync(TSubscribeCommand command, Func<TDto, Task> handler);
     }
 }

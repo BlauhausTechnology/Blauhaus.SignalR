@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
@@ -9,7 +6,6 @@ using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Client._Ioc;
 using Blauhaus.SignalR.Client.Extensions;
 
 namespace Blauhaus.SignalR.Client
