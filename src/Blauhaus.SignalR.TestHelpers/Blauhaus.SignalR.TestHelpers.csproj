@@ -13,4 +13,8 @@
       <Folder Include="Extensions\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Blauhaus.SignalR.Abstractions\Blauhaus.SignalR.Abstractions.csproj" />
+    </ItemGroup>
+
 </Project>
