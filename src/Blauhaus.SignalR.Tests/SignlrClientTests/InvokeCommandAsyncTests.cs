@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Service;
+using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client;
@@ -11,7 +12,7 @@ using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.SignlrClientTests
 {
-    public class InvokeAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto, MySubscribeCommand>>
+    public class InvokeCommandAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto>>
     {
         private MyCommand _command;
         private IDictionary<string, string> _headers;
@@ -69,24 +70,6 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
                 MockMyDtoCache.Mock.Verify(x => x.SaveAsync(dto));
             }
             
-            [Test]
-            public async Task IF_hub_invocation_succeeds_SHOULD_update_subscribers()
-            {
-                //Arrange
-                var dto = new MyDto();
-                var publishedDtos = new List<MyDto>();
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
-                await Sut.SubscribeAsync(new MySubscribeCommand(), async dto1 => publishedDtos.Add(dto1));
-                await Sut.SubscribeAsync(new MySubscribeCommand(), async dto2 => publishedDtos.Add(dto2));
-
-                //Act
-                await ExecuteAsync();
-
-                //Assert
-                Assert.That(publishedDtos.Count, Is.EqualTo(2));
-                Assert.That(publishedDtos[0], Is.EqualTo(dto));
-                Assert.That(publishedDtos[1], Is.EqualTo(dto));
-            }
 
             [Test]
             public async Task IF_device_is_disconnected_from_internet_SHOULD_return_Error()
@@ -115,6 +98,21 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
                 //Assert
                 Assert.That(result.Error.Equals(SignalRErrors.InvocationFailure(e)));
                 MockAnalyticsService.VerifyLogExceptionWithMessage("Something bad happened");
+            } 
+            
+            [Test]
+            public async Task IF_connection_throws_error_exception_SHOULD_return_Error()
+            {
+                //Arrange
+                var e = new ErrorException(Errors.Errors.Cancelled);
+                MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<MyDto>>(e);
+
+                //Act
+                var result = await ExecuteAsync();
+
+                //Assert
+                Assert.That(result.Error.Equals(Errors.Errors.Cancelled));
+                MockAnalyticsService.VerifyTrace(Errors.Errors.Cancelled.ToString(), LogSeverity.Error);
             } 
     }
 }
