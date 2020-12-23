@@ -1,6 +1,8 @@
 ﻿using System;
+using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.TestHelpers.MockBuilders;
+using Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches;
 using Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients;
 using Blauhaus.TestHelpers;
 
@@ -13,9 +15,19 @@ namespace Blauhaus.SignalR.TestHelpers.Extensions
             return mocks.AddMock<DtoCacheMockBuilder<TDto>, IDtoCache<TDto>>();
         }
         
+        public static Func<SyncDtoCacheMockBuilder<TDto>> AddMockSyncDtoCache<TDto>(this MockContainer mocks) where TDto : ISyncClientEntity
+        {
+            return mocks.AddMock<SyncDtoCacheMockBuilder<TDto>, ISyncDtoCache<TDto>>();
+        }
+        
         public static Func<SignalRClientMockBuilder<TDto>> AddMockSignalRClient<TDto>(this MockContainer mocks) where TDto : class
         {
             return mocks.AddMock<SignalRClientMockBuilder<TDto>, ISignalRClient<TDto>>();
+        }
+        
+        public static Func<SignalRSyncClientMockBuilder<TDto>> AddMockSignalRSyncClient<TDto>(this MockContainer mocks) where TDto : class, ISyncClientEntity
+        {
+            return mocks.AddMock<SignalRSyncClientMockBuilder<TDto>, ISignalRSyncClient<TDto>>();
         }
     }
 }

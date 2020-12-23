@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
+using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
@@ -11,18 +12,20 @@ using Blauhaus.Sync.Abstractions;
 
 namespace Blauhaus.SignalR.Client
 {
-    public class SignalRSyncClient<TDto> : SignalRClient<TDto>, ISignalRSyncClient<TDto>
+    public class SignalRSyncClient<TDto> : SignalRClient<TDto>, ISignalRSyncClient<TDto> where TDto : ISyncClientEntity
     {
         private IDisposable? _connectionSubscription;
 
+        private ISyncDtoCache<TDto> _syncDtoCache;
         
         public SignalRSyncClient(
             IAnalyticsService analyticsService, 
             IConnectivityService connectivityService, 
-            IDtoCache<TDto> dtoCache, 
+            ISyncDtoCache<TDto> dtoCache, 
             ISignalRConnectionProxy connection) 
                 : base(analyticsService, connectivityService, dtoCache, connection)
         {
+            _syncDtoCache = dtoCache;
         }
         
         
@@ -47,9 +50,9 @@ namespace Blauhaus.SignalR.Client
                         return Response.Failure<IDisposable>(syncResult.Error);
                     }
 
+                    await _syncDtoCache.SaveDtosAsync(syncResult.Value);
                     foreach (var dto in syncResult.Value.EntityBatch)
                     {
-                        await DtoCache.SaveAsync(dto);
                         await UpdateSubscribersAsync(dto);
                     }
                 }

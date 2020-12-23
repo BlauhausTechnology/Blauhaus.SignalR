@@ -72,8 +72,7 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
             Assert.That(_publishedDtos.Count, Is.EqualTo(2));
             Assert.That(_publishedDtos[0], Is.EqualTo(dto1));
             Assert.That(_publishedDtos[1], Is.EqualTo(dto2));
-            MockMyDtoCache.Mock.Verify(x => x.SaveAsync(dto1));
-            MockMyDtoCache.Mock.Verify(x => x.SaveAsync(dto2));
+            MockSyncMyDtoCache.VerifySaveDtosAsync(dto1, dto2);
         }
         
         [Test]
@@ -135,8 +134,8 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
             Assert.That(_publishedDtos.Count, Is.EqualTo(2));
             Assert.That(_publishedDtos[0], Is.EqualTo(dto1));
             Assert.That(_publishedDtos[1], Is.EqualTo(dto2));
-            MockMyDtoCache.Mock.Verify(x => x.SaveAsync(dto1));
-            MockMyDtoCache.Mock.Verify(x => x.SaveAsync(dto2));
+            MockSyncMyDtoCache.Mock.Verify(x => x.SaveAsync(dto1));
+            MockSyncMyDtoCache.Mock.Verify(x => x.SaveAsync(dto2));
         }
         
         

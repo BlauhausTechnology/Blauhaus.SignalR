@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.Sync.Abstractions;
@@ -9,7 +10,8 @@ using Moq;
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
 {
 
-    public class SignalRSyncClientMockBuilder<TDto> : BaseSignalRClientMockBuilder<SignalRSyncClientMockBuilder<TDto>, ISignalRSyncClient<TDto>, TDto> where TDto : class
+    public class SignalRSyncClientMockBuilder<TDto> : BaseSignalRClientMockBuilder<SignalRSyncClientMockBuilder<TDto>, ISignalRSyncClient<TDto>, TDto> 
+        where TDto : class, ISyncClientEntity
     {
         private readonly List<Func<TDto, Task>> _handlers = new List<Func<TDto, Task>>();
 

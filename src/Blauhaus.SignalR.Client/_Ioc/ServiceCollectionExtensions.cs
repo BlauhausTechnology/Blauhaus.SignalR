@@ -1,4 +1,5 @@
-﻿using Blauhaus.SignalR.Abstractions.Client;
+﻿using Blauhaus.Domain.Abstractions.Entities;
+using Blauhaus.SignalR.Abstractions.Client;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Blauhaus.SignalR.Client._Ioc
@@ -6,10 +7,11 @@ namespace Blauhaus.SignalR.Client._Ioc
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddSignalRSyncClient<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, IDtoCache<TDto>
+            where TDtoCache : class, ISyncDtoCache<TDto>
+            where TDto : ISyncClientEntity
         {
             services.AddSingleton<ISignalRSyncClient<TDto>, SignalRSyncClient<TDto>>();
-            services.AddDtoCache<TDto, TDtoCache>();
+            services.AddSyncDtoCache<TDto, TDtoCache>();
             return services;
         }
         
@@ -21,10 +23,18 @@ namespace Blauhaus.SignalR.Client._Ioc
             return services;
         }
         
-        public static IServiceCollection AddDtoCache<TDto, TDtoSaver>(this IServiceCollection services) 
-            where TDtoSaver : class, IDtoCache<TDto>
+        public static IServiceCollection AddSyncDtoCache<TDto, TDtoCache>(this IServiceCollection services) 
+            where TDtoCache : class, ISyncDtoCache<TDto> where TDto : ISyncClientEntity
         {
-            services.AddSingleton<IDtoCache<TDto>, TDtoSaver>();
+            services.AddSingleton<ISyncDtoCache<TDto>, TDtoCache>();
+            
+            return services;
+        }
+
+        public static IServiceCollection AddDtoCache<TDto, TDtoCache>(this IServiceCollection services) 
+            where TDtoCache : class, IDtoCache<TDto>
+        {
+            services.AddSingleton<IDtoCache<TDto>, TDtoCache>();
             
             return services;
         }
