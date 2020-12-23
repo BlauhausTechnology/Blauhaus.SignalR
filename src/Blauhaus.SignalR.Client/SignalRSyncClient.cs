@@ -12,11 +12,11 @@ using Blauhaus.Sync.Abstractions;
 
 namespace Blauhaus.SignalR.Client
 {
-    public class SignalRSyncClient<TDto> : SignalRClient<TDto>, ISignalRSyncClient<TDto> where TDto : ISyncClientEntity
+    public class SignalRSyncClient<TDto> : SignalRClient<TDto>, ISignalRSyncClient<TDto> where TDto : IClientEntity
     {
         private IDisposable? _connectionSubscription;
 
-        private ISyncDtoCache<TDto> _syncDtoCache;
+        private readonly ISyncDtoCache<TDto> _syncDtoCache;
         
         public SignalRSyncClient(
             IAnalyticsService analyticsService, 

@@ -4,7 +4,7 @@ using Blauhaus.Sync.Abstractions;
 
 namespace Blauhaus.SignalR.Abstractions.Client
 {
-    public interface ISyncDtoCache<TDto> : IDtoCache<TDto> where TDto : ISyncClientEntity
+    public interface ISyncDtoCache<TDto> : IDtoCache<TDto> where TDto : IClientEntity
     {
         Task SaveDtosAsync(SyncResult<TDto> syncResult);
     }

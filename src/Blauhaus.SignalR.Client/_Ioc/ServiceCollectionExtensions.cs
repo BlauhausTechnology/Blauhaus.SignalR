@@ -8,7 +8,7 @@ namespace Blauhaus.SignalR.Client._Ioc
     {
         public static IServiceCollection AddSignalRSyncClient<TDto, TDtoCache>(this IServiceCollection services) 
             where TDtoCache : class, ISyncDtoCache<TDto>
-            where TDto : ISyncClientEntity
+            where TDto : IClientEntity
         {
             services.AddSingleton<ISignalRSyncClient<TDto>, SignalRSyncClient<TDto>>();
             services.AddSyncDtoCache<TDto, TDtoCache>();
@@ -24,7 +24,7 @@ namespace Blauhaus.SignalR.Client._Ioc
         }
         
         public static IServiceCollection AddSyncDtoCache<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, ISyncDtoCache<TDto> where TDto : ISyncClientEntity
+            where TDtoCache : class, ISyncDtoCache<TDto> where TDto : IClientEntity
         {
             services.AddSingleton<ISyncDtoCache<TDto>, TDtoCache>();
             

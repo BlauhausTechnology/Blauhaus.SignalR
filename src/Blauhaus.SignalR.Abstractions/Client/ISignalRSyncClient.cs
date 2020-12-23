@@ -7,7 +7,7 @@ using Blauhaus.Sync.Abstractions;
 namespace Blauhaus.SignalR.Abstractions.Client
 {
     public interface ISignalRSyncClient<TDto> : ISignalRClient<TDto> 
-        where TDto : ISyncClientEntity
+        where TDto : IClientEntity
     {
         
         Task<Response<IDisposable>> SyncAsync(SyncCommand command, Func<TDto, Task> handler);
