@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Blauhaus.Domain.Abstractions.Entities;
+﻿using Blauhaus.Domain.Abstractions.Entities;
 using Newtonsoft.Json;
 
 namespace Blauhaus.SignalR.Abstractions.Sync

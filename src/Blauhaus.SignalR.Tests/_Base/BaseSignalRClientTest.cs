@@ -4,7 +4,6 @@ using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.DeviceServices.TestHelpers.MockBuilders;
 using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.TestHelpers.Extensions;
-using Blauhaus.SignalR.TestHelpers.MockBuilders;
 using Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches;
 using Blauhaus.SignalR.Tests.MockBuilders;
 using Blauhaus.SignalR.Tests.TestObjects;

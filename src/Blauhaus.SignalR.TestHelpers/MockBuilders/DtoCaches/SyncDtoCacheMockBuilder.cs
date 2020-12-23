@@ -3,16 +3,28 @@ using System.Linq;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.Sync;
-using Blauhaus.Sync.Abstractions;
 using Moq;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
 {
     public class SyncDtoCacheMockBuilder<TDto> : BaseDtoCacheMockBuilder<SyncDtoCacheMockBuilder<TDto>,ISyncDtoCache<TDto>,TDto> where TDto : IClientEntity
     {
+
+        public SyncDtoCacheMockBuilder()
+        {
+            Where_LoadSyncRequestAsync_returns(new SyncRequest());
+        }
+
+        public SyncDtoCacheMockBuilder<TDto> Where_LoadSyncRequestAsync_returns(SyncRequest request)
+        {
+            Mock.Setup(x => x.LoadSyncRequestAsync()).ReturnsAsync(request);
+            return this;
+        }
+        
+        
         public void VerifySaveDtosAsync(TDto dto)
         {
-            Mock.Verify(x => x.SaveDtosAsync(It.Is<SyncResponse<TDto>>(y => 
+            Mock.Verify(x => x.SaveSyncResponseAsync(It.Is<SyncResponse<TDto>>(y => 
                 y.Dtos.FirstOrDefault(z => z.Equals(dto)) != null)));
         }
         
@@ -20,7 +32,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
         {
             foreach (var dto in dtos)
             {
-                Mock.Verify(x => x.SaveDtosAsync(It.Is<SyncResponse<TDto>>(y => 
+                Mock.Verify(x => x.SaveSyncResponseAsync(It.Is<SyncResponse<TDto>>(y => 
                     y.Dtos.FirstOrDefault(z => z.Equals(dto)) != null)));
             }
         }
@@ -29,7 +41,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
         {
             foreach (var dto in dtos)
             {
-                Mock.Verify(x => x.SaveDtosAsync(It.Is<SyncResponse<TDto>>(y => 
+                Mock.Verify(x => x.SaveSyncResponseAsync(It.Is<SyncResponse<TDto>>(y => 
                     y.Dtos.FirstOrDefault(z => z.Equals(dto)) != null)));
             }
         }

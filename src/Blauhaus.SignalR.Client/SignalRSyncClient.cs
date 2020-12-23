@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
@@ -9,7 +8,6 @@ using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.Sync;
-using Blauhaus.Sync.Abstractions;
 
 namespace Blauhaus.SignalR.Client
 {
@@ -30,7 +28,7 @@ namespace Blauhaus.SignalR.Client
         }
         
         
-        public async Task<Response<IDisposable>> SyncAsync(SyncRequest request, Func<TDto, Task> handler)  
+        public async Task<Response<IDisposable>> SyncAsync(Func<TDto, Task> handler)  
         {
             //todo figure out how to handle connection state changes
 
@@ -45,13 +43,15 @@ namespace Blauhaus.SignalR.Client
                         await DtoCache.SaveAsync(dto);
                         await UpdateSubscribersAsync(dto);
                     });
-                    var syncResult = await Connection.InvokeAsync<Response<SyncResponse<TDto>>>($"Sync{typeof(TDto).Name}Async", request, AnalyticsService.AnalyticsOperationHeaders);
+
+                    var syncRequest = await _syncDtoCache.LoadSyncRequestAsync();
+                    var syncResult = await Connection.InvokeAsync<Response<SyncResponse<TDto>>>($"Sync{typeof(TDto).Name}Async", syncRequest, AnalyticsService.AnalyticsOperationHeaders);
                     if (syncResult.IsFailure)
                     {
                         return Response.Failure<IDisposable>(syncResult.Error);
                     }
 
-                    await _syncDtoCache.SaveDtosAsync(syncResult.Value);
+                    await _syncDtoCache.SaveSyncResponseAsync(syncResult.Value);
                     foreach (var dto in syncResult.Value.Dtos)
                     {
                         await UpdateSubscribersAsync(dto);
@@ -62,11 +62,11 @@ namespace Blauhaus.SignalR.Client
             }
             catch (ErrorException errorException)
             {
-                return AnalyticsService.TraceErrorResponse<IDisposable>(this, errorException.Error, request.ToObjectDictionary());
+                return AnalyticsService.TraceErrorResponse<IDisposable>(this, errorException.Error);
             }
             catch (Exception e)
             {
-                return AnalyticsService.LogExceptionResponse<IDisposable>(this, e, SignalRErrors.InvocationFailure(e), request.ToObjectDictionary());
+                return AnalyticsService.LogExceptionResponse<IDisposable>(this, e, SignalRErrors.InvocationFailure(e));
             }
         }
     }

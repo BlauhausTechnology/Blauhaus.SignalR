@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Blauhaus.SignalR.Abstractions.Sync
+﻿namespace Blauhaus.SignalR.Abstractions.Sync
 {
     public class SyncRequest
     {

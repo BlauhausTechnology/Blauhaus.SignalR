@@ -1,7 +1,6 @@
 ﻿using System;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.TestHelpers.MockBuilders;
 using Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches;
 using Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients;
 using Blauhaus.TestHelpers;

@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Abstractions.Sync;
-using Blauhaus.Sync.Abstractions;
 using Moq;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
@@ -20,8 +18,8 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
         {
             var mockToken = new Mock<IDisposable>();
 
-            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncRequest>(), It.IsAny<Func<TDto, Task>>()))
-                .Callback((SyncCommand command, Func<TDto, Task> handler) =>
+            Mock.Setup(x => x.SyncAsync(It.IsAny<Func<TDto, Task>>()))
+                .Callback((Func<TDto, Task> handler) =>
                 {
                     handler.Invoke(update);
                 }).ReturnsAsync(Response.Success(mockToken.Object));
@@ -34,8 +32,8 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
             var mockToken = new Mock<IDisposable>();
             var queue = new Queue<TDto>(updates);
             
-            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncRequest>(), It.IsAny<Func<TDto, Task>>()))
-                .Callback((SyncCommand command, Func<TDto, Task> handler) =>
+            Mock.Setup(x => x.SyncAsync(It.IsAny<Func<TDto, Task>>()))
+                .Callback((Func<TDto, Task> handler) =>
                 {
                     handler.Invoke(queue.Dequeue());
                 }).ReturnsAsync(Response.Success(mockToken.Object));
@@ -47,8 +45,8 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
         {
             var mockToken = new Mock<IDisposable>();
             
-            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncRequest>(), It.IsAny<Func<TDto, Task>>()))
-                .Callback((SyncCommand command, Func<TDto, Task> handler) =>
+            Mock.Setup(x => x.SyncAsync(It.IsAny<Func<TDto, Task>>()))
+                .Callback((Func<TDto, Task> handler) =>
                 {
                     _handlers.Add(handler);
                 }).ReturnsAsync(Response.Success(mockToken.Object));
