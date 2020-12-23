@@ -54,7 +54,7 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
             //Assert
             MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<SyncResponse<MyDto>>>("SyncMyDtoAsync", It.Is<SyncRequest>(y=> 
                 y.ModifiedAfter == 222), _headers), Times.Once);
-            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("PublishMyDto", It.IsAny<Func<MyDto, Task>>()), Times.Once);
+            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("UpdateMyDto", It.IsAny<Func<SyncResponse<MyDto>, Task>>()), Times.Once);
         }
         
         [Test]
@@ -76,11 +76,29 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
         }
         
         [Test]
-        public async Task WHEN_subscription_fails_SHOULD_fail()
+        public async Task WHEN_connection_publishes_later_response_SHOULD_update_subscribers_and_dto_cache()
         {
             //Arrange
             var dto1 = new MyDto();
             var dto2 = new MyDto();
+            
+            //Act
+            await Sut.SyncAsync(_handler);
+            await MockSignalRConnectionProxy.PublishMockSubscriptionAsync(new SyncResponse<MyDto>(new []{dto1}));
+            await MockSignalRConnectionProxy.PublishMockSubscriptionAsync(new SyncResponse<MyDto>(new []{dto2}));
+
+            //Assert 
+            Assert.That(_publishedDtos.Count, Is.EqualTo(2));
+            Assert.That(_publishedDtos[0], Is.EqualTo(dto1));
+            Assert.That(_publishedDtos[1], Is.EqualTo(dto2));
+            MockSyncMyDtoCache.VerifySaveDtosAsync(dto1, dto2);
+        }
+
+        
+        [Test]
+        public async Task WHEN_subscription_fails_SHOULD_fail()
+        {
+            //Arrange
             MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Failure<SyncResponse<MyDto>>(Errors.Errors.Cancelled));
             
             //Act
@@ -116,26 +134,6 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
             //Assert 
             Assert.That(result.Error.Equals(SignalRErrors.InvocationFailure(unhandledException)));
             MockAnalyticsService.VerifyLogExceptionWithMessage("oops");
-        }
-        
-        [Test]
-        public async Task WHEN_connection_publishes_Dto_SHOULD_update_subscribers_and_dto_cache()
-        {
-            //Arrange
-            var dto1 = new MyDto();
-            var dto2 = new MyDto();
-            
-            //Act
-            await Sut.SyncAsync(_handler);
-            await MockSignalRConnectionProxy.PublishMockSubscriptionAsync(dto1);
-            await MockSignalRConnectionProxy.PublishMockSubscriptionAsync(dto2);
-
-            //Assert 
-            Assert.That(_publishedDtos.Count, Is.EqualTo(2));
-            Assert.That(_publishedDtos[0], Is.EqualTo(dto1));
-            Assert.That(_publishedDtos[1], Is.EqualTo(dto2));
-            MockSyncMyDtoCache.Mock.Verify(x => x.SaveAsync(dto1));
-            MockSyncMyDtoCache.Mock.Verify(x => x.SaveAsync(dto2));
         }
         
         

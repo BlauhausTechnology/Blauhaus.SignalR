@@ -5,6 +5,7 @@ using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
+using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
@@ -33,7 +34,6 @@ namespace Blauhaus.SignalR.Client
             AnalyticsService = analyticsService;
             ConnectivityService = connectivityService;
         }
-
 
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 
@@ -99,6 +99,6 @@ namespace Blauhaus.SignalR.Client
                 Locker.Release();
             }
         }
-
+         
     }
 }

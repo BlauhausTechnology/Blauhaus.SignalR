@@ -1,6 +1,7 @@
 ﻿using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Blauhaus.SignalR.Client._Ioc
 {
@@ -20,6 +21,13 @@ namespace Blauhaus.SignalR.Client._Ioc
         {
             services.AddSingleton<ISignalRClient<TDto>, SignalRClient<TDto>>();
             services.AddDtoCache<TDto, TDtoCache>();
+            return services;
+        }
+        
+        public static IServiceCollection AddSignalRClient<TDto>(this IServiceCollection services) 
+        {
+            services.AddSingleton<ISignalRClient<TDto>, SignalRClient<TDto>>();
+            services.AddDtoCache<TDto, DummyDtoCache<TDto>>();
             return services;
         }
         

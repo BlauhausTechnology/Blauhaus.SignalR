@@ -11,8 +11,4 @@
     <PackageReference Include="Blauhaus.Domain.Abstractions" Version="1.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Sync\" />
-  </ItemGroup>
-
 </Project>

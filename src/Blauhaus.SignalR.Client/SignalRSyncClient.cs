@@ -38,10 +38,13 @@ namespace Blauhaus.SignalR.Client
 
                 if (_connectionSubscription == null)
                 {
-                    _connectionSubscription = Connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}", async dto =>
+                    _connectionSubscription = Connection.Subscribe<SyncResponse<TDto>>($"Update{typeof(TDto).Name}", async syncResponse =>
                     {
-                        await DtoCache.SaveAsync(dto);
-                        await UpdateSubscribersAsync(dto);
+                        await _syncDtoCache.SaveSyncResponseAsync(syncResponse);
+                        foreach (var dto in syncResponse.Dtos)
+                        {
+                            await UpdateSubscribersAsync(dto);
+                        }
                     });
 
                     var syncRequest = await _syncDtoCache.LoadSyncRequestAsync();
@@ -69,5 +72,6 @@ namespace Blauhaus.SignalR.Client
                 return AnalyticsService.LogExceptionResponse<IDisposable>(this, e, SignalRErrors.InvocationFailure(e));
             }
         }
+         
     }
 }

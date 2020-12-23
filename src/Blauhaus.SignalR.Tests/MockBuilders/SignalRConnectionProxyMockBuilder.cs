@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Blauhaus.SignalR.Abstractions.Sync;
 using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Blauhaus.TestHelpers.MockBuilders;
@@ -33,20 +34,20 @@ namespace Blauhaus.SignalR.Tests.MockBuilders
             return this;
         }
         
-        private readonly List<Func<MyDto, Task>> _handlers = new List<Func<MyDto, Task>>();
+        private readonly List<Func<SyncResponse<MyDto>, Task>> _handlers = new();
         public Mock<IDisposable> AllowMockSubscriptions()
         {
             var mockToken = new Mock<IDisposable>();
 
-            Mock.Setup(x => x.Subscribe(It.IsAny<string>(), It.IsAny<Func<MyDto, Task>>()))
-                .Callback((string methodName, Func<MyDto, Task> handler) =>
+            Mock.Setup(x => x.Subscribe(It.IsAny<string>(), It.IsAny<Func<SyncResponse<MyDto>, Task>>()))
+                .Callback((string methodName, Func<SyncResponse<MyDto>, Task> handler) =>
                 {
                     _handlers.Add(handler);
                 }).Returns(mockToken.Object);
 
             return mockToken;
         }
-        public async Task PublishMockSubscriptionAsync(MyDto dto)
+        public async Task PublishMockSubscriptionAsync(SyncResponse<MyDto> dto)
         {
             foreach (var handler in _handlers)
             {

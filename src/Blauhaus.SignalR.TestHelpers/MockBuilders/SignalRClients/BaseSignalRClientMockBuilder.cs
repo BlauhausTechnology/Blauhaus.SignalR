@@ -35,14 +35,14 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
             return (TBuilder) this;
         }
         
-        public TBuilder Where_HandleCommandAsync_returns_result<TCommand>(Response<TDto> payload)
+        public TBuilder Where_HandleCommandAsync_returns<TCommand>(Response<TDto> payload)
         {
             Mock.Setup(x => x.HandleCommandAsync(It.IsAny<TCommand>()))
                 .ReturnsAsync(payload);
             return (TBuilder) this;
         }
         
-        public TBuilder Where_HandleCommandAsync_returns_fail<TCommand>(Error error)
+        public TBuilder Where_HandleCommandAsync_fails<TCommand>(Error error)
         {
             Mock.Setup(x => x.HandleCommandAsync(It.IsAny<TCommand>()))
                 .ReturnsAsync(Response.Failure<TDto>(error));
@@ -55,7 +55,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
                 .ThrowsAsync(exception);
             return (TBuilder) this;
         }
-        public void Verify_HandleAsync<TCommand>(Expression<Func<TCommand, bool>> predicate, int times = 1)
+        public void VerifyHandleCommandAsync<TCommand>(Expression<Func<TCommand, bool>> predicate, int times = 1)
         {
             Mock.Verify(x => x.HandleCommandAsync(It.Is(predicate)), Times.Exactly(times));
         }

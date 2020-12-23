@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Blauhaus.Common.Utils.Contracts;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Responses;
 
