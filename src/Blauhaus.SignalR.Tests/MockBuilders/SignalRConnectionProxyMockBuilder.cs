@@ -34,22 +34,44 @@ namespace Blauhaus.SignalR.Tests.MockBuilders
             return this;
         }
         
-        private readonly List<Func<SyncResponse<MyDto>, Task>> _handlers = new();
-        public Mock<IDisposable> AllowMockSubscriptions()
+        private readonly List<Func<SyncResponse<MyDto>, Task>> _syncHandlers = new();
+        public Mock<IDisposable> AllowMockSync()
         {
             var mockToken = new Mock<IDisposable>();
 
             Mock.Setup(x => x.Subscribe(It.IsAny<string>(), It.IsAny<Func<SyncResponse<MyDto>, Task>>()))
                 .Callback((string methodName, Func<SyncResponse<MyDto>, Task> handler) =>
                 {
-                    _handlers.Add(handler);
+                    _syncHandlers.Add(handler);
                 }).Returns(mockToken.Object);
 
             return mockToken;
         }
-        public async Task PublishMockSubscriptionAsync(SyncResponse<MyDto> dto)
+        public async Task PublishMockSyncAsync(SyncResponse<MyDto> dto)
         {
-            foreach (var handler in _handlers)
+            foreach (var handler in _syncHandlers)
+            {
+                await handler.Invoke(dto);
+            }
+        }
+        
+        
+        private readonly List<Func<MyDto, Task>> _connectHandlers = new();
+        public Mock<IDisposable> AllowMockConnect()
+        {
+            var mockToken = new Mock<IDisposable>();
+
+            Mock.Setup(x => x.Subscribe(It.IsAny<string>(), It.IsAny<Func<MyDto, Task>>()))
+                .Callback((string methodName, Func<MyDto, Task> handler) =>
+                {
+                    _connectHandlers.Add(handler);
+                }).Returns(mockToken.Object);
+
+            return mockToken;
+        }
+        public async Task PublishMockConnectAsync(MyDto dto)
+        {
+            foreach (var handler in _connectHandlers)
             {
                 await handler.Invoke(dto);
             }

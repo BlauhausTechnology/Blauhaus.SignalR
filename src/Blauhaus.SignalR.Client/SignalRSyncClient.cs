@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
@@ -13,7 +14,7 @@ namespace Blauhaus.SignalR.Client
 {
     public class SignalRSyncClient<TDto> : SignalRClient<TDto>, ISignalRSyncClient<TDto> where TDto : IClientEntity
     {
-        private IDisposable? _connectionSubscription;
+        private IDisposable? _syncToken;
 
         private readonly ISyncDtoCache<TDto> _syncDtoCache;
         
@@ -36,9 +37,9 @@ namespace Blauhaus.SignalR.Client
             {
                 var token = await SubscribeAsync(handler);
 
-                if (_connectionSubscription == null)
+                if (_syncToken == null)
                 {
-                    _connectionSubscription = Connection.Subscribe<SyncResponse<TDto>>($"Update{typeof(TDto).Name}", async syncResponse =>
+                    _syncToken = Connection.Subscribe<SyncResponse<TDto>>($"Sync{typeof(TDto).Name}Async", async syncResponse =>
                     {
                         await _syncDtoCache.SaveSyncResponseAsync(syncResponse);
                         foreach (var dto in syncResponse.Dtos)
@@ -62,16 +63,14 @@ namespace Blauhaus.SignalR.Client
                 }
 
                 return Response.Success(token);
-            }
-            catch (ErrorException errorException)
-            {
-                return AnalyticsService.TraceErrorResponse<IDisposable>(this, errorException.Error);
-            }
+            } 
             catch (Exception e)
             {
-                return AnalyticsService.LogExceptionResponse<IDisposable>(this, e, SignalRErrors.InvocationFailure(e));
+                return HandleException<IDisposable>(e);
             }
         }
          
+        
+
     }
 }

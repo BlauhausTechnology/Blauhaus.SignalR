@@ -5,9 +5,9 @@ namespace Blauhaus.SignalR.Tests.TestObjects
 {
     public class MyDto : ISyncClientEntity
     {
-        public MyDto()
+        public MyDto(Guid? id = null)
         {
-            Id = Guid.NewGuid();
+            Id = id ?? Guid.NewGuid();
         }
         public Guid Id { get; set; }
         

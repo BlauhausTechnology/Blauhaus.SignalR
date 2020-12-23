@@ -36,7 +36,7 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
             _headers = new Dictionary<string, string>{["Key"] = "Value"};
             MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
 
-            _mockSubscription = MockSignalRConnectionProxy.AllowMockSubscriptions();
+            _mockSubscription = MockSignalRConnectionProxy.AllowMockSync();
 
             MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(new SyncResponse<MyDto>()));
         }
@@ -54,7 +54,7 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
             //Assert
             MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<SyncResponse<MyDto>>>("SyncMyDtoAsync", It.Is<SyncRequest>(y=> 
                 y.ModifiedAfter == 222), _headers), Times.Once);
-            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("UpdateMyDto", It.IsAny<Func<SyncResponse<MyDto>, Task>>()), Times.Once);
+            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("SyncMyDtoAsync", It.IsAny<Func<SyncResponse<MyDto>, Task>>()), Times.Once);
         }
         
         [Test]
@@ -84,8 +84,8 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
             
             //Act
             await Sut.SyncAsync(_handler);
-            await MockSignalRConnectionProxy.PublishMockSubscriptionAsync(new SyncResponse<MyDto>(new []{dto1}));
-            await MockSignalRConnectionProxy.PublishMockSubscriptionAsync(new SyncResponse<MyDto>(new []{dto2}));
+            await MockSignalRConnectionProxy.PublishMockSyncAsync(new SyncResponse<MyDto>(new []{dto1}));
+            await MockSignalRConnectionProxy.PublishMockSyncAsync(new SyncResponse<MyDto>(new []{dto2}));
 
             //Assert 
             Assert.That(_publishedDtos.Count, Is.EqualTo(2));
@@ -93,7 +93,6 @@ namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
             Assert.That(_publishedDtos[1], Is.EqualTo(dto2));
             MockSyncMyDtoCache.VerifySaveDtosAsync(dto1, dto2);
         }
-
         
         [Test]
         public async Task WHEN_subscription_fails_SHOULD_fail()

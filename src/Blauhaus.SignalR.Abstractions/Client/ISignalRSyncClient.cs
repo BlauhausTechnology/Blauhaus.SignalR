@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Blauhaus.Common.Utils.Contracts;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Responses;
 
@@ -11,6 +10,7 @@ namespace Blauhaus.SignalR.Abstractions.Client
     {
         
         Task<Response<IDisposable>> SyncAsync(Func<TDto, Task> handler);
+        Task<Response<IDisposable>> ConnectAsync(Guid id, Func<TDto, Task> handler);
 
     }
 }

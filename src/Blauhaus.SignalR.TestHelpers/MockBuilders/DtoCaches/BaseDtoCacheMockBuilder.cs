@@ -1,5 +1,6 @@
 ﻿using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.TestHelpers.MockBuilders;
+using Moq;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
 {
@@ -7,9 +8,9 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
         where TBuilder : BaseDtoCacheMockBuilder<TBuilder, TMock, TDto> 
         where TMock : class, IDtoCache<TDto>
     {
-        public void VerifySaveAsync(TDto dto)
+        public void VerifySaveAsync(TDto dto, int times = 1)
         {
-            Mock.Verify(x => x.SaveAsync(dto));
+            Mock.Verify(x => x.SaveAsync(dto), Times.Exactly(times));
         }
     }
 }

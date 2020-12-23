@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
@@ -22,6 +23,8 @@ namespace Blauhaus.SignalR.Client
         protected readonly IDtoCache<TDto> DtoCache;
         protected readonly IAnalyticsService AnalyticsService;
         protected readonly IConnectivityService ConnectivityService;
+
+        private IDisposable? _connectToken;
 
         public SignalRClient(
             IAnalyticsService analyticsService,
@@ -98,6 +101,55 @@ namespace Blauhaus.SignalR.Client
             {
                 Locker.Release();
             }
+        }
+        
+        
+        public async Task<Response<IDisposable>> ConnectAsync(Guid id, Func<TDto, Task> handler)
+        {
+            try
+            {
+                var token = await SubscribeAsync(handler);
+
+                if (_connectToken == null)
+                {
+                    AnalyticsService.Trace(this, $"No connections yet for {typeof(TDto).Name}, subscribing for updates from connection");
+
+                    _connectToken  = Connection.Subscribe<TDto>($"Connect{typeof(TDto).Name}Async", async dto =>
+                    {
+                        await DtoCache.SaveAsync(dto);
+                        await UpdateSubscribersAsync(dto);
+                    });
+                }
+                 
+                AnalyticsService.Trace(this, $"No connections for {id}, asking server for upates");
+                
+                var connectResult = await Connection.InvokeAsync<Response<TDto>>($"Connect{typeof(TDto).Name}Async", id, AnalyticsService.AnalyticsOperationHeaders);
+                if (connectResult.IsFailure)
+                {
+                    return Response.Failure<IDisposable>(connectResult.Error);
+                }
+                
+                await DtoCache.SaveAsync(connectResult.Value);
+                await UpdateSubscribersAsync(connectResult.Value);
+                
+                return Response.Success(token);
+            } 
+            catch (Exception e)
+            {
+                return HandleException<IDisposable>(e);
+            }
+        }
+        
+        
+        
+        protected Response<T> HandleException<T>(Exception e)
+        {
+            if (e is ErrorException errorException)
+            {
+                return AnalyticsService.TraceErrorResponse<T>(this, errorException.Error);
+            }
+
+            return AnalyticsService.LogExceptionResponse<T>(this, e, SignalRErrors.InvocationFailure(e));
         }
          
     }
