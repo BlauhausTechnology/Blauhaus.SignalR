@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Abstractions.Sync;
 using Blauhaus.Sync.Abstractions;
 using Moq;
 
@@ -11,7 +12,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
 {
 
     public class SignalRSyncClientMockBuilder<TDto> : BaseSignalRClientMockBuilder<SignalRSyncClientMockBuilder<TDto>, ISignalRSyncClient<TDto>, TDto> 
-        where TDto : class, ISyncClientEntity
+        where TDto : class, IClientEntity
     {
         private readonly List<Func<TDto, Task>> _handlers = new List<Func<TDto, Task>>();
 
@@ -19,7 +20,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
         {
             var mockToken = new Mock<IDisposable>();
 
-            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncCommand>(), It.IsAny<Func<TDto, Task>>()))
+            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncRequest>(), It.IsAny<Func<TDto, Task>>()))
                 .Callback((SyncCommand command, Func<TDto, Task> handler) =>
                 {
                     handler.Invoke(update);
@@ -33,7 +34,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
             var mockToken = new Mock<IDisposable>();
             var queue = new Queue<TDto>(updates);
             
-            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncCommand>(), It.IsAny<Func<TDto, Task>>()))
+            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncRequest>(), It.IsAny<Func<TDto, Task>>()))
                 .Callback((SyncCommand command, Func<TDto, Task> handler) =>
                 {
                     handler.Invoke(queue.Dequeue());
@@ -46,7 +47,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
         {
             var mockToken = new Mock<IDisposable>();
             
-            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncCommand>(), It.IsAny<Func<TDto, Task>>()))
+            Mock.Setup(x => x.SyncAsync(It.IsAny<SyncRequest>(), It.IsAny<Func<TDto, Task>>()))
                 .Callback((SyncCommand command, Func<TDto, Task> handler) =>
                 {
                     _handlers.Add(handler);
