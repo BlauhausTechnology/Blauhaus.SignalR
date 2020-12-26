@@ -74,7 +74,6 @@ namespace Blauhaus.SignalR.Client
             }
         }
         
-        
         public async Task<Response> HandleVoidCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         {
             if (!ConnectivityService.IsConnectedToInternet)
@@ -106,6 +105,9 @@ namespace Blauhaus.SignalR.Client
         
         public async Task<Response<IDisposable>> ConnectAsync(Guid id, Func<TDto, Task> handler)
         {
+            //todo handle not connected
+            //todo figure out how to handle connection state changes during subscription 
+
             try
             {
                 var token = await SubscribeAsync(handler);
@@ -121,8 +123,6 @@ namespace Blauhaus.SignalR.Client
                     });
                 }
                  
-                AnalyticsService.Trace(this, $"No connections for {id}, asking server for upates");
-                
                 var connectResult = await Connection.InvokeAsync<Response<TDto>>($"Connect{typeof(TDto).Name}Async", id, AnalyticsService.AnalyticsOperationHeaders);
                 if (connectResult.IsFailure)
                 {
@@ -131,8 +131,21 @@ namespace Blauhaus.SignalR.Client
                 
                 await DtoCache.SaveAsync(connectResult.Value);
                 await UpdateSubscribersAsync(connectResult.Value);
+
+                var subscription = new ActionDisposable(() =>
+                {
+                    token.Dispose();
+                    try
+                    {
+                        Connection.InvokeAsync($"Disconnect{typeof(TDto).Name}Async", id, AnalyticsService.AnalyticsOperationHeaders);
+                    }
+                    catch (Exception e)
+                    {
+                        AnalyticsService.LogException(this, e);
+                    }
+                });
                 
-                return Response.Success(token);
+                return Response.Success<IDisposable>(subscription);
             } 
             catch (Exception e)
             {

@@ -9,8 +9,7 @@ namespace Blauhaus.SignalR.Abstractions.Client
         where TDto : IClientEntity
     {
         
-        Task<Response<IDisposable>> SyncAsync(Func<TDto, Task> handler);
-        Task<Response<IDisposable>> ConnectAsync(Guid id, Func<TDto, Task> handler);
+        Task<Response<IDisposable>> SyncAsync(Func<TDto, Task> handler); 
 
     }
 }

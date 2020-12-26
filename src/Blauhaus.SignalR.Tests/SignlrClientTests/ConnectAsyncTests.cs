@@ -104,6 +104,38 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
         }
         
         [Test]
+        public async Task WHEN_connection_publishes_later_response_AND_subscription_is_disposed_SHOULD_not_update_subscribers()
+        {
+            //Arrange
+            var dto1 = new MyDto();
+            var dto2 = new MyDto();
+            
+            //Act
+            var disposable = await Sut.ConnectAsync(_id, _handler); 
+            disposable.Value.Dispose();
+            await MockSignalRConnectionProxy.PublishMockConnectAsync(dto1);
+            await MockSignalRConnectionProxy.PublishMockConnectAsync(dto2);
+
+            //Assert 
+            Assert.That(_publishedDtos.Count, Is.EqualTo(1));
+            Assert.That(_publishedDtos[0], Is.Not.EqualTo(dto1));
+            Assert.That(_publishedDtos[0], Is.Not.EqualTo(dto2));
+        }
+        
+        [Test]
+        public async Task WHEN_subscription_is_disposed_SHOULD_disconnect_from_server()
+        {
+            //Arrange 
+            
+            //Act
+            var disposable = await Sut.ConnectAsync(_id, _handler); 
+            disposable.Value.Dispose(); 
+
+            //Assert 
+            MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync("DisconnectMyDtoAsync", _id, _headers));
+        }
+        
+        [Test]
         public async Task WHEN_subscription_fails_SHOULD_fail()
         {
             //Arrange
