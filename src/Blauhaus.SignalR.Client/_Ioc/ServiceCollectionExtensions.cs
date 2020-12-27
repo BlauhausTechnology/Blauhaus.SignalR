@@ -54,7 +54,7 @@ namespace Blauhaus.SignalR.Client._Ioc
             where TConfig : class, ISignalRClientConfig
         {
             services.TryAddTransient<ISignalRClientConfig, TConfig>();
-            services.TryAddTransient<ISignalRConnectionProxy, SignalRConnectionProxy>();
+            services.TryAddSingleton<ISignalRConnectionProxy, SignalRConnectionProxy>();
             services.TryAddSingleton<ISignalRConnection, SignalRConnection>();
 
             return services;
