@@ -5,6 +5,7 @@ using Blauhaus.SignalR.Abstractions.Sync;
 using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Blauhaus.TestHelpers.MockBuilders;
+using Microsoft.AspNetCore.SignalR.Client;
 using Moq;
 
 namespace Blauhaus.SignalR.Tests.MockBuilders
@@ -32,6 +33,11 @@ namespace Blauhaus.SignalR.Tests.MockBuilders
             Mock.Setup(x => x.InvokeAsync(It.IsAny<string>(), It.IsAny<object>())).ThrowsAsync(e);
             Mock.Setup(x => x.InvokeAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<object>())).ThrowsAsync(e);
             return this;
+        }
+
+        public void Raise_ClientConnectionStateChange(HubConnectionState state, Exception? exception = null)
+        {
+            Mock.Raise(x => x.StateChanged += null, new ClientConnectionStateChangeEventArgs(state, exception));
         }
         
         private readonly List<Func<SyncResponse<MyDto>, Task>> _syncHandlers = new();

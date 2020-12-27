@@ -1,4 +1,6 @@
-﻿using Blauhaus.Domain.Abstractions.Entities;
+﻿using System;
+using Blauhaus.Common.Utils.Contracts;
+using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -17,14 +19,14 @@ namespace Blauhaus.SignalR.Client._Ioc
         }
         
         public static IServiceCollection AddSignalRClient<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, IDtoCache<TDto>
+            where TDtoCache : class, IDtoCache<TDto> where TDto : IHasId<Guid>
         {
             services.AddSingleton<ISignalRClient<TDto>, SignalRClient<TDto>>();
             services.AddDtoCache<TDto, TDtoCache>();
             return services;
         }
         
-        public static IServiceCollection AddSignalRClient<TDto>(this IServiceCollection services) 
+        public static IServiceCollection AddSignalRClient<TDto>(this IServiceCollection services) where TDto : IHasId<Guid>
         {
             services.AddSingleton<ISignalRClient<TDto>, SignalRClient<TDto>>();
             services.AddDtoCache<TDto, DummyDtoCache<TDto>>();
@@ -51,9 +53,9 @@ namespace Blauhaus.SignalR.Client._Ioc
         public static IServiceCollection AddSignalR<TConfig>(this IServiceCollection services)
             where TConfig : class, ISignalRClientConfig
         {
-            services.AddTransient<ISignalRClientConfig, TConfig>();
-            services.AddSingleton<ISignalRConnectionProxy, SignalRConnectionProxy>();
-            services.AddSingleton<ISignalRCommandHandler, SignalRCommandHandler>();
+            services.TryAddTransient<ISignalRClientConfig, TConfig>();
+            services.TryAddTransient<ISignalRConnectionProxy, SignalRConnectionProxy>();
+            services.TryAddSingleton<ISignalRConnection, SignalRConnection>();
 
             return services;
         }

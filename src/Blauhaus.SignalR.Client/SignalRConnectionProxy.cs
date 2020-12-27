@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.AccessToken;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
 using Blauhaus.SignalR.Client._Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Client
 {
     public class SignalRConnectionProxy : ISignalRConnectionProxy
     {
-        private readonly IDeviceInfoService _deviceInfoService;
         private readonly IAnalyticsService _analyticsService;
         private readonly HubConnection _hub;
 
@@ -22,27 +23,26 @@ namespace Blauhaus.SignalR.Client
             IDeviceInfoService deviceInfoService,
             IAnalyticsService analyticsService)
         {
-            _deviceInfoService = deviceInfoService;
             _analyticsService = analyticsService;
 
-            var builder = new HubConnectionBuilder();
-                //.WithAutomaticReconnect();
+            var builder = new HubConnectionBuilder()
+                .WithAutomaticReconnect();
 
             var hubUrl = $"{config.HubUrl}?device={deviceInfoService.DeviceUniqueIdentifier}";
             _analyticsService.Trace(this, $"Constructing SignalR hub connection proxy for url {hubUrl}");
  
-            builder.WithUrl(hubUrl, options => options.AccessTokenProvider = () =>
-            {
-                return Task.FromResult(accessToken.Token);
-            });
+            builder.WithUrl(hubUrl, options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(accessToken.Token);
+                });
             
             _hub = builder.Build();
-
+            
             _hub.Reconnecting += OnReconnecting;
             _hub.Reconnected += OnReconnected;
             _hub.Closed += OnClosed;
         }
-
+         
         private async Task ConnectAsync()
         {
             await _hub.StartAsync();

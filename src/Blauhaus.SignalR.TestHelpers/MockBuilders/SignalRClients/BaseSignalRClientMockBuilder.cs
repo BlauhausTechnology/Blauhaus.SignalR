@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
@@ -58,6 +59,91 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
         public void VerifyHandleCommandAsync<TCommand>(Expression<Func<TCommand, bool>> predicate, int times = 1)
         {
             Mock.Verify(x => x.HandleCommandAsync(It.Is(predicate)), Times.Exactly(times));
+        }
+        
+        
+        private readonly List<Func<TDto, Task>> _connectHandlers = new List<Func<TDto, Task>>();
+
+        public Mock<IDisposable> Where_ConnectAsync_publishes_immediately(TDto update, Guid? id = null)
+        {
+            var mockToken = new Mock<IDisposable>();
+
+            if(id == null)
+            {
+                Mock.Setup(x => x.ConnectAsync(It.IsAny<Guid>(), It.IsAny<Func<TDto, Task>>()))
+                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
+                    {
+                        handler.Invoke(update);
+                    }).ReturnsAsync(Response.Success(mockToken.Object));
+
+            }
+            else
+            {
+                Mock.Setup(x => x.ConnectAsync(id.Value, It.IsAny<Func<TDto, Task>>()))
+                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
+                    {
+                        handler.Invoke(update);
+                    }).ReturnsAsync(Response.Success(mockToken.Object));
+
+            }
+            return mockToken;
+
+        }
+
+        public Mock<IDisposable> Where_ConnectAsync_publishes_sequence(IEnumerable<TDto> updates, Guid? id = null)
+        {
+            var mockToken = new Mock<IDisposable>();
+            var queue = new Queue<TDto>(updates);
+
+            if (id == null)
+            {
+                Mock.Setup(x => x.ConnectAsync(It.IsAny<Guid>(), It.IsAny<Func<TDto, Task>>()))
+                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
+                    {
+                        handler.Invoke(queue.Dequeue());
+                    }).ReturnsAsync(Response.Success(mockToken.Object));
+            }
+            else
+            {
+                Mock.Setup(x => x.ConnectAsync(id.Value, It.IsAny<Func<TDto, Task>>()))
+                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
+                    {
+                        handler.Invoke(queue.Dequeue());
+                    }).ReturnsAsync(Response.Success(mockToken.Object));
+            }
+            return mockToken;
+        }
+        
+        public Mock<IDisposable> AllowMockConnectiones(Guid? id = null)
+        {
+            var mockToken = new Mock<IDisposable>();
+
+            if (id == null)
+            {
+                Mock.Setup(x => x.ConnectAsync(It.IsAny<Guid>(), It.IsAny<Func<TDto, Task>>()))
+                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
+                    {
+                        _connectHandlers.Add(handler);
+                    }).ReturnsAsync(Response.Success(mockToken.Object));
+            }
+            else
+            {
+                Mock.Setup(x => x.ConnectAsync(id.Value, It.IsAny<Func<TDto, Task>>()))
+                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
+                    {
+                        _connectHandlers.Add(handler);
+                    }).ReturnsAsync(Response.Success(mockToken.Object));
+            }
+
+            return mockToken;
+        }
+
+        public async Task PublishMockConnectionAsync(TDto model)
+        {
+            foreach (var handler in _connectHandlers)
+            {
+                await handler.Invoke(model);
+            }
         }
     }
     

@@ -6,14 +6,14 @@ namespace Blauhaus.SignalR.Client.Extensions
 {
     internal static class HubConnectionStateExtensions
     {
-        internal static SignalRConnectionState ToConnectionState(this HubConnectionState state)
+        internal static SignalRConnectionState ToConnectionState(this HubConnectionState state, HubConnectionState previousState)
         {
             switch (state)
             {
                 case HubConnectionState.Connecting:
                     return SignalRConnectionState.Connecting;
                 case HubConnectionState.Connected:
-                    return SignalRConnectionState.Connected;
+                    return previousState == HubConnectionState.Reconnecting ? SignalRConnectionState.Reconnected : SignalRConnectionState.Connected;
                 case HubConnectionState.Disconnected:
                     return SignalRConnectionState.Disconnected;
                 case HubConnectionState.Reconnecting:

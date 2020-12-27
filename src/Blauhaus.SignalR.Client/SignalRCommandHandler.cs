@@ -7,6 +7,7 @@ using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Extensions;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Blauhaus.SignalR.Client
 {
@@ -69,14 +70,16 @@ namespace Blauhaus.SignalR.Client
 
         public Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler)
         {
-            return SubscribeAsync(handler, () => Task.FromResult(_connectionProxy.CurrentState.ToConnectionState()));
+            return SubscribeAsync(handler, () => Task.FromResult(_connectionProxy.CurrentState.ToConnectionState(_previousState)));
         }
-        
+
+        private HubConnectionState _previousState;
         private async void OnHubStateChanged(object sender, ClientConnectionStateChangeEventArgs eventArgs)
         {
 
-            var clientState = eventArgs.State.ToConnectionState();
+            var clientState = eventArgs.State.ToConnectionState(_previousState);
             var exception = eventArgs.Exception;
+             
             var traceMessage = $"SignalR client hub {clientState}";
             
             if (clientState == SignalRConnectionState.Reconnecting && exception != null)
@@ -98,6 +101,8 @@ namespace Blauhaus.SignalR.Client
             }
 
             await UpdateSubscribersAsync(clientState);
+
+            _previousState = eventArgs.State;
         }
          
         public IDisposable SubscribeToDto<TDto>(Func<TDto, Task> handler)

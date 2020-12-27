@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
+using Blauhaus.Common.Utils.Contracts;
 using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Domain.Abstractions.Entities;
@@ -14,9 +15,8 @@ using Blauhaus.SignalR.Abstractions.Client;
 namespace Blauhaus.SignalR.Client
 {
     
-    public class SignalRClient<TDto> : BasePublisher, ISignalRClient<TDto>
+    public class SignalRClient<TDto> : BasePublisher, ISignalRClient<TDto> where TDto : IHasId<Guid>
     {
-        
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
         protected readonly ISignalRConnectionProxy Connection;
         
@@ -102,12 +102,8 @@ namespace Blauhaus.SignalR.Client
             }
         }
         
-        
         public async Task<Response<IDisposable>> ConnectAsync(Guid id, Func<TDto, Task> handler)
         {
-            //todo handle not connected
-            //todo figure out how to handle connection state changes during subscription 
-
             try
             {
                 var token = await SubscribeAsync(handler);
@@ -118,42 +114,21 @@ namespace Blauhaus.SignalR.Client
 
                     _connectToken  = Connection.Subscribe<TDto>($"Connect{typeof(TDto).Name}Async", async dto =>
                     {
-                        await DtoCache.SaveAsync(dto);
-                        await UpdateSubscribersAsync(dto);
+                        if (dto.Id == id)
+                        {
+                            await DtoCache.SaveAsync(dto);
+                            await UpdateSubscribersAsync(dto);
+                        }
                     });
                 }
-                 
-                var connectResult = await Connection.InvokeAsync<Response<TDto>>($"Connect{typeof(TDto).Name}Async", id, AnalyticsService.AnalyticsOperationHeaders);
-                if (connectResult.IsFailure)
-                {
-                    return Response.Failure<IDisposable>(connectResult.Error);
-                }
                 
-                await DtoCache.SaveAsync(connectResult.Value);
-                await UpdateSubscribersAsync(connectResult.Value);
-
-                var subscription = new ActionDisposable(() =>
-                {
-                    token.Dispose();
-                    try
-                    {
-                        Connection.InvokeAsync($"Disconnect{typeof(TDto).Name}Async", id, AnalyticsService.AnalyticsOperationHeaders);
-                    }
-                    catch (Exception e)
-                    {
-                        AnalyticsService.LogException(this, e);
-                    }
-                });
-                
-                return Response.Success<IDisposable>(subscription);
+                return Response.Success(token);
             } 
             catch (Exception e)
             {
                 return HandleException<IDisposable>(e);
             }
         }
-        
-        
         
         protected Response<T> HandleException<T>(Exception e)
         {
