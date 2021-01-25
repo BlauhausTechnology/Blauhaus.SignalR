@@ -5,9 +5,11 @@ using System.Timers;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.AccessToken;
+using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
 using Blauhaus.SignalR.Client._Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Client
@@ -18,6 +20,7 @@ namespace Blauhaus.SignalR.Client
         private readonly HubConnection _hub;
 
         public SignalRConnectionProxy(
+            IRuntimePlatform runtimePlatform,
             ISignalRClientConfig config,
             IAuthenticatedAccessToken accessToken,
             IDeviceInfoService deviceInfoService,
@@ -35,7 +38,13 @@ namespace Blauhaus.SignalR.Client
                 {
                     options.AccessTokenProvider = () => Task.FromResult(accessToken.Token);
                 });
-            
+
+            if (runtimePlatform.Value == RuntimePlatform.iOS.Value)
+            {
+                //otherwise type initialization issues
+                builder.AddNewtonsoftJsonProtocol();
+            }
+
             _hub = builder.Build();
             
             _hub.Reconnecting += OnReconnecting;
