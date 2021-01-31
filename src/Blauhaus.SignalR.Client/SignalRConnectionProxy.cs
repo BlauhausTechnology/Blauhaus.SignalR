@@ -42,7 +42,7 @@ namespace Blauhaus.SignalR.Client
             if (runtimePlatform.Value == RuntimePlatform.iOS.Value)
             {
                 //otherwise type initialization issues
-                builder.AddNewtonsoftJsonProtocol();
+                //builder.AddNewtonsoftJsonProtocol();
             }
 
             _hub = builder.Build();
