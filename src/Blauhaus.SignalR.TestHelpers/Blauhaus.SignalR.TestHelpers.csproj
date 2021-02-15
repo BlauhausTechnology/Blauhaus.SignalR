@@ -5,7 +5,7 @@
   </PropertyGroup>
 
     <ItemGroup>
-	    <PackageReference Include="Blauhaus.Analytics.TestHelpers" Version="1.4.6" />
+	    <PackageReference Include="Blauhaus.Analytics.TestHelpers" Version="1.4.7" />
 	    <PackageReference Include="Blauhaus.Auth.TestHelpers" Version="0.11.2" />
     </ItemGroup>
 
