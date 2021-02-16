@@ -52,7 +52,7 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
             await Sut.ConnectAsync(otherId, _handler);
             
             //Assert 
-            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("ConnectMyDtoAsync", It.IsAny<Func<MyDto, Task>>()), Times.Once);
+            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("SendMyDtoAsync", It.IsAny<Func<MyDto, Task>>()), Times.Once);
         }
         
         [Test]

@@ -21,12 +21,12 @@ namespace Blauhaus.SignalR.Server.Proxy
             _hubContext = hubContext;
         }
          
-        public async Task<Response> ConnectAsync<TDto>(string connectiondId, TDto dto)
+        public async Task<Response> SendDtoAsync<TDto>(string connectiondId, TDto dto)
         {
             try
             {
                 await _hubContext.Clients.Client(connectiondId)
-                    .SendAsync($"Connect{typeof(TDto).Name}Async", dto);
+                    .SendAsync($"Send{typeof(TDto).Name}Async", dto);
             }
             catch (Exception e)
             {
