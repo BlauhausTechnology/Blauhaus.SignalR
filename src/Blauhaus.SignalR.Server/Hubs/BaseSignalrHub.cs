@@ -59,6 +59,7 @@ namespace Blauhaus.SignalR.Server.Hubs
         }
 
 
+
         protected IConnectedUser GetConnectedUser()
         {
             
