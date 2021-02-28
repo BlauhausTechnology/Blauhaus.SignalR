@@ -36,6 +36,7 @@ namespace Blauhaus.SignalR.Client
             _analyticsService.Trace(this, "SignalR connection disconnecting on request");
             await UpdateSubscribersAsync(SignalRConnectionState.Disconnecting);
             await _connectionProxy.StopAsync();
+            await UpdateSubscribersAsync(SignalRConnectionState.Disconnected);
         }
 
         private async void OnHubStateChanged(object sender, ClientConnectionStateChangeEventArgs eventArgs)

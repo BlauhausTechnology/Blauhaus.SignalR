@@ -15,13 +15,13 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Blauhaus.SignalR.Server.Hubs
 {
-    public abstract class BaseSignalrHub : Hub
+    public abstract class BaseSignalRHub : Hub
     {
         protected readonly IServiceLocator ServiceLocator;
         protected readonly IAnalyticsService AnalyticsService;
         private readonly IAuthenticatedUserFactory _authenticatedUserFactory; 
 
-        protected BaseSignalrHub(
+        protected BaseSignalRHub(
             IServiceLocator serviceLocator, 
             IAnalyticsService analyticsService,
             IAuthenticatedUserFactory authenticatedUserFactory)

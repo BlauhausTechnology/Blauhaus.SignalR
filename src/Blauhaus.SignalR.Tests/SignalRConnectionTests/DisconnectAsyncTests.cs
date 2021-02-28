@@ -38,6 +38,7 @@ namespace Blauhaus.SignalR.Tests.SignalRConnectionTests
             
             //Assert
             Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Disconnecting));
+            Assert.That(StateChanges[2], Is.EqualTo(SignalRConnectionState.Disconnected));
         }
     }
 }

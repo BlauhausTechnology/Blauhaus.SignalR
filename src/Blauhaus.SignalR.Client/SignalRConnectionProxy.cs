@@ -52,7 +52,9 @@ namespace Blauhaus.SignalR.Client
          
         private async Task ConnectAsync()
         {
+            await OnReconnecting(null);
             await _hub.StartAsync();
+            await OnReconnected(_hub.ConnectionId);
         }
 
         public async Task<TDto> InvokeAsync<TDto>(string methodName, object parameter)
@@ -119,7 +121,7 @@ namespace Blauhaus.SignalR.Client
             return Task.CompletedTask;
         }
 
-        private Task OnReconnecting(Exception e)
+        private Task OnReconnecting(Exception? e)
         {
             StateChanged?.Invoke(this, new ClientConnectionStateChangeEventArgs(HubConnectionState.Reconnecting, e));
             return Task.CompletedTask;
