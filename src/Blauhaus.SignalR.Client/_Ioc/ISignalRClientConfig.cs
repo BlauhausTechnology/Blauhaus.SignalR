@@ -3,5 +3,6 @@
     public interface ISignalRClientConfig
     {
         string HubUrl { get; }
+        bool IsAutoReconnectEnabled { get; }
     }
 }

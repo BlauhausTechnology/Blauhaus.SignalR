@@ -17,7 +17,7 @@ namespace Blauhaus.SignalR.Client
         event EventHandler<ClientConnectionStateChangeEventArgs>? StateChanged;
         HubConnectionState CurrentState { get; }
         string ConnectionId { get; }
-        Task StopAsync(CancellationToken token);
+        Task StopAsync();
         ValueTask DisposeAsync();
     }
 }

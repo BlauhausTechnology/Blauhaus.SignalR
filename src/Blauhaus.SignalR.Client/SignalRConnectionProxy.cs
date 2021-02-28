@@ -28,22 +28,20 @@ namespace Blauhaus.SignalR.Client
         {
             _analyticsService = analyticsService;
 
-            var builder = new HubConnectionBuilder()
-                .WithAutomaticReconnect();
+            var builder = new HubConnectionBuilder();
+
+            if (config.IsAutoReconnectEnabled)
+            {
+                builder.WithAutomaticReconnect();
+            }
 
             var hubUrl = $"{config.HubUrl}?device={deviceInfoService.DeviceUniqueIdentifier}";
             _analyticsService.Trace(this, $"Constructing SignalR hub connection proxy for url {hubUrl}");
  
             builder.WithUrl(hubUrl, options =>
-                {
-                    options.AccessTokenProvider = () => Task.FromResult(accessToken.Token);
-                });
-
-            if (runtimePlatform.Value == RuntimePlatform.iOS.Value)
             {
-                //otherwise type initialization issues
-                //builder.AddNewtonsoftJsonProtocol();
-            }
+                options.AccessTokenProvider = () => Task.FromResult(accessToken.Token);
+            });
 
             _hub = builder.Build();
             
@@ -129,7 +127,7 @@ namespace Blauhaus.SignalR.Client
 
         public HubConnectionState CurrentState => _hub.State;
         public string ConnectionId => _hub.ConnectionId;
-        public Task StopAsync(CancellationToken token) => _hub.StopAsync(token);
+        public Task StopAsync() => _hub.StopAsync(CancellationToken.None);
         public ValueTask DisposeAsync()
         {
             _hub.Reconnecting -= OnReconnecting;
