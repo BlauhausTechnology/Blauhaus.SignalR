@@ -15,7 +15,7 @@ using Blauhaus.SignalR.Abstractions.Client;
 namespace Blauhaus.SignalR.Client
 {
     
-    public class SignalRClient<TDto> : BasePublisher, ISignalRClient<TDto> where TDto : IHasId<Guid>
+    public class SignalRClient<TDto> : BasePublisher, ISignalRClient<TDto> 
     {
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
         protected readonly ISignalRConnectionProxy Connection;
