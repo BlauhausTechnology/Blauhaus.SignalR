@@ -11,7 +11,7 @@ using Moq;
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
 {
     
-    public abstract class BaseSignalRClientMockBuilder<TBuilder, TMock, TDto> : BaseMockBuilder<TBuilder, TMock>
+    public abstract class BaseSignalRClientMockBuilder<TBuilder, TMock, TDto> : BaseAsyncPublisherMockBuilder<TBuilder, TMock, TDto>
         where TBuilder : BaseSignalRClientMockBuilder<TBuilder, TMock, TDto> 
         where TDto : class
         where TMock : class, ISignalRClient<TDto>
@@ -60,72 +60,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
         {
             Mock.Verify(x => x.HandleCommandAsync(It.Is(predicate)), Times.Exactly(times));
         }
-        
-        
-        private readonly List<Func<TDto, Task>> _connectHandlers = new List<Func<TDto, Task>>();
-
-        public Mock<IDisposable> Where_SubscribeAsync_publishes_immediately(TDto update, Guid? id = null)
-        {
-            var mockToken = new Mock<IDisposable>();
-
-            if(id == null)
-            {
-                Mock.Setup(x => x.SubscribeAsync(It.IsAny<Guid>(), It.IsAny<Func<TDto, Task>>()))
-                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
-                    {
-                        _connectHandlers.Add(handler);
-                        handler.Invoke(update);
-                    }).ReturnsAsync(Response.Success(mockToken.Object));
-
-            }
-            else
-            {
-                Mock.Setup(x => x.SubscribeAsync(id.Value, It.IsAny<Func<TDto, Task>>()))
-                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
-                    {
-                        _connectHandlers.Add(handler);
-                        handler.Invoke(update);
-                    }).ReturnsAsync(Response.Success(mockToken.Object));
-
-            }
-            return mockToken;
-
-        }
-
-        public Mock<IDisposable> Where_SubscribeAsync_publishes_sequence(IEnumerable<TDto> updates, Guid? id = null)
-        {
-            var mockToken = new Mock<IDisposable>();
-            var queue = new Queue<TDto>(updates);
-
-            if (id == null)
-            {
-                Mock.Setup(x => x.SubscribeAsync(It.IsAny<Guid>(), It.IsAny<Func<TDto, Task>>()))
-                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
-                    {
-                        _connectHandlers.Add(handler);
-                        handler.Invoke(queue.Dequeue());
-                    }).ReturnsAsync(Response.Success(mockToken.Object));
-            }
-            else
-            {
-                Mock.Setup(x => x.SubscribeAsync(id.Value, It.IsAny<Func<TDto, Task>>()))
-                    .Callback((Guid givenId, Func<TDto, Task> handler) =>
-                    {
-                        _connectHandlers.Add(handler);
-                        handler.Invoke(queue.Dequeue());
-                    }).ReturnsAsync(Response.Success(mockToken.Object));
-            }
-            return mockToken;
-        }
          
-
-        public async Task PublishMockConnectionAsync(TDto model)
-        {
-            foreach (var handler in _connectHandlers)
-            {
-                await handler.Invoke(model);
-            }
-        }
     }
     
 }

@@ -38,6 +38,20 @@ namespace Blauhaus.SignalR.Client
             ConnectivityService = connectivityService;
         }
 
+        public void Connect()
+        {
+            _connectToken ??= Connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}Async", async dto =>
+            {
+                await DtoCache.SaveAsync(dto);
+                await UpdateSubscribersAsync(dto);
+            });
+        }
+         
+        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler)
+        {
+            return base.SubscribeAsync(handler);
+        }
+        
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 
             if (!ConnectivityService.IsConnectedToInternet)
@@ -102,33 +116,6 @@ namespace Blauhaus.SignalR.Client
             }
         }
         
-        public async Task<Response<IDisposable>> SubscribeAsync(Guid id, Func<TDto, Task> handler)
-        {
-            try
-            {
-                var token = await SubscribeAsync(handler);
-
-                if (_connectToken == null)
-                {
-                    AnalyticsService.Trace(this, $"No connections yet for {typeof(TDto).Name}, subscribing for updates from connection");
-
-                    _connectToken  = Connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}Async", async dto =>
-                    {
-                        if (dto.Id == id)
-                        {
-                            await DtoCache.SaveAsync(dto);
-                            await UpdateSubscribersAsync(dto);
-                        }
-                    });
-                }
-                
-                return Response.Success(token);
-            } 
-            catch (Exception e)
-            {
-                return HandleException<IDisposable>(e);
-            }
-        }
         
         protected Response<T> HandleException<T>(Exception e)
         {
@@ -139,6 +126,6 @@ namespace Blauhaus.SignalR.Client
 
             return AnalyticsService.LogExceptionResponse<T>(this, e, SignalRErrors.InvocationFailure(e));
         }
-         
+
     }
 }

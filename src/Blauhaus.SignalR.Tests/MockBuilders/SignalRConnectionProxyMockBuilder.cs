@@ -75,7 +75,8 @@ namespace Blauhaus.SignalR.Tests.MockBuilders
 
             return mockToken;
         }
-        public async Task PublishMockConnectAsync(MyDto dto)
+        
+        public async Task MockPublishDtoAsync(MyDto dto)
         {
             foreach (var handler in _connectHandlers)
             {

@@ -14,7 +14,7 @@ using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.SignlRClientTests
 {
-    public class ConnectAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto>>
+    public class ConnectTests : BaseSignalRClientTest<SignalRClient<MyDto>>
     {
         
         private static List<MyDto> _publishedDtos = new();
@@ -41,15 +41,12 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
         }
 
         [Test]
-        public async Task SHOULD_invoke_connect_command_even_if_id_already_connected_but_should_only_subscribe_once_for_updates()
+        public void SHOULD_Subscribe_to_connection_only_once()
         {
-            //Arrange
-            var otherId = Guid.NewGuid();
-            
             //Act
-            await Sut.SubscribeAsync(_id, _handler);
-            await Sut.SubscribeAsync(_id, _handler);
-            await Sut.SubscribeAsync(otherId, _handler);
+            Sut.Connect();
+            Sut.Connect();
+            Sut.Connect();
             
             //Assert 
             MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("PublishMyDtoAsync", It.IsAny<Func<MyDto, Task>>()), Times.Once);
@@ -63,9 +60,10 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
             var dto2 = new MyDto(_id);
             
             //Act
-            await Sut.SubscribeAsync(_id, _handler); 
-            await MockSignalRConnectionProxy.PublishMockConnectAsync(dto1);
-            await MockSignalRConnectionProxy.PublishMockConnectAsync(dto2);
+            Sut.Connect(); 
+            await Sut.SubscribeAsync(_handler); 
+            await MockSignalRConnectionProxy.MockPublishDtoAsync(dto1);
+            await MockSignalRConnectionProxy.MockPublishDtoAsync(dto2);
 
             //Assert 
             Assert.That(_publishedDtos.Count, Is.EqualTo(2));
@@ -74,25 +72,7 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
             MockMyDtoCache.VerifySaveAsync(dto1);
             MockMyDtoCache.VerifySaveAsync(dto2);
         }
-        
-        [Test]
-        public async Task WHEN_connection_publishes_other_dto_id_SHOULD_not_update_subscribers_and_dto_cache()
-        {
-            //Arrange
-            var dto1 = new MyDto(_id);
-            var dto2 = new MyDto(Guid.NewGuid());
-            
-            //Act
-            await Sut.SubscribeAsync(_id, _handler); 
-            await MockSignalRConnectionProxy.PublishMockConnectAsync(dto1);
-            await MockSignalRConnectionProxy.PublishMockConnectAsync(dto2);
-
-            //Assert 
-            Assert.That(_publishedDtos.Count, Is.EqualTo(1));
-            Assert.That(_publishedDtos[0], Is.EqualTo(dto1)); 
-            MockMyDtoCache.VerifySaveAsync(dto1, 1);
-            MockMyDtoCache.VerifySaveAsync(dto2, 0);
-        }
+         
         
         [Test]
         public async Task WHEN_connection_publishes_later_response_AND_subscription_is_disposed_SHOULD_not_update_subscribers()
@@ -102,10 +82,10 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
             var dto2 = new MyDto(_id);
             
             //Act
-            var disposable = await Sut.SubscribeAsync(_id, _handler); 
-            disposable.Value.Dispose();
-            await MockSignalRConnectionProxy.PublishMockConnectAsync(dto1);
-            await MockSignalRConnectionProxy.PublishMockConnectAsync(dto2);
+            var disposable = await Sut.SubscribeAsync(_handler); 
+            disposable.Dispose();
+            await MockSignalRConnectionProxy.MockPublishDtoAsync(dto1);
+            await MockSignalRConnectionProxy.MockPublishDtoAsync(dto2);
 
             //Assert 
             Assert.That(_publishedDtos.Count, Is.EqualTo(0)); 
