@@ -8,6 +8,6 @@ namespace Blauhaus.SignalR.Abstractions.Client
     {
         Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull;
         Task<Response> HandleVoidCommandAsync<TCommand>(TCommand command) where TCommand : notnull;
-        Task<Response<IDisposable>> ConnectAsync(Guid id, Func<TDto, Task> handler);
+        Task<Response<IDisposable>> SubscribeAsync(Guid id, Func<TDto, Task> handler);
     }
 }

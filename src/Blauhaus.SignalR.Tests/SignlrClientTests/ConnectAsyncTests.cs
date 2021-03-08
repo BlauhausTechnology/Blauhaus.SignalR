@@ -47,12 +47,12 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
             var otherId = Guid.NewGuid();
             
             //Act
-            await Sut.ConnectAsync(_id, _handler);
-            await Sut.ConnectAsync(_id, _handler);
-            await Sut.ConnectAsync(otherId, _handler);
+            await Sut.SubscribeAsync(_id, _handler);
+            await Sut.SubscribeAsync(_id, _handler);
+            await Sut.SubscribeAsync(otherId, _handler);
             
             //Assert 
-            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("SendMyDtoAsync", It.IsAny<Func<MyDto, Task>>()), Times.Once);
+            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("PublishMyDtoAsync", It.IsAny<Func<MyDto, Task>>()), Times.Once);
         }
         
         [Test]
@@ -63,7 +63,7 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
             var dto2 = new MyDto(_id);
             
             //Act
-            await Sut.ConnectAsync(_id, _handler); 
+            await Sut.SubscribeAsync(_id, _handler); 
             await MockSignalRConnectionProxy.PublishMockConnectAsync(dto1);
             await MockSignalRConnectionProxy.PublishMockConnectAsync(dto2);
 
@@ -83,7 +83,7 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
             var dto2 = new MyDto(Guid.NewGuid());
             
             //Act
-            await Sut.ConnectAsync(_id, _handler); 
+            await Sut.SubscribeAsync(_id, _handler); 
             await MockSignalRConnectionProxy.PublishMockConnectAsync(dto1);
             await MockSignalRConnectionProxy.PublishMockConnectAsync(dto2);
 
@@ -102,7 +102,7 @@ namespace Blauhaus.SignalR.Tests.SignlRClientTests
             var dto2 = new MyDto(_id);
             
             //Act
-            var disposable = await Sut.ConnectAsync(_id, _handler); 
+            var disposable = await Sut.SubscribeAsync(_id, _handler); 
             disposable.Value.Dispose();
             await MockSignalRConnectionProxy.PublishMockConnectAsync(dto1);
             await MockSignalRConnectionProxy.PublishMockConnectAsync(dto2);

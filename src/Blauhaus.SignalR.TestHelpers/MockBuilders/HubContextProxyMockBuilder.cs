@@ -7,9 +7,9 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
 {
     public class HubContextProxyMockBuilder : BaseMockBuilder<HubContextProxyMockBuilder, IHubContextProxy>
     {
-        public HubContextProxyMockBuilder Where_SendAsync_returns<TDto>(Response response)
+        public HubContextProxyMockBuilder Where_PublishDtoAsync_returns<TDto>(Response response)
         {
-            Mock.Setup(x => x.SendDtoAsync(It.IsAny<string>(), It.IsAny<TDto>()))
+            Mock.Setup(x => x.PublishDtoAsync(It.IsAny<string>(), It.IsAny<TDto>()))
                 .ReturnsAsync(response);
             return this;
         }

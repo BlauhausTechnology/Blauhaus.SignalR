@@ -102,7 +102,7 @@ namespace Blauhaus.SignalR.Client
             }
         }
         
-        public async Task<Response<IDisposable>> ConnectAsync(Guid id, Func<TDto, Task> handler)
+        public async Task<Response<IDisposable>> SubscribeAsync(Guid id, Func<TDto, Task> handler)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace Blauhaus.SignalR.Client
                 {
                     AnalyticsService.Trace(this, $"No connections yet for {typeof(TDto).Name}, subscribing for updates from connection");
 
-                    _connectToken  = Connection.Subscribe<TDto>($"Send{typeof(TDto).Name}Async", async dto =>
+                    _connectToken  = Connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}Async", async dto =>
                     {
                         if (dto.Id == id)
                         {
