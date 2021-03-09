@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Tests.Client.SignalRConnectionTests.Base;
+using Blauhaus.SignalR.Tests.Client.SignalRClientTests.Base;
 using Microsoft.AspNetCore.SignalR.Client;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.Client.SignalRConnectionTests
+namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
 {
-    public class SubscribeAsyncTests : BaseSignalRConnectionTest
+    public class SubscribeAsyncTests : BaseSignalRClientTest
     {
       
 

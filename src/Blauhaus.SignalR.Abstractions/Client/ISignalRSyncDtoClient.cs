@@ -5,7 +5,7 @@ using Blauhaus.Responses;
 
 namespace Blauhaus.SignalR.Abstractions.Client
 {
-    public interface ISignalRSyncClient<TDto> : ISignalRClient<TDto, Guid> 
+    public interface ISignalRSyncDtoClient<TDto> : ISignalRDtoClient<TDto> 
         where TDto : IClientEntity
     {
         

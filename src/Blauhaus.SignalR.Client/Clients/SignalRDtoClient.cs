@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
+using Blauhaus.ClientActors.Actors;
 using Blauhaus.Common.Abstractions;
 using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
@@ -14,7 +15,7 @@ using Blauhaus.SignalR.Client.Connection;
 namespace Blauhaus.SignalR.Client.Clients
 {
     
-    public class SignalRClient<TDto, TId> : BasePublisher, ISignalRClient<TDto, TId>
+    public class SignalRDtoClient<TDto, TId> : BaseActor, ISignalRDtoClient<TDto>
         where TDto : class, IHasId<TId>
     {
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
@@ -26,7 +27,7 @@ namespace Blauhaus.SignalR.Client.Clients
 
         private IDisposable? _connectToken;
 
-        public SignalRClient(
+        public SignalRDtoClient(
             IAnalyticsService analyticsService,
             IConnectivityService connectivityService,
             IDtoCache<TDto, TId> dtoCache,
@@ -37,31 +38,19 @@ namespace Blauhaus.SignalR.Client.Clients
             AnalyticsService = analyticsService;
             ConnectivityService = connectivityService;
         }
-
-        public void Connect()
+        
+        public Task InitializeAsync()
         {
-            _connectToken ??= Connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}Async", async dto =>
+            return InvokeAsync(() =>
             {
-                await DtoCache.SaveAsync(dto);
-                await UpdateSubscribersAsync(dto);
+                _connectToken ??= Connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}Async", async dto =>
+                {
+                    await DtoCache.SaveAsync(dto);
+                    await UpdateSubscribersAsync(dto);
+                });
             });
         }
-         
-        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler)
-        {
-            return base.SubscribeAsync(handler);
-        }
-        
-        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, TId id)
-        {
-            return base.SubscribeAsync(handler, LoadCurrent, x => Equals(x.Id, id));
-        }
-
-        private Task<TDto> LoadCurrent()
-        {
-            return Task.FromResult(default(TDto));
-        }
-
+           
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 
             if (!ConnectivityService.IsConnectedToInternet)
@@ -97,35 +86,7 @@ namespace Blauhaus.SignalR.Client.Clients
                 Locker.Release();
             }
         }
-        
-        public async Task<Response> HandleVoidCommandAsync<TCommand>(TCommand command) where TCommand : notnull
-        {
-            if (!ConnectivityService.IsConnectedToInternet)
-            {
-                AnalyticsService.TraceWarning(this, "SignalR hub could not be invoked because there is no internet connection");
-                return Response.Failure(SignalRErrors.NoInternet);
-            }
-            
-            await Locker.WaitAsync();
-            try
-            {
-                return await Connection.InvokeAsync<Response>($"HandleVoid{typeof(TCommand).Name}Async", command, AnalyticsService.AnalyticsOperationHeaders);
-
-            }
-            catch (ErrorException errorException)
-            {
-                return AnalyticsService.TraceErrorResponse(this, errorException.Error, command.ToObjectDictionary());
-            }
-            catch (Exception e)
-            {
-                return AnalyticsService.LogExceptionResponse(this, e, SignalRErrors.InvocationFailure(e));
-            }
-            finally
-            {
-                Locker.Release();
-            }
-        }
-        
+         
         
         protected Response<T> HandleException<T>(Exception e)
         {

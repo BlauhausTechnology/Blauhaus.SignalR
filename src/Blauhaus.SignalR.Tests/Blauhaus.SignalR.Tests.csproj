@@ -13,7 +13,7 @@
     <Compile Include=".TestObjects\MyDto.cs" />
     <Compile Include="Client\InMemoryDtoCacheTests\.Base\BaseInMemoryDtoCacheTest.cs" />
     <Compile Include="Client\InMemoryDtoCacheTests\.Base\TestInMemoryDtoCache.cs" />
-    <Compile Include="Client\SignalRConnectionTests\.Base\BaseSignalRConnectionTest.cs" />
+    <Compile Include="Client\SignalRClientTests\.Base\BaseSignalRClientTest.cs" />
   </ItemGroup>
 
   <ItemGroup>

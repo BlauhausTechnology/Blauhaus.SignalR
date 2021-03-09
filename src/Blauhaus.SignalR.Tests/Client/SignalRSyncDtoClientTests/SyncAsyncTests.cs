@@ -12,9 +12,9 @@ using Blauhaus.SignalR.Tests.TestObjects;
 using Moq;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.Client.SignalRSyncClientTests
+namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
 {
-    public class SyncAsyncTests : BaseSignalRClientTest<SignalRSyncClient<MyDto>>
+    public class SyncAsyncTests : BaseSignalRClientTest<SignalRSyncDtoClient<MyDto>>
     {
         
         private static List<MyDto> _publishedDtos = new();

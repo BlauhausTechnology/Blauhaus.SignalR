@@ -14,19 +14,19 @@ namespace Blauhaus.SignalR.Client.Ioc
     {
         
         //Client
-        public static IServiceCollection AddSignalRClient<TDto, TId>(this IServiceCollection services) 
+        public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services) 
             where TDto : class, IHasId<TId>
         {
-            services.AddSingleton<ISignalRClient<TDto, TId>, SignalRClient<TDto, TId>>();
+            services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddDtoCache<TDto, InMemoryDtoCache<TDto, TId>, TId>();
             return services;
         }
         
-        public static IServiceCollection AddSignalRClient<TDto, TDtoCache, TId>(this IServiceCollection services) 
+        public static IServiceCollection AddSignalRDtoClient<TDto, TDtoCache, TId>(this IServiceCollection services) 
             where TDtoCache : class, IDtoCache<TDto, TId> 
             where TDto : class, IHasId<TId>
         {
-            services.AddSingleton<ISignalRClient<TDto, TId>, SignalRClient<TDto, TId>>();
+            services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddDtoCache<TDto, TDtoCache, TId>();
             return services;
         }
@@ -46,7 +46,7 @@ namespace Blauhaus.SignalR.Client.Ioc
         {
             services.TryAddTransient<ISignalRClientConfig, TConfig>();
             services.TryAddSingleton<ISignalRConnectionProxy, SignalRConnectionProxy>();
-            services.TryAddSingleton<ISignalRConnection, SignalRConnection>();
+            services.TryAddSingleton<ISignalRClient, SignalRClient>();
 
             return services;
         }
@@ -58,7 +58,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             where TDtoCache : class, ISyncDtoCache<TDto>
             where TDto : class, IClientEntity
         {
-            services.AddSingleton<ISignalRSyncClient<TDto>, SignalRSyncClient<TDto>>();
+            services.AddSingleton<ISignalRSyncDtoClient<TDto>, SignalRSyncDtoClient<TDto>>();
             services.AddSyncDtoCache<TDto, TDtoCache>();
             return services;
         }

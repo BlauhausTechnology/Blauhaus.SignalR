@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Blauhaus.SignalR.Client.Connection
 {
-    public class SignalRConnection : BasePublisher, ISignalRConnection
+    public class SignalRClient : BasePublisher, ISignalRClient
     {
         private HubConnectionState _previousState;
         
@@ -19,7 +19,7 @@ namespace Blauhaus.SignalR.Client.Connection
         private readonly ISignalRConnectionProxy _connectionProxy;
         private readonly IConnectivityService _connectivityService;
 
-        public SignalRConnection(
+        public SignalRClient(
             IAnalyticsService analyticsService,
             ISignalRConnectionProxy connectionProxy,
             IConnectivityService connectivityService)
@@ -58,25 +58,6 @@ namespace Blauhaus.SignalR.Client.Connection
             catch (Exception e)
             {
                 return _analyticsService.LogExceptionResponse(this, e, SignalRErrors.InvocationFailure(e), 
-                    command.ToObjectDictionary("Command"));
-            }
-        }
-
-        public async Task<Response<TDto>> HandleAsync<TDto, TCommand>(TCommand command) where TCommand : notnull
-        {
-            if (!_connectivityService.IsConnectedToInternet)
-            {
-                _analyticsService.TraceWarning(this, "SignalR hub could not be invoked because there is no internet connection");
-                return Response.Failure<TDto>(SignalRErrors.NoInternet);
-            }
-
-            try
-            {
-                return await _connectionProxy.InvokeAsync<Response<TDto>>($"Handle{typeof(TCommand).Name}Async", command, _analyticsService.AnalyticsOperationHeaders);
-            }
-            catch (Exception e)
-            {
-                return _analyticsService.LogExceptionResponse<TDto>(this, e, SignalRErrors.InvocationFailure(e), 
                     command.ToObjectDictionary("Command"));
             }
         }

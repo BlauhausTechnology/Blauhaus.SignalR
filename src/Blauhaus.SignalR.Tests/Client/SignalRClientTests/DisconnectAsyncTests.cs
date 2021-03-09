@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Tests.Client.SignalRConnectionTests.Base;
+using Blauhaus.SignalR.Tests.Client.SignalRClientTests.Base;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.Client.SignalRConnectionTests
+namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
 {
-    public class DisconnectAsyncTests: BaseSignalRConnectionTest
+    public class DisconnectAsyncTests: BaseSignalRClientTest
     {
         [Test]
         public async Task SHOULD_stop_connection()
