@@ -26,6 +26,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             return services;
         }
         
+        
         public static IServiceCollection AddSignalRClient<TDto>(this IServiceCollection services) where TDto : IHasId<Guid>
         {
             services.AddSingleton<ISignalRClient<TDto>, SignalRClient<TDto>>();
