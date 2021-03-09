@@ -37,7 +37,6 @@ namespace Blauhaus.SignalR.Client.Ioc
             services.AddSingleton<IDtoCache<TDto, TId>, TDtoCache>();
             return services;
         }
-
         
         //Services
 
