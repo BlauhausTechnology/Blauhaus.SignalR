@@ -6,14 +6,13 @@ using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.Sync;
-using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Tests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Moq;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.SignalRSyncClientTests
+namespace Blauhaus.SignalR.Tests.Client.SignalRSyncClientTests
 {
     public class SyncAsyncTests : BaseSignalRClientTest<SignalRSyncClient<MyDto>>
     {

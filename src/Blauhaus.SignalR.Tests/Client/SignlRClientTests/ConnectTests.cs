@@ -7,7 +7,7 @@ using Blauhaus.SignalR.Tests.TestObjects;
 using Moq;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.SignlrClientTests
+namespace Blauhaus.SignalR.Tests.Client.SignlRClientTests
 {
     public class ConnectTests : BaseSignalRClientTest<SignalRClient<MyDto, Guid>>
     {

@@ -7,12 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DtoCaches\**" />
+    <EmbeddedResource Remove="DtoCaches\**" />
+    <None Remove="DtoCaches\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include=".Ioc\ISignalRClientConfig.cs" />
     <Compile Include=".Ioc\ServiceCollectionExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.4.8" />
+    <PackageReference Include="Blauhaus.ClientActors" Version="0.6.10" />
     <PackageReference Include="Blauhaus.Common.Utils" Version="1.9.8" />
     <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.9.8" />
     <PackageReference Include="Blauhaus.DeviceServices.Abstractions" Version="0.8.8" /> 
@@ -23,10 +30,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blauhaus.SignalR.Abstractions\Blauhaus.SignalR.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DtoCaches\" />
   </ItemGroup>
 
 </Project>

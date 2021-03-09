@@ -5,11 +5,11 @@ using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Tests.SignalRConnectionTests.Base;
+using Blauhaus.SignalR.Tests.Client.SignalRConnectionTests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.SignalRConnectionTests
+namespace Blauhaus.SignalR.Tests.Client.SignalRConnectionTests
 {
     [TestFixture]
     public class InvokeAsyncTests : BaseSignalRConnectionTest

@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Tests.SignalRConnectionTests.Base;
+using Blauhaus.SignalR.Tests.Client.SignalRConnectionTests.Base;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.SignalRConnectionTests
+namespace Blauhaus.SignalR.Tests.Client.SignalRConnectionTests
 {
     public class DisconnectAsyncTests: BaseSignalRConnectionTest
     {

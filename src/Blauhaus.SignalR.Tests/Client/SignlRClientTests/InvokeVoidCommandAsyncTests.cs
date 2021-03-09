@@ -5,15 +5,14 @@ using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Tests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.SignlrClientTests
+namespace Blauhaus.SignalR.Tests.Client.SignlRClientTests
 {
-    public class InvokeCommandAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto, Guid>>
+    public class InvokeVoidCommandAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto, Guid>>
     {
         private MyCommand _command;
         private IDictionary<string, string> _headers;
@@ -28,9 +27,9 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
             MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(new List<MyDto>()));
         }
         
-        private Task<Response<MyDto>> ExecuteAsync()
+        private Task<Response> ExecuteAsync()
         {
-            return Sut.HandleCommandAsync(_command);
+            return Sut.HandleVoidCommandAsync(_command);
         }
 
             [Test]
@@ -40,7 +39,7 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
                 await ExecuteAsync();
 
                 //Assert
-                MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<MyDto>>("HandleMyCommandAsync", _command, _headers));
+                MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response>("HandleVoidMyCommandAsync", _command, _headers));
             }
             
             [Test]
@@ -48,29 +47,15 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
             {
                 //Arrange
                 var dto = new MyDto();
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
+                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success());
 
                 //Act
                 var result = await ExecuteAsync();
 
                 //Assert
-                Assert.That(result.Value, Is.EqualTo(dto));
+                Assert.That(result.IsSuccess, Is.True);
             }
-            
-            [Test]
-            public async Task IF_hub_invocation_succeeds_SHOULD_update_dto_cache_with_dto()
-            {
-                //Arrange
-                var dto = new MyDto();
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
-
-                //Act
-                await ExecuteAsync();
-
-                //Assert
-                MockMyDtoCache.Mock.Verify(x => x.SaveAsync(dto));
-            }
-            
+              
 
             [Test]
             public async Task IF_device_is_disconnected_from_internet_SHOULD_return_Error()
@@ -91,7 +76,7 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
             {
                 //Arrange
                 var e = new Exception("Something bad happened");
-                MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<MyDto>>(e);
+                MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response>(e);
 
                 //Act
                 var result = await ExecuteAsync();
@@ -101,12 +86,13 @@ namespace Blauhaus.SignalR.Tests.SignlrClientTests
                 MockAnalyticsService.VerifyLogExceptionWithMessage("Something bad happened");
             } 
             
+            
             [Test]
             public async Task IF_connection_throws_error_exception_SHOULD_return_Error()
             {
                 //Arrange
                 var e = new ErrorException(Errors.Errors.Cancelled);
-                MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<MyDto>>(e);
+                MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response>(e);
 
                 //Act
                 var result = await ExecuteAsync();

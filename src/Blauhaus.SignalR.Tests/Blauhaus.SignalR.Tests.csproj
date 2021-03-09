@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -9,7 +9,11 @@
 
   <ItemGroup>
     <Compile Include=".Base\BaseSignalRClientTest.cs" />
-    <Compile Include="SignalRConnectionTests\.Base\BaseSignalRConnectionTest.cs" />
+    <Compile Include=".TestObjects\MyCommand.cs" />
+    <Compile Include=".TestObjects\MyDto.cs" />
+    <Compile Include="Client\InMemoryDtoCacheTests\.Base\BaseInMemoryDtoCacheTest.cs" />
+    <Compile Include="Client\InMemoryDtoCacheTests\.Base\TestInMemoryDtoCache.cs" />
+    <Compile Include="Client\SignalRConnectionTests\.Base\BaseSignalRConnectionTest.cs" />
   </ItemGroup>
 
   <ItemGroup>

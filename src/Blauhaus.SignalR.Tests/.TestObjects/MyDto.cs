@@ -10,6 +10,7 @@ namespace Blauhaus.SignalR.Tests.TestObjects
             Id = id ?? Guid.NewGuid();
         }
         public Guid Id { get; set; }
+        public string Name { get; set; }
         
         public EntityState EntityState { get; set; }
         public long ModifiedAtTicks { get; set;}
