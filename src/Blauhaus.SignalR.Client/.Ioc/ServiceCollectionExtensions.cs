@@ -5,7 +5,7 @@ using Blauhaus.SignalR.Abstractions.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Blauhaus.SignalR.Client._Ioc
+namespace Blauhaus.SignalR.Client.Ioc
 {
     public static class ServiceCollectionExtensions
     {
