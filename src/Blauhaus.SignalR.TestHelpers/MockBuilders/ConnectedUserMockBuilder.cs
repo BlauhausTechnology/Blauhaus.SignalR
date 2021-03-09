@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Blauhaus.Auth.Abstractions.User;
+using Blauhaus.Common.Utils.Extensions;
 using Blauhaus.SignalR.Abstractions.Auth;
 using Blauhaus.TestHelpers.MockBuilders;
 
@@ -11,12 +12,30 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
         public ConnectedUserMockBuilder()
         {
             With(x => x.EmailAddress, Guid.NewGuid() + "@freever.com");
-            With(x => x.UserId, Guid.NewGuid());
             With(x => x.Claims, new List<UserClaim>());
             With(x => x.CurrentConnectionId, Guid.NewGuid().ToString());
+            With(x => x.CurrentDeviceIdentifier, Guid.NewGuid().ToString());
             With(x => x.UserId, Guid.NewGuid());
         }
-
+        
+        public ConnectedUserMockBuilder With_UserId(Guid userId)
+        {
+            With(x => x.UserId, userId);
+            return this;
+        }
+        
+        public ConnectedUserMockBuilder With_DeviceIdentifier(string deviceIdentifier)
+        {
+            With(x => x.CurrentDeviceIdentifier, deviceIdentifier);
+            return this;
+        }
+        
+        public ConnectedUserMockBuilder With_ConnectionId(string connectionId)
+        {
+            With(x => x.CurrentConnectionId, connectionId);
+            return this;
+        }
+        
         public ConnectedUserMockBuilder With_Claim(UserClaim claim)
         {
             Mock.Setup(x => x.HasClaim(claim.Name)).Returns(true);

@@ -1,7 +1,8 @@
-﻿namespace Blauhaus.SignalR.Client._Ioc
+﻿namespace Blauhaus.SignalR.Client.Ioc
 {
     public interface ISignalRClientConfig
     {
         string HubUrl { get; }
+        bool IsAutoReconnectEnabled { get; }
     }
 }

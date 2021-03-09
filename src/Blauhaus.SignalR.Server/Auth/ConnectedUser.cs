@@ -21,9 +21,11 @@ namespace Blauhaus.SignalR.Server.Auth
 
             CurrentDeviceIdentifier = currentDeviceIdentifier.ThrowIfNullOrWhiteSpace<IConnectedUser>(x => x.CurrentDeviceIdentifier);
             CurrentConnectionId = currentConnectionId.ThrowIfNullOrWhiteSpace<IConnectedUser>(x => x.CurrentConnectionId);
-
+            
+            UniqueId = $"{UserId}|{CurrentDeviceIdentifier}";
         }
 
+        public string UniqueId { get; }
         public string CurrentDeviceIdentifier { get; }
         public string CurrentConnectionId { get; }
     }

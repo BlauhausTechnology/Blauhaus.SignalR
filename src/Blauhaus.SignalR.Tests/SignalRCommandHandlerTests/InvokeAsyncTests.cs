@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.Errors;
@@ -9,10 +8,9 @@ using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Tests._Base;
 using Blauhaus.SignalR.Tests.TestObjects;
-using Moq;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.SignalRClientTests
+namespace Blauhaus.SignalR.Tests.SignalRCommandHandlerTests
 {
     [TestFixture]
     public class InvokeAsyncTests : BaseSignalRClientTest<SignalRCommandHandler>
@@ -44,7 +42,7 @@ namespace Blauhaus.SignalR.Tests.SignalRClientTests
                 await ExecuteAsync();
 
                 //Assert
-                MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response>("HandleMyCommandAsync", _command, _headers, It.IsAny<CancellationToken>()));
+                MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response>("HandleMyCommandAsync", _command, _headers));
             }
 
             [Test]
@@ -117,7 +115,7 @@ namespace Blauhaus.SignalR.Tests.SignalRClientTests
                 await ExecuteAsync();
 
                 //Assert
-                MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<MyDto>>("HandleMyCommandAsync", _command, _headers, It.IsAny<CancellationToken>()));
+                MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<MyDto>>("HandleMyCommandAsync", _command, _headers));
             }
             
             [Test]

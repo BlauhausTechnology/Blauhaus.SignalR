@@ -1,13 +1,18 @@
 ﻿using System;
+using Blauhaus.Domain.Abstractions.Entities;
 
 namespace Blauhaus.SignalR.Tests.TestObjects
 {
-    public class MyDto
+    public class MyDto : ISyncClientEntity
     {
-        public MyDto()
+        public MyDto(Guid? id = null)
         {
-            Id = Guid.NewGuid().ToString();
+            Id = id ?? Guid.NewGuid();
         }
-        public string Id { get; set; }
+        public Guid Id { get; set; }
+        
+        public EntityState EntityState { get; set; }
+        public long ModifiedAtTicks { get; set;}
+        public SyncState SyncState { get; set; }
     }
 }

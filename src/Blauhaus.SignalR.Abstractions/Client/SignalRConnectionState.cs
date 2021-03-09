@@ -6,5 +6,7 @@
         Connected,
         Connecting,
         Reconnecting,
+        Reconnected,
+        Disconnecting
     }
 }
