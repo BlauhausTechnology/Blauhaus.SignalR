@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
+using Blauhaus.Common.Abstractions;
 using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Errors;
@@ -13,8 +14,8 @@ using Blauhaus.SignalR.Client.Connection;
 namespace Blauhaus.SignalR.Client.Clients
 {
     
-    public class SignalRClient<TDto> : BasePublisher, ISignalRClient<TDto>
-        where TDto : class
+    public class SignalRClient<TDto, TId> : BasePublisher, ISignalRClient<TDto, TId>
+        where TDto : class, IHasId<TId>
     {
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
         protected readonly ISignalRConnectionProxy Connection;
@@ -51,7 +52,16 @@ namespace Blauhaus.SignalR.Client.Clients
             return base.SubscribeAsync(handler);
         }
         
-        
+        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, TId id)
+        {
+            return base.SubscribeAsync(handler, LoadCurrent, x => Equals(x.Id, id));
+        }
+
+        private Task<TDto> LoadCurrent()
+        {
+            return Task.FromResult(default(TDto));
+        }
+
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 
             if (!ConnectivityService.IsConnectedToInternet)
