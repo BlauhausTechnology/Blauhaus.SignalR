@@ -46,7 +46,7 @@ namespace Blauhaus.SignalR.Client.Clients
             });
         }
          
-        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, Func<TDto, bool>? predicate = null)
+        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler)
         {
             return base.SubscribeAsync(handler);
         }

@@ -2,7 +2,6 @@
 using Blauhaus.Analytics.TestHelpers.MockBuilders;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.DeviceServices.TestHelpers.MockBuilders;
-using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.TestHelpers.Extensions;
 using Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches;
@@ -11,7 +10,7 @@ using Blauhaus.SignalR.Tests.TestObjects;
 using Blauhaus.TestHelpers.BaseTests;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests._Base
+namespace Blauhaus.SignalR.Tests.Base
 {
     public abstract class BaseSignalRClientTest<TSut> : BaseServiceTest<TSut> where TSut : class
     {

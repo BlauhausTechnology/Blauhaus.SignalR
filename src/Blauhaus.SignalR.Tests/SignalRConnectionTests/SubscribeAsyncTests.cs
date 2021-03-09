@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client;
-using Blauhaus.SignalR.Tests._Base;
 using Blauhaus.SignalR.Tests.SignalRConnectionTests.Base;
 using Microsoft.AspNetCore.SignalR.Client;
 using NUnit.Framework;

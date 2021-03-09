@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Blauhaus.Analytics.TestHelpers.Extensions;
-using Blauhaus.Errors;
-using Blauhaus.Responses;
-using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Abstractions.Sync;
-using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Client.Clients;
-using Blauhaus.SignalR.Tests._Base;
+using Blauhaus.SignalR.Tests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Moq;
 using NUnit.Framework;
 
-namespace Blauhaus.SignalR.Tests.SignlRClientTests
+namespace Blauhaus.SignalR.Tests.SignlrClientTests
 {
     public class ConnectTests : BaseSignalRClientTest<SignalRClient<MyDto>>
     {

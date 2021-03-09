@@ -8,7 +8,7 @@ using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.Sync;
 using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Client.Clients;
-using Blauhaus.SignalR.Tests._Base;
+using Blauhaus.SignalR.Tests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Moq;
 using NUnit.Framework;
