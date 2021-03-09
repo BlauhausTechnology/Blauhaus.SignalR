@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Blauhaus.SignalR.Client
+namespace Blauhaus.SignalR.Client.Connection
 {
     public interface ISignalRConnectionProxy
     {

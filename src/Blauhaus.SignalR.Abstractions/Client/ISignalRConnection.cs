@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Blauhaus.Common.Utils.Contracts;
+using Blauhaus.Common.Abstractions;
 
 namespace Blauhaus.SignalR.Abstractions.Client
 {

@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
-using Blauhaus.Common.Utils.Contracts;
 using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
-using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Client.Connection;
 
-namespace Blauhaus.SignalR.Client
+namespace Blauhaus.SignalR.Client.Clients
 {
     
-    public class SignalRClient<TDto> : BasePublisher, ISignalRClient<TDto> 
+    public class SignalRClient<TDto> : BasePublisher, ISignalRClient<TDto>
+        where TDto : class
     {
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
         protected readonly ISignalRConnectionProxy Connection;
@@ -47,10 +46,11 @@ namespace Blauhaus.SignalR.Client
             });
         }
          
-        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler)
+        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, Func<TDto, bool>? predicate = null)
         {
             return base.SubscribeAsync(handler);
         }
+        
         
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 

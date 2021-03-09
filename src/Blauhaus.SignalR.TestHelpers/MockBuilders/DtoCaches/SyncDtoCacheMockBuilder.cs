@@ -7,7 +7,7 @@ using Moq;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
 {
-    public class SyncDtoCacheMockBuilder<TDto> : BaseDtoCacheMockBuilder<SyncDtoCacheMockBuilder<TDto>,ISyncDtoCache<TDto>,TDto> where TDto : IClientEntity
+    public class SyncDtoCacheMockBuilder<TDto> : BaseDtoCacheMockBuilder<SyncDtoCacheMockBuilder<TDto>,ISyncDtoCache<TDto>,TDto> where TDto : class, IClientEntity
     {
 
         public SyncDtoCacheMockBuilder()

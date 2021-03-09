@@ -6,6 +6,7 @@ using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client;
+using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Tests._Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using NUnit.Framework;

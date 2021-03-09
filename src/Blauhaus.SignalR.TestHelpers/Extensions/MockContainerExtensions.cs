@@ -9,12 +9,12 @@ namespace Blauhaus.SignalR.TestHelpers.Extensions
 {
     public static class MockContainerExtensions
     {
-        public static Func<DtoCacheMockBuilder<TDto>> AddMockDtoCache<TDto>(this MockContainer mocks)
+        public static Func<DtoCacheMockBuilder<TDto>> AddMockDtoCache<TDto>(this MockContainer mocks) where TDto : class
         {
             return mocks.AddMock<DtoCacheMockBuilder<TDto>, IDtoCache<TDto>>();
         }
         
-        public static Func<SyncDtoCacheMockBuilder<TDto>> AddMockSyncDtoCache<TDto>(this MockContainer mocks) where TDto : IClientEntity
+        public static Func<SyncDtoCacheMockBuilder<TDto>> AddMockSyncDtoCache<TDto>(this MockContainer mocks) where TDto : class, IClientEntity
         {
             return mocks.AddMock<SyncDtoCacheMockBuilder<TDto>, ISyncDtoCache<TDto>>();
         }

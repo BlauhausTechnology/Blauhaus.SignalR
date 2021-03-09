@@ -1,4 +1,5 @@
-﻿using Blauhaus.SignalR.Abstractions.Client;
+﻿using Blauhaus.Common.TestHelpers.MockBuilders;
+using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.TestHelpers.MockBuilders;
 
 namespace Blauhaus.SignalR.TestHelpers

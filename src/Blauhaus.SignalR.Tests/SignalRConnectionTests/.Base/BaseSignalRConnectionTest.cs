@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client;
+using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.Tests._Base;
 
 namespace Blauhaus.SignalR.Tests.SignalRConnectionTests.Base

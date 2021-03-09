@@ -7,7 +7,7 @@ using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Extensions;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Blauhaus.SignalR.Client
+namespace Blauhaus.SignalR.Client.Connection
 {
     public class SignalRConnection : BasePublisher, ISignalRConnection
     {
@@ -26,7 +26,7 @@ namespace Blauhaus.SignalR.Client
             _connectionProxy.StateChanged += OnHubStateChanged;
         }
         
-        public Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler)
+        public Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler, Func<SignalRConnectionState, bool>? predicate = null)
         {
             return SubscribeAsync(handler, () => Task.FromResult(_connectionProxy.CurrentState.ToConnectionState(_previousState)));
         }
@@ -68,5 +68,7 @@ namespace Blauhaus.SignalR.Client
 
             _previousState = eventArgs.State;
         }
+
+        
     }
 }

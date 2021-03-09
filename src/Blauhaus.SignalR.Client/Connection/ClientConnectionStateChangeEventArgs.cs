@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Blauhaus.SignalR.Client
+namespace Blauhaus.SignalR.Client.Connection
 {
     public class ClientConnectionStateChangeEventArgs : EventArgs
     {

@@ -7,6 +7,7 @@ using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.Sync;
 using Blauhaus.SignalR.Client;
+using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Tests._Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Moq;
