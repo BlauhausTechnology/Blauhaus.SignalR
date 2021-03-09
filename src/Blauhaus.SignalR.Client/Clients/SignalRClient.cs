@@ -20,7 +20,7 @@ namespace Blauhaus.SignalR.Client.Clients
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
         protected readonly ISignalRConnectionProxy Connection;
         
-        protected readonly IDtoCache<TDto> DtoCache;
+        protected readonly IDtoCache<TDto, TId> DtoCache;
         protected readonly IAnalyticsService AnalyticsService;
         protected readonly IConnectivityService ConnectivityService;
 
@@ -29,7 +29,7 @@ namespace Blauhaus.SignalR.Client.Clients
         public SignalRClient(
             IAnalyticsService analyticsService,
             IConnectivityService connectivityService,
-            IDtoCache<TDto> dtoCache,
+            IDtoCache<TDto, TId> dtoCache,
             ISignalRConnectionProxy connection)
         {
             DtoCache = dtoCache;

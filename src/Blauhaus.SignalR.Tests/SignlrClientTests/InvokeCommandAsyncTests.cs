@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.SignlrClientTests
 {
-    public class InvokeCommandAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto>>
+    public class InvokeCommandAsyncTests : BaseSignalRClientTest<SignalRClient<MyDto, Guid>>
     {
         private MyCommand _command;
         private IDictionary<string, string> _headers;

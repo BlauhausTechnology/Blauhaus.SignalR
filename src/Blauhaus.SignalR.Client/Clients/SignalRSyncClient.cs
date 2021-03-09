@@ -10,7 +10,7 @@ using Blauhaus.SignalR.Client.Connection;
 
 namespace Blauhaus.SignalR.Client.Clients
 {
-    public class SignalRSyncClient<TDto> : SignalRClient<TDto>, ISignalRSyncClient<TDto> where TDto : class, IClientEntity
+    public class SignalRSyncClient<TDto> : SignalRClient<TDto, Guid>, ISignalRSyncClient<TDto> where TDto : class, IClientEntity
     {
         private IDisposable? _syncToken;
 

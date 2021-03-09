@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Blauhaus.SignalR.Abstractions\Blauhaus.SignalR.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DtoCaches\" />
+  </ItemGroup>
+
 </Project>

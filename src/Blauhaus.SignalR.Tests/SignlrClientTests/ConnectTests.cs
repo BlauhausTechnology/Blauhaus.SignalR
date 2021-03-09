@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.SignlrClientTests
 {
-    public class ConnectTests : BaseSignalRClientTest<SignalRClient<MyDto>>
+    public class ConnectTests : BaseSignalRClientTest<SignalRClient<MyDto, Guid>>
     {
         
         private static List<MyDto> _publishedDtos = new();

@@ -2,7 +2,7 @@
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
 {
-    public class SignalRClientMockBuilder<TDto> : BaseSignalRClientMockBuilder<SignalRClientMockBuilder<TDto>, ISignalRClient<TDto>, TDto> where TDto : class
+    public class SignalRClientMockBuilder<TDto, TId> : BaseSignalRClientMockBuilder<SignalRClientMockBuilder<TDto, TId>, ISignalRClient<TDto, TId>, TDto, TId> where TDto : class
     {
         
     }
