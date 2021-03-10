@@ -20,9 +20,9 @@ namespace Blauhaus.SignalR.TestHelpers.Extensions
             return mocks.AddMock<SyncDtoCacheMockBuilder<TDto>, ISyncDtoCache<TDto>>();
         }
         
-        public static Func<SignalRDtoClientMockBuilder<TDto, TId>> AddMockSignalRClient<TDto, TId>(this MockContainer mocks) where TDto : class
+        public static Func<SignalRDtoClientMockBuilder<TDto>> AddMockSignalRDtoClient<TDto>(this MockContainer mocks) where TDto : class
         {
-            return mocks.AddMock<SignalRDtoClientMockBuilder<TDto, TId>, ISignalRDtoClient<TDto>>();
+            return mocks.AddMock<SignalRDtoClientMockBuilder<TDto>, ISignalRDtoClient<TDto>>();
         }
         
         public static Func<SignalRDtoSyncClientMockBuilder<TDto>> AddMockSignalRSyncClient<TDto>(this MockContainer mocks) where TDto : class, IClientEntity

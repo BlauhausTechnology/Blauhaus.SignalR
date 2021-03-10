@@ -9,7 +9,7 @@ using Moq;
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
 {
 
-    public class SignalRDtoSyncClientMockBuilder<TDto> : BaseSignalRDtoClientMockBuilder<SignalRDtoSyncClientMockBuilder<TDto>, ISignalRSyncDtoClient<TDto>, TDto, Guid> 
+    public class SignalRDtoSyncClientMockBuilder<TDto> : BaseSignalRDtoClientMockBuilder<SignalRDtoSyncClientMockBuilder<TDto>, ISignalRSyncDtoClient<TDto>, TDto> 
         where TDto : class, IClientEntity
     {
         private readonly List<Func<TDto, Task>> _handlers = new List<Func<TDto, Task>>();
