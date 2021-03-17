@@ -19,9 +19,9 @@
 
   <ItemGroup>
     <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.4.8" />
-    <PackageReference Include="Blauhaus.ClientActors" Version="0.6.11" />
-    <PackageReference Include="Blauhaus.Common.Utils" Version="1.9.10" />
-    <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.9.10" />
+    <PackageReference Include="Blauhaus.ClientActors" Version="0.6.16" />
+    <PackageReference Include="Blauhaus.Common.Utils" Version="1.9.12" />
+    <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.9.12" />
     <PackageReference Include="Blauhaus.DeviceServices.Abstractions" Version="0.8.8" /> 
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.4" /> 
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" /> 

@@ -24,7 +24,7 @@ namespace Blauhaus.SignalR.Client.DtoCache
         
         public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, TId id)
         {
-            return SubscribeAsync(handler, x => Equals(x.Id, id));
+            return AddFilteredSubscriberAsync(handler, x => Equals(x.Id, id));
         }
 
         public Task<TDto?> GetOneAsync(TId id)
