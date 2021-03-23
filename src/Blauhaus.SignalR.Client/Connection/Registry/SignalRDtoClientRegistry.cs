@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Blauhaus.SignalR.Abstractions.Client;
 
 namespace Blauhaus.SignalR.Client.Connection.Registry
 {
     public class SignalRDtoClientRegistry : ISignalRDtoClientRegistry
     {
-        private readonly List<Func<Task>> _initializationTasks = new List<Func<Task>>();
+        private readonly IEnumerable<ISignalRDtoClient> _clients;
 
-        internal void AddDtoClient(Func<Task> initializationFunc)
+        public SignalRDtoClientRegistry(IEnumerable<ISignalRDtoClient> clients)
         {
-            _initializationTasks.Add(initializationFunc);
+            _clients = clients;
         }
-        
         
         public Task InitializeAllClientsAsync()
         {
             var tasks = new List<Task>();
-            foreach (var initializationTask in _initializationTasks)
+            foreach (var initializationTask in _clients)
             {
-                tasks.Add(initializationTask.Invoke());
+                tasks.Add(initializationTask.InitializeAsync());
             }
             return Task.WhenAll(tasks);
         }

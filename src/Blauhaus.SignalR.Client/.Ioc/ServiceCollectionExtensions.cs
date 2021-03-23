@@ -16,14 +16,12 @@ namespace Blauhaus.SignalR.Client.Ioc
     {
 
 
-        private static readonly SignalRDtoClientRegistry SignalRDtoClientRegistry = new SignalRDtoClientRegistry();
-        
         //Client
         public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services) 
             where TDto : class, IHasId<TId>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
-            SignalRDtoClientRegistry.AddDtoClient(async ()=> await services.BuildServiceProvider().GetRequiredService<ISignalRDtoClient<TDto>>().InitializeAsync());
+            services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
             services.AddDtoCache<TDto, InMemoryDtoCache<TDto, TId>, TId>();
             return services;
         }
@@ -33,7 +31,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             where TDto : class, IHasId<TId>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
-            SignalRDtoClientRegistry.AddDtoClient(async ()=> await services.BuildServiceProvider().GetRequiredService<ISignalRDtoClient<TDto>>().InitializeAsync());
+            services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
             services.AddDtoCache<TDto, TDtoCache, TId>();
             return services;
         }
@@ -53,7 +51,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             services.TryAddTransient<ISignalRClientConfig, TConfig>();
             services.TryAddSingleton<ISignalRConnectionProxy, SignalRConnectionProxy>();
             services.TryAddSingleton<ISignalRClient, SignalRClient>();
-            services.TryAddSingleton<ISignalRDtoClientRegistry>(sp => SignalRDtoClientRegistry);
+            services.TryAddSingleton<ISignalRDtoClientRegistry, SignalRDtoClientRegistry>();
 
             return services;
         }
