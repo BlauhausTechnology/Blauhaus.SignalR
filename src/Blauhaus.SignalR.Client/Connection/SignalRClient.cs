@@ -17,15 +17,18 @@ namespace Blauhaus.SignalR.Client.Connection
         
         private readonly IAnalyticsService _analyticsService;
         private readonly ISignalRConnectionProxy _connectionProxy;
+        private readonly ISignalRDtoClientRegistry _signalRDtoClientRegistry;
         private readonly IConnectivityService _connectivityService;
 
         public SignalRClient(
             IAnalyticsService analyticsService,
             ISignalRConnectionProxy connectionProxy,
+            ISignalRDtoClientRegistry signalRDtoClientRegistry,
             IConnectivityService connectivityService)
         {
             _analyticsService = analyticsService;
             _connectionProxy = connectionProxy;
+            _signalRDtoClientRegistry = signalRDtoClientRegistry;
             _connectivityService = connectivityService;
 
             _connectionProxy.StateChanged += OnHubStateChanged;
@@ -33,7 +36,7 @@ namespace Blauhaus.SignalR.Client.Connection
         
         public Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler)
         {
-            return SubscribeAsync(handler, () => Task.FromResult(_connectionProxy.CurrentState.ToConnectionState(_previousState)));
+            return AddSubscribeAsync(handler, () => Task.FromResult(_connectionProxy.CurrentState.ToConnectionState(_previousState)));
         }
 
         public async Task DisconnectAsync()
@@ -42,6 +45,11 @@ namespace Blauhaus.SignalR.Client.Connection
             await UpdateSubscribersAsync(SignalRConnectionState.Disconnecting);
             await _connectionProxy.StopAsync();
             await UpdateSubscribersAsync(SignalRConnectionState.Disconnected);
+        }
+
+        public Task InitializeAllClientsAsync()
+        {
+            return _signalRDtoClientRegistry.InitializeAllClientsAsync();
         }
 
         public async Task<Response> HandleAsync<TCommand>(TCommand command) where TCommand : notnull

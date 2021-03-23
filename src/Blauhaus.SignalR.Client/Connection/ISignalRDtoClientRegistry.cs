@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Blauhaus.SignalR.Client.ClientRegistry
+namespace Blauhaus.SignalR.Abstractions.Client
 {
     public interface ISignalRDtoClientRegistry
     {

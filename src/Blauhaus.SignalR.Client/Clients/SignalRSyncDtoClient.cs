@@ -33,7 +33,7 @@ namespace Blauhaus.SignalR.Client.Clients
 
             try
             {
-                var token = await SubscribeAsync(handler);
+                var token = await AddSubscribeAsync(handler);
 
                 if (_syncToken == null)
                 {

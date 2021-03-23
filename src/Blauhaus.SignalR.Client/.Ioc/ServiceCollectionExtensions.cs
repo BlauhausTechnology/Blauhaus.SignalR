@@ -2,7 +2,6 @@
 using Blauhaus.Common.Abstractions;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Client.ClientRegistry;
 using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.Client.DtoCache;

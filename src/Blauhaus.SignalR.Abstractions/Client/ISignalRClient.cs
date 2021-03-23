@@ -6,8 +6,9 @@ namespace Blauhaus.SignalR.Abstractions.Client
 {
     public interface ISignalRClient : IAsyncPublisher<SignalRConnectionState>
     {
-        Task DisconnectAsync();
-        
+        Task InitializeAllClientsAsync();
         Task<Response> HandleAsync<TCommand>(TCommand command) where TCommand : notnull;
+        Task DisconnectAsync();
+
     }
 }

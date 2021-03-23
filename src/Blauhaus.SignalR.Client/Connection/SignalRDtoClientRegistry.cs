@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Blauhaus.SignalR.Client.ClientRegistry;
+using Blauhaus.SignalR.Abstractions.Client;
 
-namespace Blauhaus.SignalR.Client.Clients
+namespace Blauhaus.SignalR.Client.Connection
 {
     public class SignalRDtoClientRegistry : ISignalRDtoClientRegistry
     {

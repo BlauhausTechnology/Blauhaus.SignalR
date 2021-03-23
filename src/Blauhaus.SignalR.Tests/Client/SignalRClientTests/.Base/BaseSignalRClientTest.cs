@@ -4,13 +4,15 @@ using System.Threading.Tasks;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.Tests.Base;
+using Blauhaus.TestHelpers.MockBuilders;
 
 namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests.Base
 {
     public abstract class BaseSignalRClientTest : BaseSignalRClientTest<SignalRClient>
     {
-        protected List<SignalRConnectionState> StateChanges;
-        protected Func<SignalRConnectionState, Task> Handler;
+        protected List<SignalRConnectionState> StateChanges = null!;
+        protected Func<SignalRConnectionState, Task> Handler = null!;
+        protected MockBuilder<ISignalRDtoClientRegistry> SignalRClientRegistry = null!;
 
         public override void Setup()
         {
@@ -22,6 +24,9 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests.Base
                 StateChanges.Add(connectionState);
                 return Task.CompletedTask;
             };
+            SignalRClientRegistry = new MockBuilder<ISignalRDtoClientRegistry>();
+            
+            AddService(x => SignalRClientRegistry.Object);
         }
 
     }
