@@ -51,6 +51,7 @@ namespace Blauhaus.SignalR.Client.Clients
                 });
             });
         }
+         
            
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 
@@ -98,6 +99,5 @@ namespace Blauhaus.SignalR.Client.Clients
 
             return AnalyticsService.LogExceptionResponse<T>(this, e, SignalRErrors.InvocationFailure(e));
         }
-
     }
 }

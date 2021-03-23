@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Blauhaus.Common.Abstractions;
+using Blauhaus.Common.TestHelpers.MockBuilders;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.TestHelpers.MockBuilders;
 using Moq;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
 {
-    public abstract class BaseDtoCacheMockBuilder<TBuilder, TMock, TDto, TId> : BaseMockBuilder<TBuilder, TMock>
+    public abstract class BaseDtoCacheMockBuilder<TBuilder, TMock, TDto, TId> : BaseAsyncIdPublisherMockBuilder<TBuilder, TMock, TDto, TId>
         where TBuilder : BaseDtoCacheMockBuilder<TBuilder, TMock, TDto, TId> 
         where TMock : class, IDtoCache<TDto, TId>
         where TDto : class, IHasId<TId>

@@ -12,7 +12,7 @@ using Moq;
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
 {
     
-    public abstract class BaseSignalRDtoClientMockBuilder<TBuilder, TMock, TDto> : BaseMockBuilder<TBuilder, TMock>
+    public abstract class BaseSignalRDtoClientMockBuilder<TBuilder, TMock, TDto> : BaseAsyncPublisherMockBuilder<TBuilder, TMock, TDto>
         where TBuilder : BaseSignalRDtoClientMockBuilder<TBuilder, TMock, TDto> 
         where TDto : class
         where TMock : class, ISignalRDtoClient<TDto>
