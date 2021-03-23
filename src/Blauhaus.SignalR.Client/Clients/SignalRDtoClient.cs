@@ -47,6 +47,8 @@ namespace Blauhaus.SignalR.Client.Clients
                 _connectToken ??= Connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}Async", async dto =>
                 {
                     await DtoCache.SaveAsync(dto);
+                   AnalyticsService.Trace(this, $"Received {typeof(TDto).Name}");
+                    //todo this doesnt make sense since this is not a publisher...?
                     await UpdateSubscribersAsync(dto);
                 });
             });
