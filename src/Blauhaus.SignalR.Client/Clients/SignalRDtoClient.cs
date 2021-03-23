@@ -48,6 +48,7 @@ namespace Blauhaus.SignalR.Client.Clients
                     await DtoCache.SaveAsync(dto);
                     await UpdateSubscribersAsync(dto);
                 });
+                AnalyticsService.Trace(this, $"{typeof(TDto).Name}SyncClient initialized");
             });
         }
            
