@@ -9,7 +9,7 @@ using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
 using Blauhaus.SignalR.Client.Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Blauhaus.SignalR.Client.Connection
+namespace Blauhaus.SignalR.Client.Connection.Proxy
 {
     public class SignalRConnectionProxy : ISignalRConnectionProxy
     {

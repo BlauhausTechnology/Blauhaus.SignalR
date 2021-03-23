@@ -6,6 +6,8 @@ using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Client.Connection.Proxy;
+using Blauhaus.SignalR.Client.Connection.Registry;
 using Blauhaus.SignalR.Client.Extensions;
 using Microsoft.AspNetCore.SignalR.Client;
 

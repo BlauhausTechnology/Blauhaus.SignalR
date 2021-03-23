@@ -7,6 +7,7 @@ using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.Sync;
 using Blauhaus.SignalR.Client.Connection;
+using Blauhaus.SignalR.Client.Connection.Proxy;
 
 namespace Blauhaus.SignalR.Client.Clients
 {

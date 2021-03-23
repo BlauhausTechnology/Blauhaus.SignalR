@@ -11,6 +11,7 @@ using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Connection;
+using Blauhaus.SignalR.Client.Connection.Proxy;
 
 namespace Blauhaus.SignalR.Client.Clients
 {
