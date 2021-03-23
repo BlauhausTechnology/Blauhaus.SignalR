@@ -16,6 +16,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
             With(x => x.CurrentConnectionId, Guid.NewGuid().ToString());
             With(x => x.CurrentDeviceIdentifier, Guid.NewGuid().ToString());
             With(x => x.UserId, Guid.NewGuid());
+            Mock.Setup(x => x.UniqueId).Returns(() => $"{Mock.Object.UserId}|{Mock.Object.CurrentDeviceIdentifier}");
         }
         
         public ConnectedUserMockBuilder With_UserId(Guid userId)
