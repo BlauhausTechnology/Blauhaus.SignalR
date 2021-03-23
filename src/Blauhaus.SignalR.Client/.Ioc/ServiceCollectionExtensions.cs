@@ -4,6 +4,8 @@ using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Client.Connection;
+using Blauhaus.SignalR.Client.Connection.Proxy;
+using Blauhaus.SignalR.Client.Connection.Registry;
 using Blauhaus.SignalR.Client.DtoCache;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -21,7 +23,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             where TDto : class, IHasId<TId>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
-            SignalRDtoClientRegistry.AddDtoClient(services.BuildServiceProvider().GetRequiredService<ISignalRDtoClient<TDto>>().InitializeAsync());
+            SignalRDtoClientRegistry.AddDtoClient(async ()=> await services.BuildServiceProvider().GetRequiredService<ISignalRDtoClient<TDto>>().InitializeAsync());
             services.AddDtoCache<TDto, InMemoryDtoCache<TDto, TId>, TId>();
             return services;
         }
@@ -31,7 +33,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             where TDto : class, IHasId<TId>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
-            SignalRDtoClientRegistry.AddDtoClient(services.BuildServiceProvider().GetRequiredService<ISignalRDtoClient<TDto>>().InitializeAsync());
+            SignalRDtoClientRegistry.AddDtoClient(async ()=> await services.BuildServiceProvider().GetRequiredService<ISignalRDtoClient<TDto>>().InitializeAsync());
             services.AddDtoCache<TDto, TDtoCache, TId>();
             return services;
         }
