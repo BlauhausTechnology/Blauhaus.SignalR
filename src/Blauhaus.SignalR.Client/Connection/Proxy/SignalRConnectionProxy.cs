@@ -100,7 +100,6 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             _analyticsService.Debug($"Subscription added for {methodName} returning {typeof(TDto).Name}");
             return _hub.On<TDto>(methodName, async dto =>
             {
-                _analyticsService.Debug($"SignalR Connection Prxy received {typeof(TDto).Name} from {methodName}");
                 await handler.Invoke(dto);
             });
         }
