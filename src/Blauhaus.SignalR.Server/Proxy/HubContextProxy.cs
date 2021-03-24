@@ -25,10 +25,10 @@ namespace Blauhaus.SignalR.Server.Proxy
         {
             try
             {
-                _analyticsService.Debug($"Publishing {typeof(TDto).Name} to user with connection Id {connectiondId}");
+                var methodName = $"Publish{typeof(TDto).Name}Async";
+                _analyticsService.Debug($"Publishing {typeof(TDto).Name} to user with connection Id {connectiondId} as {methodName}");
                 
-                await _hubContext.Clients.Client(connectiondId)
-                    .SendAsync($"Publish{typeof(TDto).Name}Async", dto);
+                await _hubContext.Clients.Client(connectiondId).SendAsync(methodName, dto);
             }
             catch (Exception e)
             {

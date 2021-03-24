@@ -44,7 +44,8 @@ namespace Blauhaus.SignalR.Client.Clients
         {
             return InvokeAsync(() =>
             {
-                _connectToken ??= Connection.Subscribe<TDto>($"Publish{typeof(TDto).Name}Async", async dto =>
+                var methodName = $"Publish{typeof(TDto).Name}Async";
+                _connectToken ??= Connection.Subscribe<TDto>(methodName, async dto =>
                 {
                     await DtoCache.SaveAsync(dto);
                    AnalyticsService.Debug($"Received {typeof(TDto).Name}");
@@ -53,8 +54,7 @@ namespace Blauhaus.SignalR.Client.Clients
                     await UpdateSubscribersAsync(dto);
                 });
                 
-                
-                AnalyticsService.Debug($"Initialized SignalR Dto Client for {typeof(TDto).Name}");
+                AnalyticsService.Debug($"Initialized SignalR Dto Client for {typeof(TDto).Name} as {methodName}");
             });
         }
          
