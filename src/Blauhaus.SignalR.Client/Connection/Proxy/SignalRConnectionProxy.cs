@@ -97,8 +97,10 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
 
         public IDisposable Subscribe<TDto>(string methodName, Func<TDto, Task> handler)
         {
+            _analyticsService.Debug($"Subscription added for {methodName} returning {typeof(TDto).Name}");
             return _hub.On<TDto>(methodName, async dto =>
             {
+                _analyticsService.Debug($"SignalR Connection Prxy received {typeof(TDto).Name} from {methodName}");
                 await handler.Invoke(dto);
             });
         }
@@ -129,6 +131,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         public Task StopAsync() => _hub.StopAsync(CancellationToken.None);
         public ValueTask DisposeAsync()
         {
+            _analyticsService.Trace(this, "SignalR connection disposing...");
             _hub.Reconnecting -= OnReconnecting;
             _hub.Reconnected -= OnReconnected;
             _hub.Closed -= OnClosed;
