@@ -52,6 +52,9 @@ namespace Blauhaus.SignalR.Client.Clients
                     //todo this doesnt make sense since this is not a publisher...?
                     await UpdateSubscribersAsync(dto);
                 });
+                
+                
+                AnalyticsService.Debug($"Initialized SignalR Dto Client for {typeof(TDto).Name}");
             });
         }
          
