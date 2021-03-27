@@ -36,11 +36,12 @@ namespace Blauhaus.SignalR.Client.Connection
             _connectionProxy.StateChanged += OnHubStateChanged;
         }
         
-        public Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler)
-        {
-            return AddSubscribeAsync(handler, () => Task.FromResult(_connectionProxy.CurrentState.ToConnectionState(_previousState)));
-        }
 
+        public Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler, Func<SignalRConnectionState, bool>? filter = null)
+        {
+            return Task.FromResult(AddSubscriber(handler, filter));
+        }
+        
         public async Task DisconnectAsync()
         {
             _analyticsService.Trace(this, "SignalR connection disconnecting on request");
@@ -102,6 +103,5 @@ namespace Blauhaus.SignalR.Client.Connection
             _previousState = eventArgs.State;
         }
 
-        
     }
 }

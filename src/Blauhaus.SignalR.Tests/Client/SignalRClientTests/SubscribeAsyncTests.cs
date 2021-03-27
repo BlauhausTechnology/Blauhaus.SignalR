@@ -24,7 +24,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             
             //Assert
             MockAnalyticsService.VerifyTrace($"SignalR client hub Reconnecting due to exception: {exception.Message}", LogSeverity.Warning);
-            Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Reconnecting));
+            Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Reconnecting));
         }
         
         [Test]
@@ -39,7 +39,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             
             //Assert
             MockAnalyticsService.VerifyTrace($"SignalR client hub Disconnected due to exception: {exception.Message}", LogSeverity.Warning);
-            Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Disconnected));
+            Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Disconnected));
         }
         
         [Test]
@@ -53,7 +53,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             
             //Assert
             MockAnalyticsService.VerifyTrace($"SignalR client hub Disconnected");
-            Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Disconnected));
+            Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Disconnected));
         }
         
         [Test]
@@ -68,7 +68,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             
             //Assert
             MockAnalyticsService.VerifyTrace($"SignalR client hub Connected");
-            Assert.That(StateChanges[2], Is.EqualTo(SignalRConnectionState.Connected));
+            Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Connected));
         }
         
         
@@ -84,7 +84,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             
             //Assert
             MockAnalyticsService.VerifyTrace($"SignalR client hub Reconnected");
-            Assert.That(StateChanges[2], Is.EqualTo(SignalRConnectionState.Reconnected));
+            Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Reconnected));
         }
     }
 }

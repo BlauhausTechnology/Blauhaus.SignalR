@@ -9,7 +9,7 @@ using Moq;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
 {
-    public abstract class BaseDtoCacheMockBuilder<TBuilder, TMock, TDto, TId> : BaseAsyncIdPublisherMockBuilder<TBuilder, TMock, TDto, TId>
+    public abstract class BaseDtoCacheMockBuilder<TBuilder, TMock, TDto, TId> : BaseAsyncPublisherMockBuilder<TBuilder, TMock, TDto>
         where TBuilder : BaseDtoCacheMockBuilder<TBuilder, TMock, TDto, TId> 
         where TMock : class, IDtoCache<TDto, TId>
         where TDto : class, IHasId<TId>

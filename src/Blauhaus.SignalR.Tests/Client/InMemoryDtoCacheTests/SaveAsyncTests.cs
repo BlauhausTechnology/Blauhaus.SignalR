@@ -42,7 +42,7 @@ namespace Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests
             {
                 publishedDtos.Add(d);
                 return Task.CompletedTask;
-            }, DtoOne.Id);
+            }, dto => dto.Id == DtoOne.Id);
             
             //Act
             await Sut.SaveAsync(DtoOne);
@@ -61,7 +61,7 @@ namespace Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests
             {
                 publishedDtos.Add(d);
                 return Task.CompletedTask;
-            }, DtoOne.Id);
+            }, dto => dto.Id == DtoOne.Id);
             
             //Act
             await Sut.SaveAsync(DtoThree);
