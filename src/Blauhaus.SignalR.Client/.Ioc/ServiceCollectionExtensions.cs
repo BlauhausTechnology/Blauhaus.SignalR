@@ -1,7 +1,12 @@
 ﻿using System;
-using Blauhaus.Common.Utils.Contracts;
+using Blauhaus.Common.Abstractions;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Client.Clients;
+using Blauhaus.SignalR.Client.Connection;
+using Blauhaus.SignalR.Client.Connection.Proxy;
+using Blauhaus.SignalR.Client.Connection.Registry;
+using Blauhaus.SignalR.Client.DtoCache;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -9,56 +14,68 @@ namespace Blauhaus.SignalR.Client.Ioc
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSignalRSyncClient<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, ISyncDtoCache<TDto>
-            where TDto : IClientEntity
-        {
-            services.AddSingleton<ISignalRSyncClient<TDto>, SignalRSyncClient<TDto>>();
-            services.AddSyncDtoCache<TDto, TDtoCache>();
-            return services;
-        }
-        
-        public static IServiceCollection AddSignalRClient<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, IDtoCache<TDto> where TDto : IHasId<Guid>
-        {
-            services.AddSingleton<ISignalRClient<TDto>, SignalRClient<TDto>>();
-            services.AddDtoCache<TDto, TDtoCache>();
-            return services;
-        }
-        
-        
-        public static IServiceCollection AddSignalRClient<TDto>(this IServiceCollection services) where TDto : IHasId<Guid>
-        {
-            services.AddSingleton<ISignalRClient<TDto>, SignalRClient<TDto>>();
-            services.AddDtoCache<TDto, DummyDtoCache<TDto>>();
-            return services;
-        }
-        
-        public static IServiceCollection AddSyncDtoCache<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, ISyncDtoCache<TDto> where TDto : IClientEntity
-        {
-            services.AddSingleton<ISyncDtoCache<TDto>, TDtoCache>();
-            
-            return services;
-        }
 
-        public static IServiceCollection AddDtoCache<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, IDtoCache<TDto>
+
+        //Client
+        public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services) 
+            where TDto : class, IHasId<TId>
         {
-            services.AddSingleton<IDtoCache<TDto>, TDtoCache>();
-            
+            services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
+            services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
+            services.AddDtoCache<TDto, InMemoryDtoCache<TDto, TId>, TId>();
             return services;
         }
-
+        
+        public static IServiceCollection AddSignalRDtoClient<TDto, TDtoCache, TId>(this IServiceCollection services) 
+            where TDtoCache : class, IDtoCache<TDto, TId> 
+            where TDto : class, IHasId<TId>
+        {
+            services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
+            services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
+            services.AddDtoCache<TDto, TDtoCache, TId>();
+            return services;
+        }
+        
+        private static IServiceCollection AddDtoCache<TDto, TDtoCache, TId>(this IServiceCollection services) 
+            where TDtoCache : class, IDtoCache<TDto, TId> where TDto : class, IHasId<TId>
+        {
+            services.AddSingleton<IDtoCache<TDto, TId>, TDtoCache>();
+            return services;
+        }
+        
+        //Services
 
         public static IServiceCollection AddSignalR<TConfig>(this IServiceCollection services)
             where TConfig : class, ISignalRClientConfig
         {
             services.TryAddTransient<ISignalRClientConfig, TConfig>();
             services.TryAddSingleton<ISignalRConnectionProxy, SignalRConnectionProxy>();
-            services.TryAddSingleton<ISignalRConnection, SignalRConnection>();
+            services.TryAddSingleton<ISignalRClient, SignalRClient>();
+            services.TryAddSingleton<ISignalRDtoClientRegistry, SignalRDtoClientRegistry>();
 
             return services;
         }
+        
+        
+        //Sync
+        
+        public static IServiceCollection AddSignalRSyncClient<TDto, TDtoCache>(this IServiceCollection services) 
+            where TDtoCache : class, ISyncDtoCache<TDto>
+            where TDto : class, IClientEntity
+        {
+            services.AddSingleton<ISignalRSyncDtoClient<TDto>, SignalRSyncDtoClient<TDto>>();
+            services.AddSyncDtoCache<TDto, TDtoCache>();
+            return services;
+        }
+        
+         
+        private static IServiceCollection AddSyncDtoCache<TDto, TDtoCache>(this IServiceCollection services) 
+            where TDtoCache : class, ISyncDtoCache<TDto> where TDto : class, IClientEntity
+        {
+            services.AddSingleton<ISyncDtoCache<TDto>, TDtoCache>();
+            
+            return services;
+        }
+
     }
 }

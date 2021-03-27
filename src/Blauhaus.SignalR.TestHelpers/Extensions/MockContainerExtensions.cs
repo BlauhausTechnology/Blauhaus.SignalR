@@ -1,4 +1,5 @@
 ﻿using System;
+using Blauhaus.Common.Abstractions;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches;
@@ -9,24 +10,24 @@ namespace Blauhaus.SignalR.TestHelpers.Extensions
 {
     public static class MockContainerExtensions
     {
-        public static Func<DtoCacheMockBuilder<TDto>> AddMockDtoCache<TDto>(this MockContainer mocks)
+        public static Func<DtoCacheMockBuilder<TDto, TId>> AddMockDtoCache<TDto, TId>(this MockContainer mocks) where TDto : class, IHasId<TId>
         {
-            return mocks.AddMock<DtoCacheMockBuilder<TDto>, IDtoCache<TDto>>();
+            return mocks.AddMock<DtoCacheMockBuilder<TDto, TId>, IDtoCache<TDto, TId>>();
         }
         
-        public static Func<SyncDtoCacheMockBuilder<TDto>> AddMockSyncDtoCache<TDto>(this MockContainer mocks) where TDto : IClientEntity
+        public static Func<SyncDtoCacheMockBuilder<TDto>> AddMockSyncDtoCache<TDto>(this MockContainer mocks) where TDto : class, IClientEntity
         {
             return mocks.AddMock<SyncDtoCacheMockBuilder<TDto>, ISyncDtoCache<TDto>>();
         }
         
-        public static Func<SignalRClientMockBuilder<TDto>> AddMockSignalRClient<TDto>(this MockContainer mocks) where TDto : class
+        public static Func<SignalRDtoClientMockBuilder<TDto>> AddMockSignalRDtoClient<TDto>(this MockContainer mocks) where TDto : class
         {
-            return mocks.AddMock<SignalRClientMockBuilder<TDto>, ISignalRClient<TDto>>();
+            return mocks.AddMock<SignalRDtoClientMockBuilder<TDto>, ISignalRDtoClient<TDto>>();
         }
         
-        public static Func<SignalRSyncClientMockBuilder<TDto>> AddMockSignalRSyncClient<TDto>(this MockContainer mocks) where TDto : class, IClientEntity
+        public static Func<SignalRDtoSyncClientMockBuilder<TDto>> AddMockSignalRSyncClient<TDto>(this MockContainer mocks) where TDto : class, IClientEntity
         {
-            return mocks.AddMock<SignalRSyncClientMockBuilder<TDto>, ISignalRSyncClient<TDto>>();
+            return mocks.AddMock<SignalRDtoSyncClientMockBuilder<TDto>, ISignalRSyncDtoClient<TDto>>();
         }
     }
 }

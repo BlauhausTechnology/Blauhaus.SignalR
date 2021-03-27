@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
@@ -7,7 +8,7 @@ using Moq;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
 {
-    public class SyncDtoCacheMockBuilder<TDto> : BaseDtoCacheMockBuilder<SyncDtoCacheMockBuilder<TDto>,ISyncDtoCache<TDto>,TDto> where TDto : IClientEntity
+    public class SyncDtoCacheMockBuilder<TDto> : BaseDtoCacheMockBuilder<SyncDtoCacheMockBuilder<TDto>,ISyncDtoCache<TDto>,TDto, Guid> where TDto : class, IClientEntity
     {
 
         public SyncDtoCacheMockBuilder()
