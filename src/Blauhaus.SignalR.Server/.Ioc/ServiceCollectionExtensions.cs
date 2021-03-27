@@ -3,7 +3,7 @@ using Blauhaus.SignalR.Server.Proxy;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Blauhaus.SignalR.Server._Ioc
+namespace Blauhaus.SignalR.Server.Ioc
 {
     public static class ServiceCollectionExtensions
     {

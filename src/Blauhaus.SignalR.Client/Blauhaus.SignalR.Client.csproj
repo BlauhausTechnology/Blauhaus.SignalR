@@ -7,15 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DtoCaches\**" />
+    <EmbeddedResource Remove="DtoCaches\**" />
+    <None Remove="DtoCaches\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include=".Ioc\ISignalRClientConfig.cs" />
     <Compile Include=".Ioc\ServiceCollectionExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.4.7" />
-    <PackageReference Include="Blauhaus.Common.Utils" Version="1.9.1" />
+    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.5.2" />
+    <PackageReference Include="Blauhaus.ClientActors" Version="0.6.19" />
+    <PackageReference Include="Blauhaus.Common.Utils" Version="1.9.13" />
+    <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.9.13" />
     <PackageReference Include="Blauhaus.DeviceServices.Abstractions" Version="0.8.8" /> 
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.3" /> 
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.4" /> 
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" /> 
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
