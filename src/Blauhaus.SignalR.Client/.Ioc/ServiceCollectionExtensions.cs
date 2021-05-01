@@ -14,8 +14,6 @@ namespace Blauhaus.SignalR.Client.Ioc
 {
     public static class ServiceCollectionExtensions
     {
-
-
         //Client
         public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services) 
             where TDto : class, IHasId<TId>
