@@ -8,7 +8,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoSavers
 {
     public class BaseDtoSaverMockBuilder<TBuilder, TMock, TDto, TId> : BaseMockBuilder<TBuilder, TMock>
         where TBuilder : BaseDtoSaverMockBuilder<TBuilder, TMock, TDto, TId> 
-        where TMock : class, IDtoSaver<TDto>
+        where TMock : class, IDtoHandler<TDto>
         where TDto : class, IHasId<TId>
     {
         

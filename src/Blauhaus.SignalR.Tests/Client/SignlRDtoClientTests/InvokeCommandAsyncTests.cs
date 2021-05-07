@@ -67,7 +67,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             await ExecuteAsync();
 
             //Assert
-            MockMyDtoCache.Mock.Verify(x => x.SaveAsync(dto));
+            MockMyDtoCache.Mock.Verify(x => x.HandleAsync(dto));
         }
         
 

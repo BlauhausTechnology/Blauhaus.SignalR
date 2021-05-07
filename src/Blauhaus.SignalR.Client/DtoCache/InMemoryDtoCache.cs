@@ -13,7 +13,7 @@ namespace Blauhaus.SignalR.Client.DtoCache
 
         protected Dictionary<TId, TDto> CachedDtos = new Dictionary<TId, TDto>();
 
-        public Task SaveAsync(TDto dto)
+        public Task HandleAsync(TDto dto)
         {
             return InvokeAsync(async () =>
             {

@@ -16,23 +16,36 @@ namespace Blauhaus.SignalR.Client.Ioc
     public static class ServiceCollectionExtensions
     {
         //Client 
-        public static IServiceCollection AddSignalRDtoClient<TDto, TId, TDtoSaver>(this IServiceCollection services) 
+        public static IServiceCollection AddSignalRDtoClient<TDto, TId, TDtoHandler>(this IServiceCollection services) 
             where TDto : class, IHasId<TId>
-            where TDtoSaver : class, IDtoSaver<TDto>
+            where TDtoHandler : class, IDtoHandler<TDto>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
-            services.TryAddSingleton<IDtoSaver<TDto>, TDtoSaver>();
-            services.AddSingleton<Func<TId, Task<IDtoSaver<TDto>>>>(sp => id => Task.FromResult<IDtoSaver<TDto>>(sp.GetRequiredService<TDtoSaver>()));
+            services.AddDtoHandler<TDto, TId, TDtoHandler>();
+            return services;
+        }
+        public static IServiceCollection AddDtoHandler<TDto, TId, TDtoHandler>(this IServiceCollection services) 
+            where TDto : class, IHasId<TId>
+            where TDtoHandler : class, IDtoHandler<TDto>
+        {
+            services.AddSingleton<Func<TId, Task<IDtoHandler<TDto>>>>(sp => id => Task.FromResult<IDtoHandler<TDto>>(sp.GetRequiredService<TDtoHandler>()));
             return services;
         }
 
-        public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services, Func<IServiceProvider, TId, Task<IDtoSaver<TDto>>> dtoSaverResolver) 
+        public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services, Func<IServiceProvider, TId, Task<IDtoHandler<TDto>>> resolver) 
             where TDto : class, IHasId<TId>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
-            services.AddSingleton<Func<TId, Task<IDtoSaver<TDto>>>>(sp => id => dtoSaverResolver.Invoke(sp, id));
+            services.AddSingleton<Func<TId, Task<IDtoHandler<TDto>>>>(sp => id => resolver.Invoke(sp, id));
+            return services;
+        }
+        public static IServiceCollection AddDtoHandler<TDto, TId, TDtoHandler>(this IServiceCollection services, Func<IServiceProvider, TId, Task<IDtoHandler<TDto>>> resolver) 
+            where TDto : class, IHasId<TId>
+            where TDtoHandler : class, IDtoHandler<TDto>
+        {
+            services.AddSingleton<Func<TId, Task<IDtoHandler<TDto>>>>(sp => id => resolver.Invoke(sp, id));
             return services;
         }
 
@@ -42,7 +55,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
             services.AddSingleton<IDtoCache<TDto, TId>, InMemoryDtoCache<TDto, TId>>();
-            services.AddSingleton<Func<TId, Task<IDtoSaver<TDto>>>>(sp => id => Task.FromResult<IDtoSaver<TDto>>(sp.GetRequiredService<IDtoCache<TDto, TId>>()));
+            services.AddSingleton<Func<TId, Task<IDtoHandler<TDto>>>>(sp => id => Task.FromResult<IDtoHandler<TDto>>(sp.GetRequiredService<IDtoCache<TDto, TId>>()));
             return services;
         }
          

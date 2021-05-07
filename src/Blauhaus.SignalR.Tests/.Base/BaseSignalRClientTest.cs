@@ -28,7 +28,7 @@ namespace Blauhaus.SignalR.Tests.Base
             AddService(MockAnalyticsService.Object);
             AddService(MockConnectivityService.Object);
             
-            AddService<Func<Guid, Task<IDtoSaver<MyDto>>>>(x => id => Task.FromResult(MockMyDtoCache.Object));
+            AddService<Func<Guid, Task<IDtoHandler<MyDto>>>>(x => id => Task.FromResult(MockMyDtoCache.Object));
         }
 
         protected SignalRConnectionProxyMockBuilder MockSignalRConnectionProxy => AddMock<SignalRConnectionProxyMockBuilder, ISignalRConnectionProxy>().Invoke();

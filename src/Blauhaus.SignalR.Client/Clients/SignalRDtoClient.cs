@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
@@ -24,20 +25,20 @@ namespace Blauhaus.SignalR.Client.Clients
         
         protected readonly IAnalyticsService AnalyticsService;
         protected readonly IConnectivityService ConnectivityService;
-        private readonly Func<TId, Task<IDtoSaver<TDto>>> _dtoSaverResolver;
+        private readonly IEnumerable<Func<TId, Task<IDtoHandler<TDto>>>> _dtoHandlerResolver;
 
         private IDisposable? _connectToken;
 
         public SignalRDtoClient(
             IAnalyticsService analyticsService,
             IConnectivityService connectivityService,
-            Func<TId, Task<IDtoSaver<TDto>>> dtoSaverResolver,
+            IEnumerable<Func<TId, Task<IDtoHandler<TDto>>>> dtoHandlerResolver,
             ISignalRConnectionProxy connection)
         {
             Connection = connection;
             AnalyticsService = analyticsService;
             ConnectivityService = connectivityService;
-            _dtoSaverResolver = dtoSaverResolver;
+            _dtoHandlerResolver = dtoHandlerResolver;
         }
         
         public Task InitializeAsync()
@@ -58,8 +59,11 @@ namespace Blauhaus.SignalR.Client.Clients
 
         private async Task SaveDtoAsync(TDto dto)
         {
-            var dtoSaver = await _dtoSaverResolver.Invoke(dto.Id);
-            await dtoSaver.SaveAsync(dto);
+            foreach (var dtoHandlerResolver in _dtoHandlerResolver)
+            {
+                var handler = await dtoHandlerResolver.Invoke(dto.Id);
+                await handler.HandleAsync(dto);
+            }
         }
            
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull

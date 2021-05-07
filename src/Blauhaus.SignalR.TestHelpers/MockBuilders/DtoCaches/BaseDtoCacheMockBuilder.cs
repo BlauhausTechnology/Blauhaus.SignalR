@@ -16,7 +16,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
     {
         public void VerifySaveAsync(TDto dto, int times = 1)
         {
-            Mock.Verify(x => x.SaveAsync(dto), Times.Exactly(times));
+            Mock.Verify(x => x.HandleAsync(dto), Times.Exactly(times));
         }
         
         public TBuilder Where_GetOneAsync_returns(TDto dto)

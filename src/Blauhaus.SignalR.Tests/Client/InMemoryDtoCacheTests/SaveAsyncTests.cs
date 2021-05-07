@@ -15,7 +15,7 @@ namespace Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests
         public async Task SHOULD_add_Dto_to_Cache()
         {
             //Act
-            await Sut.SaveAsync(DtoOne);
+            await Sut.HandleAsync(DtoOne);
             
             //Assert
             Assert.That(Sut.Cache.First().Value, Is.EqualTo(DtoOne));
@@ -25,8 +25,8 @@ namespace Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests
         public async Task SHOULD_not_add_duplicate()
         {
             //Act
-            await Sut.SaveAsync(DtoOne);
-            await Sut.SaveAsync(DtoOne);
+            await Sut.HandleAsync(DtoOne);
+            await Sut.HandleAsync(DtoOne);
             
             //Assert
             Assert.That(Sut.Cache.Count, Is.EqualTo(1));
@@ -45,7 +45,7 @@ namespace Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests
             }, dto => dto.Id == DtoOne.Id);
             
             //Act
-            await Sut.SaveAsync(DtoOne);
+            await Sut.HandleAsync(DtoOne);
             
             //Assert
             Assert.That(publishedDtos.Count, Is.EqualTo(1));
@@ -64,7 +64,7 @@ namespace Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests
             }, dto => dto.Id == DtoOne.Id);
             
             //Act
-            await Sut.SaveAsync(DtoThree);
+            await Sut.HandleAsync(DtoThree);
             
             //Assert
             Assert.That(publishedDtos.Count, Is.EqualTo(0));

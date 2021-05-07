@@ -6,12 +6,12 @@ using Blauhaus.Common.Abstractions;
 namespace Blauhaus.SignalR.Abstractions.Client
 {
 
-    public interface IDtoSaver<in TDto>
+    public interface IDtoHandler<in TDto>
     {
-        Task SaveAsync(TDto dto);
+        Task HandleAsync(TDto dto);
     }
 
-    public interface IDtoCache<TDto, in TId> : IAsyncPublisher<TDto>, IDtoSaver<TDto>
+    public interface IDtoCache<TDto, in TId> : IAsyncPublisher<TDto>, IDtoHandler<TDto>
         where TDto : class, IHasId<TId>
     {
         Task<TDto?> GetOneAsync(TId id);

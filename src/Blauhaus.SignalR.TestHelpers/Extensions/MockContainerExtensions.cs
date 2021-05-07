@@ -18,7 +18,7 @@ namespace Blauhaus.SignalR.TestHelpers.Extensions
 
         public static Func<DtoSaverMockBuilder<TDto, TId>> AddMockDtoSaver<TDto, TId>(this MockContainer mocks) where TDto : class, IHasId<TId>
         {
-            return mocks.AddMock<DtoSaverMockBuilder<TDto, TId>, IDtoSaver<TDto>>();
+            return mocks.AddMock<DtoSaverMockBuilder<TDto, TId>, IDtoHandler<TDto>>();
         }
          
         public static Func<SignalRDtoClientMockBuilder<TDto>> AddMockSignalRDtoClient<TDto>(this MockContainer mocks) where TDto : class
