@@ -18,8 +18,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.github\workflows\blauhaus.yml = ..\.github\workflows\blauhaus.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blauhaus.SignalR.Client.Sqlite", "Blauhaus.SignalR.Client.Sqlite\Blauhaus.SignalR.Client.Sqlite.csproj", "{888A5A9E-B0A4-4282-8A6A-4609A9D5C93C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,10 +44,6 @@ Global
 		{F236B383-5D5C-4B47-A9CA-994030FD41E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F236B383-5D5C-4B47-A9CA-994030FD41E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F236B383-5D5C-4B47-A9CA-994030FD41E6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{888A5A9E-B0A4-4282-8A6A-4609A9D5C93C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{888A5A9E-B0A4-4282-8A6A-4609A9D5C93C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{888A5A9E-B0A4-4282-8A6A-4609A9D5C93C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{888A5A9E-B0A4-4282-8A6A-4609A9D5C93C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

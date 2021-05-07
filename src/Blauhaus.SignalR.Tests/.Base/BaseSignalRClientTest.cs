@@ -3,6 +3,7 @@ using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Analytics.TestHelpers.MockBuilders;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.DeviceServices.TestHelpers.MockBuilders;
+using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.Client.Connection.Proxy;
 using Blauhaus.SignalR.TestHelpers.Extensions;
@@ -25,8 +26,7 @@ namespace Blauhaus.SignalR.Tests.Base
             AddService(MockAnalyticsService.Object);
             AddService(MockConnectivityService.Object);
             
-            AddService(MockMyDtoCache.Object);
-            AddService(MockSyncMyDtoCache.Object);
+            AddService<Func<Guid, IDtoSaver<MyDto>>>(x => id => MockMyDtoCache.Object);
         }
 
         protected SignalRConnectionProxyMockBuilder MockSignalRConnectionProxy => AddMock<SignalRConnectionProxyMockBuilder, ISignalRConnectionProxy>().Invoke();
@@ -34,6 +34,5 @@ namespace Blauhaus.SignalR.Tests.Base
         protected ConnectivityServiceMockBuilder MockConnectivityService => AddMock<ConnectivityServiceMockBuilder, IConnectivityService>().Invoke();
 
         protected DtoCacheMockBuilder<MyDto, Guid> MockMyDtoCache => Mocks.AddMockDtoCache<MyDto, Guid>().Invoke();
-        protected SyncDtoCacheMockBuilder<MyDto> MockSyncMyDtoCache => Mocks.AddMockSyncDtoCache<MyDto>().Invoke();
     }
 }

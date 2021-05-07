@@ -22,22 +22,22 @@ namespace Blauhaus.SignalR.Client.Clients
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
         protected readonly ISignalRConnectionProxy Connection;
         
-        protected readonly IDtoSaver<TDto> DtoSaver;
         protected readonly IAnalyticsService AnalyticsService;
         protected readonly IConnectivityService ConnectivityService;
+        private readonly Func<TId, IDtoSaver<TDto>> _dtoSaverResolver;
 
         private IDisposable? _connectToken;
 
         public SignalRDtoClient(
             IAnalyticsService analyticsService,
             IConnectivityService connectivityService,
-            IDtoSaver<TDto> dtoSaver,
+            Func<TId, IDtoSaver<TDto>> dtoSaverResolver,
             ISignalRConnectionProxy connection)
         {
-            DtoSaver = dtoSaver;
             Connection = connection;
             AnalyticsService = analyticsService;
             ConnectivityService = connectivityService;
+            _dtoSaverResolver = dtoSaverResolver;
         }
         
         public Task InitializeAsync()
@@ -47,11 +47,11 @@ namespace Blauhaus.SignalR.Client.Clients
                 var methodName = $"Publish{typeof(TDto).Name}Async";
                 _connectToken ??= Connection.Subscribe<TDto>(methodName, async dto =>
                 {
-                    await DtoSaver.SaveAsync(dto);
+                    await _dtoSaverResolver.Invoke(dto.Id)
+                        .SaveAsync(dto);
+
                    AnalyticsService.Debug($"Received {typeof(TDto).Name}");
-                   
-                    //todo this doesnt make sense since this is not a publisher...?
-                    await UpdateSubscribersAsync(dto);
+                    
                 });
                 
                 AnalyticsService.Debug($"Initialized SignalR Dto Client for {typeof(TDto).Name} as {methodName}");
@@ -77,10 +77,9 @@ namespace Blauhaus.SignalR.Client.Clients
                     AnalyticsService.Debug($"Successfully handled {typeof(TCommand).Name} and received {typeof(TDto).Name} result");
                     
                     var dto = result.Value;
-                    
-                    //todo this doesnt make sense since this is not a publisher...?
-                    await UpdateSubscribersAsync(dto);
-                    await DtoSaver.SaveAsync(dto);
+                     
+                    await _dtoSaverResolver.Invoke(dto.Id)
+                        .SaveAsync(dto);
                 }
 
                 return result;
