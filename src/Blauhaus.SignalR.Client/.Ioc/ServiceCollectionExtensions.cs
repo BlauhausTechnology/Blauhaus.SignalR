@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Blauhaus.Common.Abstractions;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
@@ -15,6 +16,7 @@ namespace Blauhaus.SignalR.Client.Ioc
     public static class ServiceCollectionExtensions
     {
         //Client 
+         
         public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services, Func<IServiceProvider, TId, IDtoSaver<TDto>> dtoSaverResolver) 
             where TDto : class, IHasId<TId>
         {

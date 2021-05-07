@@ -24,14 +24,14 @@ namespace Blauhaus.SignalR.Client.Clients
         
         protected readonly IAnalyticsService AnalyticsService;
         protected readonly IConnectivityService ConnectivityService;
-        private readonly Func<TId, IDtoSaver<TDto>> _dtoSaverResolver;
+        private readonly Func<TId, Task<IDtoSaver<TDto>>> _dtoSaverResolver;
 
         private IDisposable? _connectToken;
 
         public SignalRDtoClient(
             IAnalyticsService analyticsService,
             IConnectivityService connectivityService,
-            Func<TId, IDtoSaver<TDto>> dtoSaverResolver,
+            Func<TId, Task<IDtoSaver<TDto>>> dtoSaverResolver,
             ISignalRConnectionProxy connection)
         {
             Connection = connection;
@@ -47,17 +47,20 @@ namespace Blauhaus.SignalR.Client.Clients
                 var methodName = $"Publish{typeof(TDto).Name}Async";
                 _connectToken ??= Connection.Subscribe<TDto>(methodName, async dto =>
                 {
-                    await _dtoSaverResolver.Invoke(dto.Id)
-                        .SaveAsync(dto);
-
-                   AnalyticsService.Debug($"Received {typeof(TDto).Name}");
-                    
+                    AnalyticsService.Debug($"Received {typeof(TDto).Name}");
+                    await SaveDtoAsync(dto);
                 });
                 
                 AnalyticsService.Debug($"Initialized SignalR Dto Client for {typeof(TDto).Name} as {methodName}");
             });
         }
-         
+
+
+        private async Task SaveDtoAsync(TDto dto)
+        {
+            var dtoSaver = await _dtoSaverResolver.Invoke(dto.Id);
+            await dtoSaver.SaveAsync(dto);
+        }
            
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 
@@ -75,11 +78,8 @@ namespace Blauhaus.SignalR.Client.Clients
                 if (result.IsSuccess)
                 {
                     AnalyticsService.Debug($"Successfully handled {typeof(TCommand).Name} and received {typeof(TDto).Name} result");
-                    
-                    var dto = result.Value;
-                     
-                    await _dtoSaverResolver.Invoke(dto.Id)
-                        .SaveAsync(dto);
+
+                    await SaveDtoAsync(result.Value);
                 }
 
                 return result;
@@ -97,16 +97,6 @@ namespace Blauhaus.SignalR.Client.Clients
                 Locker.Release();
             }
         }
-         
-        
-        protected Response<T> HandleException<T>(Exception e)
-        {
-            if (e is ErrorException errorException)
-            {
-                return AnalyticsService.TraceErrorResponse<T>(this, errorException.Error);
-            }
-
-            return AnalyticsService.LogExceptionResponse<T>(this, e, SignalRErrors.InvocationFailure(e));
-        }
+          
     }
 }
