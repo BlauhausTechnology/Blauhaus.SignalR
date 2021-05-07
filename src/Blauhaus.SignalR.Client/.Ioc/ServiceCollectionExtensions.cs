@@ -20,26 +20,27 @@ namespace Blauhaus.SignalR.Client.Ioc
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
-            services.AddDtoCache<TDto, InMemoryDtoCache<TDto, TId>, TId>();
+            services.AddDtoSaver<TDto, InMemoryDtoCache<TDto, TId>>();
             return services;
         }
         
         public static IServiceCollection AddSignalRDtoClient<TDto, TDtoCache, TId>(this IServiceCollection services) 
-            where TDtoCache : class, IDtoCache<TDto, TId> 
+            where TDtoCache : class, IDtoSaver<TDto> 
             where TDto : class, IHasId<TId>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
-            services.AddDtoCache<TDto, TDtoCache, TId>();
+            services.AddDtoSaver<TDto, TDtoCache>();
             return services;
         }
         
-        private static IServiceCollection AddDtoCache<TDto, TDtoCache, TId>(this IServiceCollection services) 
-            where TDtoCache : class, IDtoCache<TDto, TId> where TDto : class, IHasId<TId>
+        private static IServiceCollection AddDtoSaver<TDto, TDtoSaver>(this IServiceCollection services) 
+            where TDtoSaver : class, IDtoSaver<TDto>  
         {
-            services.AddSingleton<IDtoCache<TDto, TId>, TDtoCache>();
+            services.AddSingleton<IDtoSaver<TDto>, TDtoSaver>();
             return services;
         }
+         
         
         //Services
 

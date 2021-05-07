@@ -15,16 +15,16 @@ namespace Blauhaus.SignalR.Client.Clients
     {
         private IDisposable? _syncToken;
 
-        private readonly ISyncDtoCache<TDto> _syncDtoCache;
+        private readonly ISyncDtoCache<TDto> _syncDtoSaver;
         
         public SignalRSyncDtoClient(
             IAnalyticsService analyticsService, 
             IConnectivityService connectivityService, 
-            ISyncDtoCache<TDto> dtoCache, 
+            ISyncDtoCache<TDto> dtoSaver, 
             ISignalRConnectionProxy connection) 
-                : base(analyticsService, connectivityService, dtoCache, connection)
+                : base(analyticsService, connectivityService, dtoSaver, connection)
         {
-            _syncDtoCache = dtoCache;
+            _syncDtoSaver = dtoSaver;
         }
         
         
@@ -40,21 +40,21 @@ namespace Blauhaus.SignalR.Client.Clients
                 {
                     _syncToken = Connection.Subscribe<SyncResponse<TDto>>($"Sync{typeof(TDto).Name}Async", async syncResponse =>
                     {
-                        await _syncDtoCache.SaveSyncResponseAsync(syncResponse);
+                        await _syncDtoSaver.SaveSyncResponseAsync(syncResponse);
                         foreach (var dto in syncResponse.Dtos)
                         {
                             await UpdateSubscribersAsync(dto);
                         }
                     });
 
-                    var syncRequest = await _syncDtoCache.LoadSyncRequestAsync();
+                    var syncRequest = await _syncDtoSaver.LoadSyncRequestAsync();
                     var syncResult = await Connection.InvokeAsync<Response<SyncResponse<TDto>>>($"Sync{typeof(TDto).Name}Async", syncRequest, AnalyticsService.AnalyticsOperationHeaders);
                     if (syncResult.IsFailure)
                     {
                         return Response.Failure<IDisposable>(syncResult.Error);
                     }
 
-                    await _syncDtoCache.SaveSyncResponseAsync(syncResult.Value);
+                    await _syncDtoSaver.SaveSyncResponseAsync(syncResult.Value);
                     foreach (var dto in syncResult.Value.Dtos)
                     {
                         await UpdateSubscribersAsync(dto);

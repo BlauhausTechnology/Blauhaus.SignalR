@@ -22,7 +22,7 @@ namespace Blauhaus.SignalR.Client.Clients
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
         protected readonly ISignalRConnectionProxy Connection;
         
-        protected readonly IDtoCache<TDto, TId> DtoCache;
+        protected readonly IDtoSaver<TDto> DtoSaver;
         protected readonly IAnalyticsService AnalyticsService;
         protected readonly IConnectivityService ConnectivityService;
 
@@ -31,10 +31,10 @@ namespace Blauhaus.SignalR.Client.Clients
         public SignalRDtoClient(
             IAnalyticsService analyticsService,
             IConnectivityService connectivityService,
-            IDtoCache<TDto, TId> dtoCache,
+            IDtoSaver<TDto> dtoSaver,
             ISignalRConnectionProxy connection)
         {
-            DtoCache = dtoCache;
+            DtoSaver = dtoSaver;
             Connection = connection;
             AnalyticsService = analyticsService;
             ConnectivityService = connectivityService;
@@ -47,7 +47,7 @@ namespace Blauhaus.SignalR.Client.Clients
                 var methodName = $"Publish{typeof(TDto).Name}Async";
                 _connectToken ??= Connection.Subscribe<TDto>(methodName, async dto =>
                 {
-                    await DtoCache.SaveAsync(dto);
+                    await DtoSaver.SaveAsync(dto);
                    AnalyticsService.Debug($"Received {typeof(TDto).Name}");
                    
                     //todo this doesnt make sense since this is not a publisher...?
@@ -80,7 +80,7 @@ namespace Blauhaus.SignalR.Client.Clients
                     
                     //todo this doesnt make sense since this is not a publisher...?
                     await UpdateSubscribersAsync(dto);
-                    await DtoCache.SaveAsync(dto);
+                    await DtoSaver.SaveAsync(dto);
                 }
 
                 return result;
