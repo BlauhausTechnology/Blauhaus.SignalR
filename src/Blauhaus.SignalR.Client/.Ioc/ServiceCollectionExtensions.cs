@@ -16,15 +16,13 @@ namespace Blauhaus.SignalR.Client.Ioc
     public static class ServiceCollectionExtensions
     {
         //Client 
-         
-
         public static IServiceCollection AddSignalRDtoClient<TDto, TId, TDtoSaver>(this IServiceCollection services) 
             where TDto : class, IHasId<TId>
             where TDtoSaver : IDtoSaver<TDto>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
-            services.AddSingleton<Func<TId, IDtoSaver<TDto>>>(sp => id => sp.GetRequiredService<TDtoSaver>());
+            services.AddSingleton<Func<TId, Task<IDtoSaver<TDto>>>>(sp => id => Task.FromResult<IDtoSaver<TDto>>(sp.GetRequiredService<TDtoSaver>()));
             return services;
         }
 
@@ -43,7 +41,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
             services.AddSingleton<IDtoCache<TDto, TId>, InMemoryDtoCache<TDto, TId>>();
-            services.AddSingleton<Func<TId, IDtoSaver<TDto>>>(sp => id => sp.GetRequiredService<IDtoCache<TDto, TId>>());
+            services.AddSingleton<Func<TId, Task<IDtoSaver<TDto>>>>(sp => id => Task.FromResult<IDtoSaver<TDto>>(sp.GetRequiredService<IDtoCache<TDto, TId>>()));
             return services;
         }
          
