@@ -17,8 +17,18 @@ namespace Blauhaus.SignalR.Client.Ioc
     {
         //Client 
          
-        public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services, 
-            Func<IServiceProvider, TId, Task<IDtoSaver<TDto>>> dtoSaverResolver) 
+
+        public static IServiceCollection AddSignalRDtoClient<TDto, TId, TDtoSaver>(this IServiceCollection services) 
+            where TDto : class, IHasId<TId>
+            where TDtoSaver : IDtoSaver<TDto>
+        {
+            services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
+            services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
+            services.AddSingleton<Func<TId, IDtoSaver<TDto>>>(sp => id => sp.GetRequiredService<TDtoSaver>());
+            return services;
+        }
+
+        public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services, Func<IServiceProvider, TId, Task<IDtoSaver<TDto>>> dtoSaverResolver) 
             where TDto : class, IHasId<TId>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
