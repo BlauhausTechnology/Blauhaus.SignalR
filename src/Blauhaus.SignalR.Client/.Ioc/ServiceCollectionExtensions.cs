@@ -29,7 +29,8 @@ namespace Blauhaus.SignalR.Client.Ioc
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
-            services.AddSingleton<Func<TId, IDtoSaver<TDto>>>(sp => id => sp.GetRequiredService<InMemoryDtoCache<TDto, TId>>());
+            services.AddSingleton<IDtoCache<TDto, TId>, InMemoryDtoCache<TDto, TId>>();
+            services.AddSingleton<Func<TId, IDtoSaver<TDto>>>(sp => id => sp.GetRequiredService<IDtoCache<TDto, TId>>());
             return services;
         }
          
