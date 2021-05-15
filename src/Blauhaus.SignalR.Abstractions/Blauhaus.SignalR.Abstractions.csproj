@@ -12,4 +12,8 @@
     <PackageReference Include="Blauhaus.Domain.Abstractions" Version="1.1.24" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
 </Project>
