@@ -36,7 +36,6 @@ namespace Blauhaus.SignalR.Client.Connection
             _connectionProxy.StateChanged += OnHubStateChanged;
         }
         
-
         public Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler, Func<SignalRConnectionState, bool>? filter = null)
         {
             return Task.FromResult(AddSubscriber(handler, filter));
