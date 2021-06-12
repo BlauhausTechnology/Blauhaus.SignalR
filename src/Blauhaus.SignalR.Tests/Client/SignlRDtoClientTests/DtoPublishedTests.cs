@@ -4,7 +4,6 @@ using Blauhaus.SignalR.Tests.TestObjects;
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Blauhaus.Responses;
 
 namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 {
@@ -18,6 +17,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 
             _dto = new MyDto();
         }
+
         [Test]
         public async Task IF_hub_invocation_succeeds_SHOULD_invoke_handlers()
         { 
