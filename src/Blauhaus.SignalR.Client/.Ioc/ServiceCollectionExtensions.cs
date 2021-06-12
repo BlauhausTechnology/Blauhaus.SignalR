@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Blauhaus.Common.Abstractions;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.SignalR.Abstractions.Client;
@@ -14,35 +15,50 @@ namespace Blauhaus.SignalR.Client.Ioc
 {
     public static class ServiceCollectionExtensions
     {
+        //Client 
+        public static IServiceCollection AddSignalRDtoClient<TDto, TId, TDtoHandler>(this IServiceCollection services) 
+            where TDto : class, IHasId<TId>
+            where TDtoHandler : class, IDtoHandler<TDto>
+        {
+            services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
+            services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
+            services.AddDtoHandler<TDto, TId, TDtoHandler>();
+            return services;
+        }
+        public static IServiceCollection AddDtoHandler<TDto, TId, TDtoHandler>(this IServiceCollection services) 
+            where TDto : class, IHasId<TId>
+            where TDtoHandler : class, IDtoHandler<TDto>
+        {
+            services.AddSingleton<Func<TId, Task<IDtoHandler<TDto>>>>(sp => id => Task.FromResult<IDtoHandler<TDto>>(sp.GetRequiredService<TDtoHandler>()));
+            return services;
+        }
 
+        public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services, Func<IServiceProvider, TId, Task<IDtoHandler<TDto>>> resolver) 
+            where TDto : class, IHasId<TId>
+        {
+            services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
+            services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
+            services.AddSingleton<Func<TId, Task<IDtoHandler<TDto>>>>(sp => id => resolver.Invoke(sp, id));
+            return services;
+        }
+        public static IServiceCollection AddDtoHandler<TDto, TId, TDtoHandler>(this IServiceCollection services, Func<IServiceProvider, TId, Task<IDtoHandler<TDto>>> resolver) 
+            where TDto : class, IHasId<TId>
+            where TDtoHandler : class, IDtoHandler<TDto>
+        {
+            services.AddSingleton<Func<TId, Task<IDtoHandler<TDto>>>>(sp => id => resolver.Invoke(sp, id));
+            return services;
+        }
 
-        //Client
         public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services) 
             where TDto : class, IHasId<TId>
         {
             services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
-            services.AddDtoCache<TDto, InMemoryDtoCache<TDto, TId>, TId>();
+            services.AddSingleton<IDtoCache<TDto, TId>, InMemoryDtoCache<TDto, TId>>();
+            services.AddSingleton<Func<TId, Task<IDtoHandler<TDto>>>>(sp => id => Task.FromResult<IDtoHandler<TDto>>(sp.GetRequiredService<IDtoCache<TDto, TId>>()));
             return services;
         }
-        
-        public static IServiceCollection AddSignalRDtoClient<TDto, TDtoCache, TId>(this IServiceCollection services) 
-            where TDtoCache : class, IDtoCache<TDto, TId> 
-            where TDto : class, IHasId<TId>
-        {
-            services.AddSingleton<ISignalRDtoClient<TDto>, SignalRDtoClient<TDto, TId>>();
-            services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRDtoClient<TDto>>());
-            services.AddDtoCache<TDto, TDtoCache, TId>();
-            return services;
-        }
-        
-        private static IServiceCollection AddDtoCache<TDto, TDtoCache, TId>(this IServiceCollection services) 
-            where TDtoCache : class, IDtoCache<TDto, TId> where TDto : class, IHasId<TId>
-        {
-            services.AddSingleton<IDtoCache<TDto, TId>, TDtoCache>();
-            return services;
-        }
-        
+         
         //Services
 
         public static IServiceCollection AddSignalR<TConfig>(this IServiceCollection services)
@@ -55,27 +71,6 @@ namespace Blauhaus.SignalR.Client.Ioc
 
             return services;
         }
-        
-        
-        //Sync
-        
-        public static IServiceCollection AddSignalRSyncClient<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, ISyncDtoCache<TDto>
-            where TDto : class, IClientEntity
-        {
-            services.AddSingleton<ISignalRSyncDtoClient<TDto>, SignalRSyncDtoClient<TDto>>();
-            services.AddSyncDtoCache<TDto, TDtoCache>();
-            return services;
-        }
-        
-         
-        private static IServiceCollection AddSyncDtoCache<TDto, TDtoCache>(this IServiceCollection services) 
-            where TDtoCache : class, ISyncDtoCache<TDto> where TDto : class, IClientEntity
-        {
-            services.AddSingleton<ISyncDtoCache<TDto>, TDtoCache>();
-            
-            return services;
-        }
-
+          
     }
 }

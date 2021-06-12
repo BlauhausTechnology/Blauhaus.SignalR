@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.ClientActors.Actors;
 using Blauhaus.Common.Abstractions;
-using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.Client.Connection.Proxy;
 
 namespace Blauhaus.SignalR.Client.Clients
@@ -22,42 +21,56 @@ namespace Blauhaus.SignalR.Client.Clients
         protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
         protected readonly ISignalRConnectionProxy Connection;
         
-        protected readonly IDtoCache<TDto, TId> DtoCache;
         protected readonly IAnalyticsService AnalyticsService;
         protected readonly IConnectivityService ConnectivityService;
+        private readonly IEnumerable<Func<TId, Task<IDtoHandler<TDto>>>> _dtoHandlerResolver;
 
         private IDisposable? _connectToken;
 
         public SignalRDtoClient(
             IAnalyticsService analyticsService,
             IConnectivityService connectivityService,
-            IDtoCache<TDto, TId> dtoCache,
+            IEnumerable<Func<TId, Task<IDtoHandler<TDto>>>> dtoHandlerResolver,
             ISignalRConnectionProxy connection)
         {
-            DtoCache = dtoCache;
             Connection = connection;
             AnalyticsService = analyticsService;
             ConnectivityService = connectivityService;
+            _dtoHandlerResolver = dtoHandlerResolver;
         }
         
         public Task InitializeAsync()
         {
-            return InvokeAsync(() =>
+            return InvokeAsync(SubscribeToIncomingDtos);
+        }
+
+        private void SubscribeToIncomingDtos()
+        {
+            if (_connectToken == null)
             {
                 var methodName = $"Publish{typeof(TDto).Name}Async";
-                _connectToken ??= Connection.Subscribe<TDto>(methodName, async dto =>
+
+                _connectToken = Connection.Subscribe<TDto>(methodName, async dto =>
                 {
-                    await DtoCache.SaveAsync(dto);
-                   AnalyticsService.Debug($"Received {typeof(TDto).Name}");
-                   
-                    //todo this doesnt make sense since this is not a publisher...?
-                    await UpdateSubscribersAsync(dto);
+                    AnalyticsService.Debug($"Received {typeof(TDto).Name}");
+                    await HandleIncomingDtoAsync(dto);
                 });
-                
+                            
                 AnalyticsService.Debug($"Initialized SignalR Dto Client for {typeof(TDto).Name} as {methodName}");
-            });
+            }
         }
-         
+
+
+        private async Task HandleIncomingDtoAsync(TDto dto)
+        {
+            await UpdateSubscribersAsync(dto);
+
+            foreach (var dtoHandlerResolver in _dtoHandlerResolver)
+            {
+                var handler = await dtoHandlerResolver.Invoke(dto.Id);
+                await handler.HandleAsync(dto);
+            }
+        }
            
         public async Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         { 
@@ -75,12 +88,8 @@ namespace Blauhaus.SignalR.Client.Clients
                 if (result.IsSuccess)
                 {
                     AnalyticsService.Debug($"Successfully handled {typeof(TCommand).Name} and received {typeof(TDto).Name} result");
-                    
-                    var dto = result.Value;
-                    
-                    //todo this doesnt make sense since this is not a publisher...?
-                    await UpdateSubscribersAsync(dto);
-                    await DtoCache.SaveAsync(dto);
+
+                    await HandleIncomingDtoAsync(result.Value);
                 }
 
                 return result;
@@ -98,16 +107,15 @@ namespace Blauhaus.SignalR.Client.Clients
                 Locker.Release();
             }
         }
-         
-        
-        protected Response<T> HandleException<T>(Exception e)
-        {
-            if (e is ErrorException errorException)
-            {
-                return AnalyticsService.TraceErrorResponse<T>(this, errorException.Error);
-            }
 
-            return AnalyticsService.LogExceptionResponse<T>(this, e, SignalRErrors.InvocationFailure(e));
+        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, Func<TDto, bool>? filter = null)
+        {
+            return InvokeAsync(() =>
+            {
+                SubscribeToIncomingDtos();
+
+                return AddSubscriber(handler, filter);
+            });
         }
     }
 }

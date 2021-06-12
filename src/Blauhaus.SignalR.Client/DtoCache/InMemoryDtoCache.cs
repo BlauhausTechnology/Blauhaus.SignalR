@@ -12,8 +12,8 @@ namespace Blauhaus.SignalR.Client.DtoCache
     {
 
         protected Dictionary<TId, TDto> CachedDtos = new Dictionary<TId, TDto>();
-        
-        public Task SaveAsync(TDto dto)
+
+        public Task HandleAsync(TDto dto)
         {
             return InvokeAsync(async () =>
             {
@@ -21,22 +21,23 @@ namespace Blauhaus.SignalR.Client.DtoCache
                 await UpdateSubscribersAsync(dto);
             });
         }
-        
-        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, TId id)
+
+        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, Func<TDto, bool>? filter = null)
         {
-            return AddFilteredSubscriberAsync(handler, x => Equals(x.Id, id));
+            return InvokeAsync(() => AddSubscriber(handler, filter));
         }
 
         public Task<TDto?> GetOneAsync(TId id)
         {
             return InvokeAsync(() =>
-                CachedDtos.TryGetValue(id, out var dto) 
-                    ? dto : null);
+                CachedDtos.TryGetValue(id, out var dto)
+                    ? dto
+                    : null);
         }
 
         public Task<IReadOnlyList<TDto>> GetAllAsync()
         {
-            return InvokeAsync<IReadOnlyList<TDto>>(() => 
+            return InvokeAsync<IReadOnlyList<TDto>>(() =>
                 CachedDtos.Values.ToList());
         }
 

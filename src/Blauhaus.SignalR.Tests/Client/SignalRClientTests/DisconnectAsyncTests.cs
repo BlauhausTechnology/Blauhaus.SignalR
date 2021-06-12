@@ -37,8 +37,8 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             await Sut.DisconnectAsync();
             
             //Assert
-            Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Disconnecting));
-            Assert.That(StateChanges[2], Is.EqualTo(SignalRConnectionState.Disconnected));
+            Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Disconnecting));
+            Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Disconnected));
         }
     }
 }

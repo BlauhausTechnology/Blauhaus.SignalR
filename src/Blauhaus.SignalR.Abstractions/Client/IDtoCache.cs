@@ -5,11 +5,16 @@ using Blauhaus.Common.Abstractions;
 
 namespace Blauhaus.SignalR.Abstractions.Client
 {
-    public interface IDtoCache<TDto, in TId> : IAsyncIdPublisher<TDto, TId>
+
+    public interface IDtoHandler<in TDto>
+    {
+        Task HandleAsync(TDto dto);
+    }
+
+    public interface IDtoCache<TDto, in TId> : IAsyncPublisher<TDto>, IDtoHandler<TDto>
         where TDto : class, IHasId<TId>
     {
         Task<TDto?> GetOneAsync(TId id);
-        Task SaveAsync(TDto dto);
         Task<IReadOnlyList<TDto>> GetAllAsync();
         Task<IReadOnlyList<TDto>> GetWhereAsync(Func<TDto, bool> search);
     }
