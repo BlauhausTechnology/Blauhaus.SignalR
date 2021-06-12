@@ -9,10 +9,10 @@ using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 {
-    public class ConnectTests : BaseSignalRClientTest<SignalRDtoClient<MyDto, Guid>>
+    public class InitializeAsyncTests : BaseSignalRClientTest<SignalRDtoClient<MyDto, Guid>>
     {
         
-        private IDictionary<string, string> _headers;
+        private IDictionary<string, string> _headers = null!;
          
         public override void Setup()
         {
@@ -20,8 +20,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 
             _headers = new Dictionary<string, string>{["Key"] = "Value"};
             MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
-
-            MockSignalRConnectionProxy.AllowMockConnect();
+             
         }
 
         [Test]

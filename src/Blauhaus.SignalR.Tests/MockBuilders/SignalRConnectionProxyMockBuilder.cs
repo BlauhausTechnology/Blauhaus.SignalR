@@ -14,7 +14,22 @@ namespace Blauhaus.SignalR.Tests.MockBuilders
 {
     public class SignalRConnectionProxyMockBuilder : BaseMockBuilder<SignalRConnectionProxyMockBuilder, ISignalRConnectionProxy>
     {
+        private readonly List<Func<MyDto, Task>> _connectHandlers = new();
 
+        public SignalRConnectionProxyMockBuilder()
+        {
+            var mockToken = new Mock<IDisposable>();
+
+            Mock.Setup(x => x.Subscribe(It.IsAny<string>(), It.IsAny<Func<MyDto, Task>>()))
+                .Callback((string methodName, Func<MyDto, Task> handler) =>
+                {
+                    _connectHandlers.Add(handler);
+                }).Returns(mockToken.Object);
+
+            MockToken = mockToken;
+        }
+
+        public Mock<IDisposable> MockToken { get; }
 
         public SignalRConnectionProxyMockBuilder Where_InvokeAsync_returns<TDto>(TDto response)
         {
@@ -41,43 +56,7 @@ namespace Blauhaus.SignalR.Tests.MockBuilders
         {
             Mock.Raise(x => x.StateChanged += null, new ClientConnectionStateChangeEventArgs(state, exception));
         }
-        
-        private readonly List<Func<SyncResponse<MyDto>, Task>> _syncHandlers = new();
-        public Mock<IDisposable> AllowMockSync()
-        {
-            var mockToken = new Mock<IDisposable>();
-
-            Mock.Setup(x => x.Subscribe(It.IsAny<string>(), It.IsAny<Func<SyncResponse<MyDto>, Task>>()))
-                .Callback((string methodName, Func<SyncResponse<MyDto>, Task> handler) =>
-                {
-                    _syncHandlers.Add(handler);
-                }).Returns(mockToken.Object);
-
-            return mockToken;
-        }
-        public async Task PublishMockSyncAsync(SyncResponse<MyDto> dto)
-        {
-            foreach (var handler in _syncHandlers)
-            {
-                await handler.Invoke(dto);
-            }
-        }
-        
-        
-        private readonly List<Func<MyDto, Task>> _connectHandlers = new();
-        public Mock<IDisposable> AllowMockConnect()
-        {
-            var mockToken = new Mock<IDisposable>();
-
-            Mock.Setup(x => x.Subscribe(It.IsAny<string>(), It.IsAny<Func<MyDto, Task>>()))
-                .Callback((string methodName, Func<MyDto, Task> handler) =>
-                {
-                    _connectHandlers.Add(handler);
-                }).Returns(mockToken.Object);
-
-            return mockToken;
-        }
-        
+         
         public async Task MockPublishDtoAsync(MyDto dto)
         {
             foreach (var handler in _connectHandlers)
