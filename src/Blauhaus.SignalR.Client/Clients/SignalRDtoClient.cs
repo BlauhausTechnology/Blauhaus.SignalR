@@ -6,12 +6,10 @@ using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.ClientActors.Actors;
 using Blauhaus.Common.Abstractions;
-using Blauhaus.Common.Utils.Disposables;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.Client.Connection.Proxy;
 
 namespace Blauhaus.SignalR.Client.Clients
@@ -43,22 +41,30 @@ namespace Blauhaus.SignalR.Client.Clients
         
         public Task InitializeAsync()
         {
-            return InvokeAsync(() =>
+            return InvokeAsync(SubscribeToIncomingDtos);
+        }
+
+        private void SubscribeToIncomingDtos()
+        {
+            if (_connectToken == null)
             {
                 var methodName = $"Publish{typeof(TDto).Name}Async";
-                _connectToken ??= Connection.Subscribe<TDto>(methodName, async dto =>
+
+                _connectToken = Connection.Subscribe<TDto>(methodName, async dto =>
                 {
                     AnalyticsService.Debug($"Received {typeof(TDto).Name}");
-                    await SaveDtoAsync(dto);
+                    await HandleIncomingDtoAsync(dto);
                 });
-                
+                            
                 AnalyticsService.Debug($"Initialized SignalR Dto Client for {typeof(TDto).Name} as {methodName}");
-            });
+            }
         }
 
 
-        private async Task SaveDtoAsync(TDto dto)
+        private async Task HandleIncomingDtoAsync(TDto dto)
         {
+            await UpdateSubscribersAsync(dto);
+
             foreach (var dtoHandlerResolver in _dtoHandlerResolver)
             {
                 var handler = await dtoHandlerResolver.Invoke(dto.Id);
@@ -83,7 +89,7 @@ namespace Blauhaus.SignalR.Client.Clients
                 {
                     AnalyticsService.Debug($"Successfully handled {typeof(TCommand).Name} and received {typeof(TDto).Name} result");
 
-                    await SaveDtoAsync(result.Value);
+                    await HandleIncomingDtoAsync(result.Value);
                 }
 
                 return result;
@@ -101,6 +107,15 @@ namespace Blauhaus.SignalR.Client.Clients
                 Locker.Release();
             }
         }
-          
+
+        public Task<IDisposable> SubscribeAsync(Func<TDto, Task> handler, Func<TDto, bool>? filter = null)
+        {
+            return InvokeAsync(() =>
+            {
+                SubscribeToIncomingDtos();
+
+                return AddSubscriber(handler, filter);
+            });
+        }
     }
 }

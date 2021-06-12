@@ -14,8 +14,8 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 {
     public class InvokeCommandAsyncTests : BaseSignalRClientTest<SignalRDtoClient<MyDto, Guid>>
     {
-        private MyCommand _command;
-        private IDictionary<string, string> _headers;
+        private MyCommand _command = null!;
+        private IDictionary<string, string> _headers = null!;
         
         public override void Setup()
         {
@@ -57,7 +57,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
         }
         
         [Test]
-        public async Task IF_hub_invocation_succeeds_SHOULD_update_dto_cache_with_dto()
+        public async Task IF_hub_invocation_succeeds_SHOULD_invoke_handlers()
         {
             //Arrange
             var dto = new MyDto();
@@ -67,9 +67,49 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             await ExecuteAsync();
 
             //Assert
-            MockMyDtoCache.Mock.Verify(x => x.HandleAsync(dto));
+            MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(dto));
         }
-        
+
+        [Test]
+        public async Task IF_hub_invocation_succeeds_SHOULD_notify_subscribers()
+        {
+            //Arrange
+            var dto = new MyDto();
+            MyDto? incomingDto = null;
+            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
+            await Sut.SubscribeAsync(x =>
+            {
+                incomingDto = x;
+                return Task.CompletedTask;
+            });
+
+            //Act
+            await ExecuteAsync();
+
+            //Assert
+            Assert.That(incomingDto!=null);
+            Assert.That(incomingDto!.Id, Is.EqualTo(dto.Id));
+        }
+        [Test]
+        public async Task IF_hub_invocation_succeeds_SHOULD_not_notify_ex_subscribers()
+        {
+            //Arrange
+            var dto = new MyDto();
+            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
+            MyDto? incomingDto = null;
+            var token = await Sut.SubscribeAsync(x =>
+            {
+                incomingDto = x;
+                return Task.CompletedTask;
+            });
+            token.Dispose();
+
+            //Act
+            await ExecuteAsync();
+
+            //Assert
+            Assert.That(incomingDto, Is.Null);
+        }
 
         [Test]
         public async Task IF_device_is_disconnected_from_internet_SHOULD_return_Error()

@@ -13,7 +13,7 @@ namespace Blauhaus.SignalR.Abstractions.Client
 
     }
 
-    public interface ISignalRDtoClient<TDto> : ISignalRDtoClient
+    public interface ISignalRDtoClient<TDto> : ISignalRDtoClient, IAsyncPublisher<TDto>
     {
         
         Task<Response<TDto>> HandleCommandAsync<TCommand>(TCommand command) where TCommand : notnull;
