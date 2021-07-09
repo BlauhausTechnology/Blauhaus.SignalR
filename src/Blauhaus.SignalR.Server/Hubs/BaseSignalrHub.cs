@@ -19,16 +19,16 @@ namespace Blauhaus.SignalR.Server.Hubs
     {
         protected readonly IServiceLocator ServiceLocator;
         protected readonly IAnalyticsService AnalyticsService;
-        private readonly IAuthenticatedUserFactory _authenticatedUserFactory; 
+        private readonly IConnectedUserFactory _userFactory;
 
         protected BaseSignalRHub(
             IServiceLocator serviceLocator, 
             IAnalyticsService analyticsService,
-            IAuthenticatedUserFactory authenticatedUserFactory)
+            IConnectedUserFactory userFactory)
         {
             ServiceLocator = serviceLocator;
             AnalyticsService = analyticsService;
-            _authenticatedUserFactory = authenticatedUserFactory; 
+            _userFactory = userFactory;
         }
 
         protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TCommand>(
@@ -58,21 +58,7 @@ namespace Blauhaus.SignalR.Server.Hubs
 
         protected IConnectedUser GetConnectedUser()
         {
-            
-            var deviceIdentifier = Context.GetHttpContext().Request.Query["device"];
-            if (string.IsNullOrEmpty(deviceIdentifier))
-            {
-                throw new InvalidOperationException("No device identifier");
-            }
-
-            var getUserResult = _authenticatedUserFactory.ExtractFromClaimsPrincipal(Context.User ?? throw new InvalidOperationException("Invalid user in Context"));
-            if (getUserResult.IsFailure)
-            {
-                throw new InvalidOperationException("No connected user");
-            }
-
-            var authenticatedUser = getUserResult.Value;
-            return new ConnectedUser(authenticatedUser, deviceIdentifier, Context.ConnectionId);
+            return _userFactory.ExtractFromHubConext(Context); 
         }
     }
 }
