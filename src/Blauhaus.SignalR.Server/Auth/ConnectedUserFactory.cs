@@ -10,17 +10,14 @@ namespace Blauhaus.SignalR.Server.Auth
     public class ConnectedUserFactory : IConnectedUserFactory
     {
         private readonly IAuthenticatedUserFactory _authenticatedUserFactory;
-        private readonly IAnalyticsService _analyticsService;
 
         public ConnectedUserFactory(
-            IAuthenticatedUserFactory authenticatedUserFactory,
-            IAnalyticsService analyticsService)
+            IAuthenticatedUserFactory authenticatedUserFactory)
         {
             _authenticatedUserFactory = authenticatedUserFactory;
-            _analyticsService = analyticsService;
         }
 
-        public IConnectedUser ExtractFromHubConext(HubCallerContext context)
+        public IConnectedUser ExtractFromHubContext(HubCallerContext context)
         {
             var deviceIdentifier = context.GetHttpContext().Request.Query["device"];
             if (string.IsNullOrEmpty(deviceIdentifier))

@@ -58,7 +58,7 @@ namespace Blauhaus.SignalR.Server.Hubs
 
         protected IConnectedUser GetConnectedUser()
         {
-            return _userFactory.ExtractFromHubConext(Context); 
+            return _userFactory.ExtractFromHubContext(Context); 
         }
     }
 }
