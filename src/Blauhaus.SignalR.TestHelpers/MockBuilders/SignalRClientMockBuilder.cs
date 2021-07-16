@@ -25,6 +25,22 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
         {
             Mock.Verify(x => x.HandleAsync(It.Is(predicate)));
         }
+
+        public SignalRClientMockBuilder Where_HandleAsync_succeeds<TCommand, TResponse>(TResponse response)
+        {
+            Mock.Setup(x => x.HandleAsync<TCommand, TResponse>(It.IsAny<TCommand>())).ReturnsAsync(Response.Success(response));
+            return this;
+        }
+        public SignalRClientMockBuilder Where_HandleAsync_fails<TCommand, TResponse>(Error error)
+        {
+            Mock.Setup(x => x.HandleAsync<TCommand, TResponse>(It.IsAny<TCommand>())).ReturnsAsync(Response.Failure<TResponse>(error));
+            return this;
+        }
+         
+        public void VerifyHandleAsync<TCommand, TResponse>(Expression<Func<TCommand, bool>> predicate)
+        {
+            Mock.Verify(x => x.HandleAsync<TCommand, TResponse>(It.Is(predicate)));
+        }
          
     }
 }

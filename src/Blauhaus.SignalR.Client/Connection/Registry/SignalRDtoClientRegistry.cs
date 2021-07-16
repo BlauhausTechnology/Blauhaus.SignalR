@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Blauhaus.SignalR.Abstractions.Client;
 
@@ -7,11 +8,11 @@ namespace Blauhaus.SignalR.Client.Connection.Registry
 {
     public class SignalRDtoClientRegistry : ISignalRDtoClientRegistry
     {
-        private readonly IEnumerable<ISignalRDtoClient> _clients;
+        private readonly List<ISignalRDtoClient> _clients;
 
         public SignalRDtoClientRegistry(IEnumerable<ISignalRDtoClient> clients)
         {
-            _clients = clients;
+            _clients = clients.ToList();
         }
         
         public Task InitializeAllClientsAsync()

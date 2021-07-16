@@ -40,7 +40,7 @@ namespace Blauhaus.SignalR.Client.Connection
         {
             return Task.FromResult(AddSubscriber(handler, filter));
         }
-        
+
         public async Task DisconnectAsync()
         {
             _analyticsService.Trace(this, "SignalR connection disconnecting on request");
@@ -71,6 +71,25 @@ namespace Blauhaus.SignalR.Client.Connection
                     command.ToObjectDictionary("Command"));
             }
         }
+        
+        public async Task<Response<TResponse>> HandleAsync<TCommand, TResponse>(TCommand command) where TCommand : notnull
+        {
+            if (!_connectivityService.IsConnectedToInternet)
+            {
+                _analyticsService.TraceWarning(this, "SignalR hub could not be invoked because there is no internet connection");
+                return Response.Failure<TResponse>(SignalRErrors.NoInternet);
+            }
+            try
+            {
+                return await _connectionProxy.InvokeAsync<Response<TResponse>>($"Handle{typeof(TCommand).Name}Async", command, _analyticsService.AnalyticsOperationHeaders);
+            }
+            catch (Exception e)
+            {
+                return _analyticsService.LogExceptionResponse<TResponse>(this, e, SignalRErrors.InvocationFailure(e), 
+                    command.ToObjectDictionary("Command"));
+            }
+        }
+
         
         private async void OnHubStateChanged(object sender, ClientConnectionStateChangeEventArgs eventArgs)
         {
