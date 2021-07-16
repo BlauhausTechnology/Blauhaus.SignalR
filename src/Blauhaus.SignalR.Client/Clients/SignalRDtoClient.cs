@@ -10,6 +10,7 @@ using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Abstractions.DtoCaches;
 using Blauhaus.SignalR.Client.Connection.Proxy;
 
 namespace Blauhaus.SignalR.Client.Clients
@@ -41,10 +42,10 @@ namespace Blauhaus.SignalR.Client.Clients
         
         public Task InitializeAsync()
         {
-            return InvokeAsync(SubscribeToIncomingDtos);
+            return InvokeAsync(EnsureSubscribedToIncomingDtos);
         }
 
-        private void SubscribeToIncomingDtos()
+        private void EnsureSubscribedToIncomingDtos()
         {
             if (_connectToken == null)
             {
@@ -112,7 +113,7 @@ namespace Blauhaus.SignalR.Client.Clients
         {
             return InvokeAsync(() =>
             {
-                SubscribeToIncomingDtos();
+                EnsureSubscribedToIncomingDtos();
 
                 return AddSubscriber(handler, filter);
             });

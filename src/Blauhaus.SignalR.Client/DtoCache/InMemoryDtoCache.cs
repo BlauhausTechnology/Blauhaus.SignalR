@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Blauhaus.ClientActors.Actors;
 using Blauhaus.Common.Abstractions;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Abstractions.DtoCaches;
 
 namespace Blauhaus.SignalR.Client.DtoCache
 {
-    public class InMemoryDtoCache<TDto, TId> : BaseActor, IDtoCache<TDto, TId> where TDto : class, IHasId<TId>
+    public class InMemoryDtoCache<TDto, TId> : BaseActor, IDtoCache<TDto, TId> 
+        where TDto : class, IHasId<TId>
     {
 
         protected Dictionary<TId, TDto> CachedDtos = new Dictionary<TId, TDto>();

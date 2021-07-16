@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blauhaus.Common.Abstractions;
+using Blauhaus.Domain.Abstractions.Entities;
 
-namespace Blauhaus.SignalR.Abstractions.Client
+namespace Blauhaus.SignalR.Abstractions.DtoCaches
 {
 
     public interface IDtoHandler<in TDto>
@@ -18,4 +19,6 @@ namespace Blauhaus.SignalR.Abstractions.Client
         Task<IReadOnlyList<TDto>> GetAllAsync();
         Task<IReadOnlyList<TDto>> GetWhereAsync(Func<TDto, bool> search);
     }
+
+  
 }

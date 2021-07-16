@@ -4,6 +4,7 @@ using System.Linq;
 using Blauhaus.Common.Abstractions;
 using Blauhaus.Common.TestHelpers.MockBuilders;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Abstractions.DtoCaches;
 using Blauhaus.TestHelpers.MockBuilders;
 using Moq;
 
