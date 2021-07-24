@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.AccessToken;
+using Blauhaus.Common.ValueObjects.BuildConfigs;
 using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
 using Blauhaus.SignalR.Client.Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Client.Connection.Proxy
 {
@@ -17,6 +19,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         private readonly HubConnection _hub;
 
         public SignalRConnectionProxy(
+            IBuildConfig buildConfig,
             IRuntimePlatform runtimePlatform,
             ISignalRClientConfig config,
             IAuthenticatedAccessToken accessToken,
@@ -34,6 +37,15 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
 
             var hubUrl = $"{config.HubUrl}?device={deviceInfoService.DeviceUniqueIdentifier}";
             _analyticsService.Trace(this, $"Constructing SignalR hub connection proxy for url {hubUrl}");
+
+            if (buildConfig.Equals(BuildConfig.Debug))
+            {
+                builder.ConfigureLogging(logging =>
+                {
+                    logging.AddConsole();
+                    logging.SetMinimumLevel(LogLevel.Debug);
+                });
+            }
  
             builder.WithUrl(hubUrl, options =>
             {
