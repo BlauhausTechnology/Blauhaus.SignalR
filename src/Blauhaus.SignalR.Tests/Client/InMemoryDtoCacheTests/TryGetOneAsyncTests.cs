@@ -2,14 +2,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
-using Blauhaus.Errors;
 using Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests
 {
-    public class GetOneAsyncTests : BaseInMemoryDtoCacheTest
+    public class TryGetOneAsyncTests : BaseInMemoryDtoCacheTest
     {
 
         [Test]
@@ -19,21 +18,23 @@ namespace Blauhaus.SignalR.Tests.Client.InMemoryDtoCacheTests
             Sut.Cache.Add(DtoThree.Id, DtoThree);
             
             //Act
-            var result = await Sut.GetOneAsync(DtoThree.Id);
+            var result = await Sut.TryGetOneAsync(DtoThree.Id);
             
             //Assert
             Assert.That(result, Is.EqualTo(DtoThree));
         }
         
         [Test]
-        public async Task IF_Dto_does_not_existS_SHOULD_return_throw()
+        public async Task IF_Dto_does_not_existS_SHOULD_return_null()
         {
             //Arrange
             Sut.Cache.Add(DtoThree.Id, DtoThree);
             
             //Act
-            Assert.ThrowsAsync<ErrorException>(async ()=> await Sut.GetOneAsync(DtoOne.Id));
-             
+            var result = await Sut.TryGetOneAsync(DtoOne.Id);
+            
+            //Assert
+            Assert.That(result, Is.Null);
         }
          
     }

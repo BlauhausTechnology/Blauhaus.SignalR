@@ -20,6 +20,22 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
             Mock.Verify(x => x.HandleAsync(dto), Times.Exactly(times));
         }
         
+        public TBuilder Where_TryGetOneAsync_returns(TDto? dto)
+        {
+            Mock.Setup(x => x.TryGetOneAsync(It.IsAny<TId>())).ReturnsAsync(dto);
+            return (TBuilder) this;
+        }
+        public TBuilder Where_TryGetOneAsync_returns(Func<TDto?> dto)
+        {
+            Mock.Setup(x => x.TryGetOneAsync(It.IsAny<TId>())).ReturnsAsync(dto);
+            return (TBuilder) this;
+        }
+        public TBuilder Where_TryGetOneAsync_returns(TDto? dto, TId id)
+        {
+            Mock.Setup(x => x.TryGetOneAsync(id)).ReturnsAsync(dto);
+            return (TBuilder) this;
+        }
+
         public TBuilder Where_GetOneAsync_returns(TDto dto)
         {
             Mock.Setup(x => x.GetOneAsync(It.IsAny<TId>())).ReturnsAsync(dto);
@@ -35,11 +51,6 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders.DtoCaches
             Mock.Setup(x => x.GetOneAsync(id)).ReturnsAsync(dto);
             return (TBuilder) this;
         }
-        public TBuilder Where_GetOneAsync_returns(Func<TDto> dto, TId id)
-        {
-            Mock.Setup(x => x.GetOneAsync(id)).ReturnsAsync(dto);
-            return (TBuilder) this;
-        } 
         
         public TBuilder Where_GetAllAsync_returns(TDto dto)
         {

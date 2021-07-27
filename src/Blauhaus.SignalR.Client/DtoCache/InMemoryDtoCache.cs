@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blauhaus.ClientActors.Actors;
 using Blauhaus.Common.Abstractions;
+using Blauhaus.Domain.Abstractions.Errors;
+using Blauhaus.Errors;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.DtoCaches;
 
@@ -29,7 +31,19 @@ namespace Blauhaus.SignalR.Client.DtoCache
             return InvokeAsync(() => AddSubscriber(handler, filter));
         }
 
-        public Task<TDto?> GetOneAsync(TId id)
+        public Task<TDto> GetOneAsync(TId id)
+        {
+            return InvokeAsync(() =>
+            {
+                if (CachedDtos.TryGetValue(id, out var dto))
+                {
+                    return dto;
+                }
+                throw new ErrorException(DomainErrors.NotFound<TDto>());
+            });
+        }
+
+        public Task<TDto?> TryGetOneAsync(TId id)
         {
             return InvokeAsync(() =>
                 CachedDtos.TryGetValue(id, out var dto)
