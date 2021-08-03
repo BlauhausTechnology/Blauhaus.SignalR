@@ -38,12 +38,12 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             var hubUrl = $"{config.HubUrl}?device={deviceInfoService.DeviceUniqueIdentifier}";
             _analyticsService.Trace(this, $"Constructing SignalR hub connection proxy for url {hubUrl}");
 
-            if (buildConfig.Equals(BuildConfig.Debug))
+            if (buildConfig.Equals(BuildConfig.Debug) && config.IsTraceLoggingRequired)
             {
                 builder.ConfigureLogging(logging =>
                 {
-                    logging.AddConsole();
-                    logging.SetMinimumLevel(LogLevel.Debug);
+                    logging.AddDebug();
+                    logging.SetMinimumLevel(LogLevel.Trace);
                 });
             }
  
