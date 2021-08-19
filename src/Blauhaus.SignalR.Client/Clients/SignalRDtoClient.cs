@@ -7,10 +7,10 @@ using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.ClientActors.Actors;
 using Blauhaus.Common.Abstractions;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
+using Blauhaus.Domain.Abstractions.DtoHandlers;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.Abstractions.DtoCaches;
 using Blauhaus.SignalR.Client.Connection.Proxy;
 
 namespace Blauhaus.SignalR.Client.Clients

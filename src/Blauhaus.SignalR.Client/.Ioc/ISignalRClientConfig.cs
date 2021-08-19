@@ -1,4 +1,4 @@
-﻿namespace Blauhaus.SignalR.Client.Ioc
+﻿namespace Blauhaus.SignalR.Client._.Ioc
 {
     public interface ISignalRClientConfig
     {

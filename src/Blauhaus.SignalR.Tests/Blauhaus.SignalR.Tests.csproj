@@ -12,13 +12,12 @@
     <Compile Include=".Base\BaseSignalRClientTest.cs" />
     <Compile Include=".TestObjects\MyCommand.cs" />
     <Compile Include=".TestObjects\MyDto.cs" />
-    <Compile Include="Client\InMemoryDtoCacheTests\.Base\BaseInMemoryDtoCacheTest.cs" />
-    <Compile Include="Client\InMemoryDtoCacheTests\.Base\TestInMemoryDtoCache.cs" />
     <Compile Include="Client\SignalRClientTests\.Base\BaseSignalRClientTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Blauhaus.DeviceServices.TestHelpers" Version="1.0.5" />
+    <PackageReference Include="Blauhaus.Domain.TestHelpers" Version="1.2.3" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />

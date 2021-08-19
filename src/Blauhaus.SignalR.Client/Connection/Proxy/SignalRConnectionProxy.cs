@@ -7,7 +7,7 @@ using Blauhaus.Auth.Abstractions.AccessToken;
 using Blauhaus.Common.ValueObjects.BuildConfigs;
 using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
-using Blauhaus.SignalR.Client.Ioc;
+using Blauhaus.SignalR.Client._.Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 
