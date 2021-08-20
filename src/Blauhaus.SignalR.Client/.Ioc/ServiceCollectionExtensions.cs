@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Blauhaus.Common.Abstractions;
+using Blauhaus.Domain.Abstractions.DtoCaches;
 using Blauhaus.Domain.Abstractions.DtoHandlers;
 using Blauhaus.Domain.Client.DtoCaches;
 using Blauhaus.Domain.Client.Ioc;
