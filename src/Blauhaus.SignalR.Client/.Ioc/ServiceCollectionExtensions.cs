@@ -13,7 +13,7 @@ using Blauhaus.SignalR.Client.Connection.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Blauhaus.SignalR.Client._.Ioc
+namespace Blauhaus.SignalR.Client.Ioc
 {
     public static class ServiceCollectionExtensions
     {
