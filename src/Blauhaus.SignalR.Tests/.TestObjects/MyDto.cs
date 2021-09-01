@@ -3,7 +3,7 @@ using Blauhaus.Domain.Abstractions.Entities;
 
 namespace Blauhaus.SignalR.Tests.TestObjects
 {
-    public class MyDto : ISyncClientEntity
+    public class MyDto : ISyncClientEntity<Guid>
     {
         public MyDto(Guid? id = null)
         {
