@@ -62,7 +62,7 @@ namespace Blauhaus.SignalR.Client.Clients
         }
 
 
-        private async Task HandleIncomingDtoAsync(TDto dto)
+        protected async Task HandleIncomingDtoAsync(TDto dto)
         {
             await UpdateSubscribersAsync(dto);
 
