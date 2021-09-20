@@ -7,7 +7,6 @@ using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.Domain.Abstractions.DtoHandlers;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Domain.Abstractions.Sync;
-using Blauhaus.Domain.Client.Sync.DtoBatches;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
@@ -39,18 +38,19 @@ namespace Blauhaus.SignalR.Client.Clients
             await Locker.WaitAsync();
             try
             {
-                var result = await Connection.InvokeAsync<Response<DtoBatch<TDto, TId>>>($"Handle{nameof(DtoSyncCommand)}Async", command, AnalyticsService.AnalyticsOperationHeaders);
+                var result = await Connection.InvokeAsync<Response<IDtoBatch>>($"Handle{nameof(DtoSyncCommand)}Async", command, AnalyticsService.AnalyticsOperationHeaders);
 
                 if (result.IsSuccess)
                 {
                     AnalyticsService.Debug($"Successfully handled {nameof(DtoSyncCommand)} and received: {result.Value}" );
 
-                    foreach (var dto in result.Value.Dtos)
+                    var dtoBatch = (DtoBatch<TDto, TId>) result.Value;
+                    foreach (var dto in dtoBatch.Dtos)
                     {
                         await HandleIncomingDtoAsync(dto);
                     }
 
-                    return Response.Success<IDtoBatch<TDto>>(result.Value);
+                    return Response.Success<IDtoBatch<TDto>>(dtoBatch);
                 }
 
                 return Response.Failure<IDtoBatch<TDto>>(result.Error);

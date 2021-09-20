@@ -4,7 +4,6 @@ using Blauhaus.SignalR.Tests.TestObjects;
 using System;
 using System.Collections.Generic;
 using Blauhaus.Domain.Abstractions.Sync;
-using Blauhaus.Domain.Client.Sync.DtoBatches;
 using Blauhaus.Responses;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -24,12 +23,12 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
         {
             base.Setup();
 
-            _command = new DtoSyncCommand(100, 10);
+            _command = DtoSyncCommand.Create<MyDto>(10);
             _headers = new Dictionary<string, string>{["Key"] = "Value"};
             MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
             
             _dto = new MyDto{ModifiedAtTicks = 10001};
-            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(new DtoBatch<MyDto, Guid>(new List<MyDto>
+            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success<IDtoBatch>(new DtoBatch<MyDto, Guid>(new List<MyDto>
             {
                 _dto
             }, 2)));
@@ -48,7 +47,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             await ExecuteAsync();
 
             //Assert
-            MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<DtoBatch<MyDto, Guid>>>("HandleDtoSyncCommandAsync", _command, _headers));
+            MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<IDtoBatch>>("HandleDtoSyncCommandAsync", _command, _headers));
         }
         
         [Test]
@@ -111,7 +110,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
         {
             //Arrange
             var e = new Exception("Something bad happened");
-            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<DtoBatch<MyDto, Guid>>>(e);
+            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<IDtoBatch>>(e);
 
             //Act
             var result = await ExecuteAsync();
@@ -126,7 +125,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
         {
             //Arrange
             var e = new ErrorException(Errors.Errors.Cancelled);
-            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<DtoBatch<MyDto, Guid>>>(e);
+            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<IDtoBatch>>(e);
 
             //Act
             var result = await ExecuteAsync();
