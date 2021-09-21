@@ -30,7 +30,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
         {
             private async Task<Response> ExecuteAsync()
             {
-                return await Sut.HandleAsync(_command);
+                return await Sut.HandleVoidCommandAsync(_command);
             }
 
             [Test]
@@ -110,7 +110,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
 
              private async Task<Response<MyResponse>> ExecuteAsync()
             {
-                return await Sut.HandleAsync<MyCommand, MyResponse>(_command);
+                return await Sut.HandleCommandAsync<MyCommand, MyResponse>(_command);
             }
 
             [Test]

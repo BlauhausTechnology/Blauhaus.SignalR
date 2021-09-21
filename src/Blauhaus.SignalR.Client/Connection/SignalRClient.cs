@@ -54,7 +54,7 @@ namespace Blauhaus.SignalR.Client.Connection
             return _signalRDtoClientRegistry.InitializeAllClientsAsync();
         }
 
-        public async Task<Response> HandleAsync<TCommand>(TCommand command) where TCommand : notnull
+        public async Task<Response> HandleVoidCommandAsync<TCommand>(TCommand command) where TCommand : notnull
         {
             if (!_connectivityService.IsConnectedToInternet)
             {
@@ -72,7 +72,7 @@ namespace Blauhaus.SignalR.Client.Connection
             }
         }
         
-        public async Task<Response<TResponse>> HandleAsync<TCommand, TResponse>(TCommand command) where TCommand : notnull
+        public async Task<Response<TResponse>> HandleCommandAsync<TCommand, TResponse>(TCommand command) where TCommand : notnull
         {
             if (!_connectivityService.IsConnectedToInternet)
             {
