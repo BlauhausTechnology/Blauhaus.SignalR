@@ -31,6 +31,8 @@ namespace Blauhaus.SignalR.Server.Hubs
             AnalyticsService = analyticsService;
             _userFactory = userFactory;
         }
+
+
         protected async Task<Response> HandleVoidCommandAsync<TCommand>(
             TCommand command, 
             IDictionary<string, string> headers, 
@@ -57,6 +59,31 @@ namespace Blauhaus.SignalR.Server.Hubs
         }
 
         protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TCommand>(
+            TCommand command, 
+            IDictionary<string, string> headers, 
+            Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,
+            Func<Guid, IAuthenticatedCommandHandler<TResponse, TCommand, IConnectedUser>> handlerResolver)
+        {
+            using var _ = AnalyticsService.StartRequestOperation(this, typeof(TCommand).Name, headers);
+            try
+            {
+                var connectedUser = GetConnectedUser();
+                var id = idResolver.Compile().Invoke(command, connectedUser);
+                var handler = handlerResolver.Invoke(id);
+
+                return await handler.HandleAsync(command, connectedUser);
+            }
+            catch (ErrorException error)
+            {
+                return AnalyticsService.TraceErrorResponse<TResponse>(this, error.Error, command.ToObjectDictionary());
+            }
+            catch (Exception e)
+            {
+                return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), command.ToObjectDictionary());
+            }
+        }
+
+        protected async Task<Response<TResponse>> HandleDtoSyncCommandAsync<TResponse, TCommand>(
             TCommand command, 
             IDictionary<string, string> headers, 
             Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,

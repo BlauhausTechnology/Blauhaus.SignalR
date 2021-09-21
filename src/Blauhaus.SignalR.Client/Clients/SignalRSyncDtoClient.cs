@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
@@ -10,11 +11,13 @@ using Blauhaus.Domain.Abstractions.Sync;
 using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Abstractions.Sync;
 using Blauhaus.SignalR.Client.Connection.Proxy;
+using Newtonsoft.Json;
 
 namespace Blauhaus.SignalR.Client.Clients
 {
-    public class SignalRSyncDtoClient<TDto, TId> : SignalRDtoClient<TDto,TId>, ISignalRSyncDtoClient<TDto>
+    public class SignalRSyncDtoClient<TDto, TId> : SignalRDtoClient<TDto,TId>, ISignalRSyncDtoClient<TDto, TId>
         where TDto : class, IClientEntity<TId> 
         where TId : IEquatable<TId>
     {
@@ -27,57 +30,43 @@ namespace Blauhaus.SignalR.Client.Clients
         {
         }
 
-        public async Task<Response<IDtoBatch<TDto>>> HandleAsync(DtoSyncCommand command)
+        public async Task<Response<DtoBatch<TDto, TId>>> HandleAsync(DtoSyncCommand command)
         {
             if (!ConnectivityService.IsConnectedToInternet)
             {
                 AnalyticsService.TraceWarning(this, "SignalR hub could not be invoked because there is no internet connection");
-                return Response.Failure<IDtoBatch<TDto>>(SignalRErrors.NoInternet);
+                return Response.Failure<DtoBatch<TDto, TId>>(SignalRErrors.NoInternet);
             }
             
             await Locker.WaitAsync();
             try
             {
-                var result = await Connection.InvokeAsync<Response<DtoObjectBatch>>($"Handle{nameof(DtoSyncCommand)}Async", command, AnalyticsService.AnalyticsOperationHeaders);
+                var result = await Connection.InvokeAsync<Response<SerializedDtoBatch>>($"Handle{nameof(DtoSyncCommand)}Async", command, AnalyticsService.AnalyticsOperationHeaders);
 
-                if (result.IsSuccess)
+                if (result.IsFailure)
                 {
-                    AnalyticsService.Debug($"Successfully handled {nameof(DtoSyncCommand)} and received: {result.Value}" );
+                    return Response.Failure<DtoBatch<TDto, TId>>(result.Error);
+                }
+                
+                AnalyticsService.Debug($"Successfully handled {nameof(DtoSyncCommand)} and received: {result.Value}" );
 
-                    var currentBatchCount = result.Value.DtoObjects.Count;
-                    var remainingDtoCount = result.Value.RemainingDtoCount;
-                    var batchLastModifiedTicks = 0L;
-
-                    var dtos = new TDto[result.Value.DtoObjects.Count];
-                    for (var i = 0; i < dtos.Length; i++)
-                    {
-                        dtos[i] = (TDto)result.Value.DtoObjects[i];
-                        if (dtos[i].ModifiedAtTicks > batchLastModifiedTicks)
-                        {
-                            batchLastModifiedTicks = dtos[i].ModifiedAtTicks;
-                        }
-                    }
-                    foreach (var dto in dtos)
-                    {
-                        await HandleIncomingDtoAsync(dto);
-                    }
-
-                    var dtoBatch = new EmptyDtoBatch<TDto>(currentBatchCount, remainingDtoCount, batchLastModifiedTicks);
-
-
-                    return Response.Success<IDtoBatch<TDto>>(dtoBatch);
+                var dtoBatch = result.Value.Extract<TDto, TId>();
+                  
+                foreach (var dto in dtoBatch.Dtos)
+                {
+                    await HandleIncomingDtoAsync(dto);
                 }
 
-                return Response.Failure<IDtoBatch<TDto>>(result.Error);
+                return Response.Success(dtoBatch);
 
             }
             catch (ErrorException errorException)
             {
-                return AnalyticsService.TraceErrorResponse<IDtoBatch<TDto>>(this, errorException.Error, command.ToObjectDictionary());
+                return AnalyticsService.TraceErrorResponse<DtoBatch<TDto, TId>>(this, errorException.Error, command.ToObjectDictionary());
             }
             catch (Exception e)
             {
-                return AnalyticsService.LogExceptionResponse<IDtoBatch<TDto>>(this, e, SignalRErrors.InvocationFailure(e), command.ToObjectDictionary());
+                return AnalyticsService.LogExceptionResponse<DtoBatch<TDto, TId>>(this, e, SignalRErrors.InvocationFailure(e), command.ToObjectDictionary());
             }
             finally
             {
