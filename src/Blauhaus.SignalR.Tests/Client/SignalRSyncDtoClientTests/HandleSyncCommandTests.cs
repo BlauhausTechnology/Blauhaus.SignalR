@@ -28,7 +28,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
             
             _dto = new MyDto{ModifiedAtTicks = 10001};
-            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success<IDtoBatch>(new DtoBatch<MyDto, Guid>(new List<MyDto>
+            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(new DtoObjectBatch(new List<object>
             {
                 _dto
             }, 2)));
@@ -47,7 +47,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             await ExecuteAsync();
 
             //Assert
-            MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<IDtoBatch>>("HandleDtoSyncCommandAsync", _command, _headers));
+            MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<DtoObjectBatch>>("HandleDtoSyncCommandAsync", _command, _headers));
         }
         
         [Test]
@@ -110,7 +110,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
         {
             //Arrange
             var e = new Exception("Something bad happened");
-            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<IDtoBatch>>(e);
+            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<DtoObjectBatch>>(e);
 
             //Act
             var result = await ExecuteAsync();
@@ -125,7 +125,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
         {
             //Arrange
             var e = new ErrorException(Errors.Errors.Cancelled);
-            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<IDtoBatch>>(e);
+            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<DtoObjectBatch>>(e);
 
             //Act
             var result = await ExecuteAsync();

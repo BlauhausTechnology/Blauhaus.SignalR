@@ -38,17 +38,32 @@ namespace Blauhaus.SignalR.Client.Clients
             await Locker.WaitAsync();
             try
             {
-                var result = await Connection.InvokeAsync<Response<IDtoBatch>>($"Handle{nameof(DtoSyncCommand)}Async", command, AnalyticsService.AnalyticsOperationHeaders);
+                var result = await Connection.InvokeAsync<Response<DtoObjectBatch>>($"Handle{nameof(DtoSyncCommand)}Async", command, AnalyticsService.AnalyticsOperationHeaders);
 
                 if (result.IsSuccess)
                 {
                     AnalyticsService.Debug($"Successfully handled {nameof(DtoSyncCommand)} and received: {result.Value}" );
 
-                    var dtoBatch = (DtoBatch<TDto, TId>) result.Value;
-                    foreach (var dto in dtoBatch.Dtos)
+                    var currentBatchCount = result.Value.DtoObjects.Count;
+                    var remainingDtoCount = result.Value.RemainingDtoCount;
+                    var batchLastModifiedTicks = 0L;
+
+                    var dtos = new TDto[result.Value.DtoObjects.Count];
+                    for (var i = 0; i < dtos.Length; i++)
+                    {
+                        dtos[i] = (TDto)result.Value.DtoObjects[i];
+                        if (dtos[i].ModifiedAtTicks > batchLastModifiedTicks)
+                        {
+                            batchLastModifiedTicks = dtos[i].ModifiedAtTicks;
+                        }
+                    }
+                    foreach (var dto in dtos)
                     {
                         await HandleIncomingDtoAsync(dto);
                     }
+
+                    var dtoBatch = new EmptyDtoBatch<TDto>(currentBatchCount, remainingDtoCount, batchLastModifiedTicks);
+
 
                     return Response.Success<IDtoBatch<TDto>>(dtoBatch);
                 }
