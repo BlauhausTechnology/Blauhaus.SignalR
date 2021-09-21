@@ -20,18 +20,6 @@ namespace Blauhaus.SignalR.Client.Clients
         public IReadOnlyList<object> DtoObjects { get; }
         public int RemainingDtoCount { get; }
 
-        public DtoBatch<TDto, TId> ToDtoBatch<TDto, TId>() 
-            where TDto : IClientEntity<TId> 
-            where TId : IEquatable<TId>
-        {
-            var dtos = new TDto[DtoObjects.Count];
-            for (var i = 0; i < dtos.Length; i++)
-            {
-                dtos[i] = (TDto)DtoObjects[i];
-            }
-
-            return new DtoBatch<TDto, TId>(dtos, RemainingDtoCount);
-        }
-         
+        
     }
 }

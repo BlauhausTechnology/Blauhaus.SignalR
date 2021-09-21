@@ -6,6 +6,7 @@ using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.Services;
 using Blauhaus.Domain.Abstractions.CommandHandlers;
+using Blauhaus.Domain.Abstractions.Sync;
 using Blauhaus.Errors;
 using Blauhaus.Ioc.Abstractions;
 using Blauhaus.Responses;
@@ -79,7 +80,7 @@ namespace Blauhaus.SignalR.Server.Hubs
                 return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), command.ToObjectDictionary());
             }
         }
-
+         
         protected IConnectedUser GetConnectedUser()
         {
             return _userFactory.ExtractFromHubContext(Context); 
