@@ -41,7 +41,7 @@ namespace Blauhaus.SignalR.Client.Clients
             await Locker.WaitAsync();
             try
             {
-                var result = await Connection.InvokeAsync<Response<SerializedDtoBatch>>($"Handle{nameof(DtoSyncCommand)}Async", command, AnalyticsService.AnalyticsOperationHeaders);
+                var result = await Connection.InvokeAsync<Response<DtoBatch<TDto, TId>>>($"Handle{typeof(TDto).Name}SyncCommandAsync", command, AnalyticsService.AnalyticsOperationHeaders);
 
                 if (result.IsFailure)
                 {
@@ -50,7 +50,8 @@ namespace Blauhaus.SignalR.Client.Clients
                 
                 AnalyticsService.Debug($"Successfully handled {nameof(DtoSyncCommand)} and received: {result.Value}" );
 
-                var dtoBatch = result.Value.Extract<TDto, TId>();
+                var dtoBatch = result.Value;
+                //var dtoBatch = result.Value.Extract<TDto, TId>();
                   
                 foreach (var dto in dtoBatch.Dtos)
                 {
