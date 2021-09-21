@@ -28,10 +28,14 @@ namespace Blauhaus.SignalR.Client.Ioc
         {
             services.TryAddSingleton<ISignalRSyncDtoClient<TDto>, SignalRSyncDtoClient<TDto, TId>>();
             services.TryAddSingleton<ICommandHandler<IDtoBatch<TDto>, DtoSyncCommand>>(sp => sp.GetRequiredService<ISignalRSyncDtoClient<TDto>>());
-            
-            //for the SyncManager to resolve
+             
+            //for the AppLifecycleManager to resolve
             services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRSyncDtoClient<TDto>>());
 
+            //for sync manager to resolve
+            services.AddDtoSyncHandler<TDto, TId>();
+
+            //for dto cache to resolve
             services.AddDtoHandler<TDto, TId, TSyncDtoCache>();
             
             return services;
