@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Domain.Abstractions.Sync;
@@ -34,6 +35,18 @@ namespace Blauhaus.SignalR.Abstractions.Sync
             return new SerializedDtoBatch(
                 dtoBatch.CurrentDtoCount,
                 dtoBatch.RemainingDtoCount,
+                batchLastModified,
+                serializedDtos);
+        }
+
+        public static SerializedDtoBatch Create(IReadOnlyList<IClientEntity> dtos, int remainingDtoCount) 
+        {
+            var serializedDtos = JsonConvert.SerializeObject(dtos);
+            var batchLastModified = dtos.OrderByDescending(x => x.ModifiedAtTicks).Select(x => x.ModifiedAtTicks).FirstOrDefault();
+
+            return new SerializedDtoBatch(
+                dtos.Count,
+                remainingDtoCount,
                 batchLastModified,
                 serializedDtos);
         }
