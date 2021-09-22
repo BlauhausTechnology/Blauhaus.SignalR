@@ -35,6 +35,7 @@ namespace Blauhaus.SignalR.Client.Clients
             _syncDtoCache = syncDtoCache;
         }
 
+
         public async Task<Response<DtoBatch<TDto, TId>>> HandleAsync(DtoSyncCommand command)
         {
             if (!ConnectivityService.IsConnectedToInternet)
