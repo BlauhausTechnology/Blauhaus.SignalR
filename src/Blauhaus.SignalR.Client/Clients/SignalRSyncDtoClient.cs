@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
+using Blauhaus.Domain.Abstractions.DtoCaches;
 using Blauhaus.Domain.Abstractions.DtoHandlers;
 using Blauhaus.Domain.Abstractions.Entities;
 using Blauhaus.Domain.Abstractions.Sync;
@@ -21,13 +22,17 @@ namespace Blauhaus.SignalR.Client.Clients
         where TDto : class, IClientEntity<TId> 
         where TId : IEquatable<TId>
     {
+        private readonly ISyncDtoCache<TDto, TId> _syncDtoCache;
+
         public SignalRSyncDtoClient(
             IAnalyticsService analyticsService, 
             IConnectivityService connectivityService, 
             IEnumerable<Func<TId, Task<IDtoHandler<TDto>>>> dtoHandlerResolver, 
+            ISyncDtoCache<TDto, TId> syncDtoCache,
             ISignalRConnectionProxy connection) 
                 : base(analyticsService, connectivityService, dtoHandlerResolver, connection)
         {
+            _syncDtoCache = syncDtoCache;
         }
 
         public async Task<Response<DtoBatch<TDto, TId>>> HandleAsync(DtoSyncCommand command)
@@ -51,7 +56,8 @@ namespace Blauhaus.SignalR.Client.Clients
                 AnalyticsService.Debug($"Successfully handled {nameof(DtoSyncCommand)} and received: {result.Value}" );
 
                 var dtoBatch = result.Value;
-                //var dtoBatch = result.Value.Extract<TDto, TId>();
+
+                await _syncDtoCache.SaveSyncedDtosAsync(dtoBatch);
                   
                 foreach (var dto in dtoBatch.Dtos)
                 {

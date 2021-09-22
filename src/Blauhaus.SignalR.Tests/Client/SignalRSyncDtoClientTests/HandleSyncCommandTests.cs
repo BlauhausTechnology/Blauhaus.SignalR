@@ -8,6 +8,7 @@ using Blauhaus.Responses;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Blauhaus.Analytics.Abstractions.Service;
+using Blauhaus.Domain.TestHelpers.MockBuilders.Client.Sync;
 using Blauhaus.Errors;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.Sync;
@@ -21,6 +22,9 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
         private IDictionary<string, string> _headers = null!;
         private MyDto _dto = null!;
 
+        protected SyncDtoCacheMockBuilder<MyDto, Guid> MockSyncDtoCache = null!;
+        private DtoBatch<MyDto, Guid> _dtoBatch = null!;
+
         public override void Setup()
         {
             base.Setup();
@@ -30,11 +34,15 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
             
             _dto = new MyDto{ModifiedAtTicks = 10001};
-            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(new DtoBatch<MyDto, Guid>(new List<MyDto>
-                {
-                    _dto
-                }, 2)));
-             
+            _dtoBatch = new DtoBatch<MyDto, Guid>(new List<MyDto>
+            {
+                _dto
+            }, 2);
+            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(_dtoBatch));
+
+            MockSyncDtoCache = new SyncDtoCacheMockBuilder<MyDto, Guid>();
+            AddService(MockSyncDtoCache.Object);
+
         }
         
         private Task<Response<DtoBatch<MyDto, Guid>>> ExecuteAsync()
@@ -71,6 +79,17 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             await ExecuteAsync();
 
             //Assert
+            MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(It.Is<MyDto>(y => y.Id == _dto.Id)));
+        }
+
+        [Test]
+        public async Task IF_hub_invocation_succeeds_SHOULD_save_dtos()
+        { 
+            //Act
+            await ExecuteAsync();
+
+            //Assert
+            MockSyncDtoCache.Verify(x => x.SaveSyncedDtosAsync(_dtoBatch));
             MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(It.Is<MyDto>(y => y.Id == _dto.Id)));
         }
 
