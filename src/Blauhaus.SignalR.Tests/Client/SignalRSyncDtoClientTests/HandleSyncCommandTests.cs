@@ -34,7 +34,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
             
             _dto = new MyDto{ModifiedAtTicks = 10001};
-            _dtoBatch = new DtoBatch<MyDto, Guid>(new List<MyDto>
+            _dtoBatch = DtoBatch<MyDto, Guid>.Create(new List<MyDto>
             {
                 _dto
             }, 2);
