@@ -35,6 +35,12 @@ namespace Blauhaus.SignalR.Client.Clients
             _syncDtoCache = syncDtoCache;
         }
 
+        protected override async Task HandleIncomingDtoAsync(TDto dto)
+        {
+            await base.HandleIncomingDtoAsync(dto);
+
+            await _syncDtoCache.HandleAsync(dto);
+        }
 
         public async Task<Response<DtoBatch<TDto, TId>>> HandleAsync(DtoSyncCommand command)
         {

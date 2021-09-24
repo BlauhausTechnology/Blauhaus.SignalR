@@ -23,7 +23,7 @@
     <PackageReference Include="Blauhaus.Common.Utils" Version="1.11.11" />
     <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.11.11" />
     <PackageReference Include="Blauhaus.DeviceServices.Abstractions" Version="1.0.5" />
-    <PackageReference Include="Blauhaus.Domain.Client" Version="1.4.18" /> 
+    <PackageReference Include="Blauhaus.Domain.Client" Version="1.4.22" /> 
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.10" /> 
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" /> 
     <PackageReference Include="System.Reactive" Version="5.0.0" />
