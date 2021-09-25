@@ -68,7 +68,8 @@ namespace Blauhaus.SignalR.Client.Clients
                   
                 foreach (var dto in dtoBatch.Dtos)
                 {
-                    await HandleIncomingDtoAsync(dto);
+                    //don't call the local override because it also tells the cache to Handle the DTO which removes SyncState
+                    await base.HandleIncomingDtoAsync(dto);
                 }
 
                 return Response.Success(dtoBatch);

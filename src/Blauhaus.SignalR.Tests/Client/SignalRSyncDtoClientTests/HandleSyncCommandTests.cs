@@ -90,6 +90,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
 
             //Assert
             MockSyncDtoCache.Verify(x => x.SaveSyncedDtosAsync(_dtoBatch));
+            MockSyncDtoCache.Verify(x => x.HandleAsync(It.IsAny<MyDto>()), Times.Never());
             MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(It.Is<MyDto>(y => y.Id == _dto.Id)));
         }
 
