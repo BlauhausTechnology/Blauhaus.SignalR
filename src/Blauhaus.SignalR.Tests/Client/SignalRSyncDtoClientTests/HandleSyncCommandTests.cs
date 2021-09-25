@@ -71,16 +71,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             Assert.That(result.Value.CurrentDtoCount, Is.EqualTo(1));
             Assert.That(result.Value.RemainingDtoCount, Is.EqualTo(2));
         }
-
-        [Test]
-        public async Task IF_hub_invocation_succeeds_SHOULD_invoke_handlers()
-        { 
-            //Act
-            await ExecuteAsync();
-
-            //Assert
-            MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(It.Is<MyDto>(y => y.Id == _dto.Id)));
-        }
+ 
 
         [Test]
         public async Task IF_hub_invocation_succeeds_SHOULD_save_dtos()
@@ -91,7 +82,6 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             //Assert
             MockSyncDtoCache.Verify(x => x.SaveSyncedDtosAsync(_dtoBatch));
             MockSyncDtoCache.Verify(x => x.HandleAsync(It.IsAny<MyDto>()), Times.Never());
-            MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(It.Is<MyDto>(y => y.Id == _dto.Id)));
         }
 
         [Test]

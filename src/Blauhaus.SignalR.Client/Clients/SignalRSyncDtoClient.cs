@@ -13,35 +13,26 @@ using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Abstractions.Sync;
+using Blauhaus.SignalR.Client.Clients.Base;
 using Blauhaus.SignalR.Client.Connection.Proxy;
 using Newtonsoft.Json;
 
 namespace Blauhaus.SignalR.Client.Clients
 {
-    public class SignalRSyncDtoClient<TDto, TId> : SignalRDtoClient<TDto,TId>, ISignalRSyncDtoClient<TDto, TId>
+    public class SignalRSyncDtoClient<TDto, TId> : BaseSignalRDtoClient<TDto,TId, ISyncDtoCache<TDto, TId>>, ISignalRSyncDtoClient<TDto, TId>
         where TDto : class, IClientEntity<TId> 
         where TId : IEquatable<TId>
-    {
-        private readonly ISyncDtoCache<TDto, TId> _syncDtoCache;
+    { 
 
         public SignalRSyncDtoClient(
             IAnalyticsService analyticsService, 
             IConnectivityService connectivityService, 
-            IEnumerable<Func<TId, Task<IDtoHandler<TDto>>>> dtoHandlerResolver, 
             ISyncDtoCache<TDto, TId> syncDtoCache,
             ISignalRConnectionProxy connection) 
-                : base(analyticsService, connectivityService, dtoHandlerResolver, connection)
+                : base(analyticsService, connectivityService, syncDtoCache, connection)
         {
-            _syncDtoCache = syncDtoCache;
         }
-
-        protected override async Task HandleIncomingDtoAsync(TDto dto)
-        {
-            await base.HandleIncomingDtoAsync(dto);
-
-            await _syncDtoCache.HandleAsync(dto);
-        }
-
+         
         public async Task<Response<DtoBatch<TDto, TId>>> HandleAsync(DtoSyncCommand command)
         {
             if (!ConnectivityService.IsConnectedToInternet)
@@ -64,12 +55,11 @@ namespace Blauhaus.SignalR.Client.Clients
 
                 var dtoBatch = result.Value;
 
-                await _syncDtoCache.SaveSyncedDtosAsync(dtoBatch);
+                await DtoCache.SaveSyncedDtosAsync(dtoBatch);
                   
                 foreach (var dto in dtoBatch.Dtos)
                 {
-                    //don't call the local override because it also tells the cache to Handle the DTO which removes SyncState
-                    await base.HandleIncomingDtoAsync(dto);
+                    await UpdateSubscribersAsync(dto); 
                 }
 
                 return Response.Success(dtoBatch);

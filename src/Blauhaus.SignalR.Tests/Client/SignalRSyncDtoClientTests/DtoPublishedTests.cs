@@ -26,7 +26,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
         }
 
         [Test]
-        public async Task IF_hub_invocation_succeeds_SHOULD_invoke_handlers()
+        public async Task IF_hub_invocation_succeeds_SHOULD_invoke_SyncDtoCache()
         { 
             //Arrange
             await Sut.InitializeAsync();
@@ -38,21 +38,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRSyncDtoClientTests
             MockSyncDtoCache.Mock.Verify(x => x.HandleAsync(_dto));
         }
          
-        
-        [Test]
-        public async Task IF_hub_invocation_succeeds_SHOULD_invoke_SyncDtoCache()
-        { 
-            //Arrange
-            await Sut.InitializeAsync();
-
-            //Act
-            await MockSignalRConnectionProxy.MockPublishDtoAsync(_dto);
-
-            //Assert
-            MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(_dto));
-        }
-
-
+         
         [Test]
         public async Task SHOULD_notify_Subscribers()
         {

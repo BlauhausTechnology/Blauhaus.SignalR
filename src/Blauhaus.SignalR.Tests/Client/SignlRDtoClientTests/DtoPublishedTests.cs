@@ -3,11 +3,13 @@ using Blauhaus.SignalR.Tests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using System;
 using System.Threading.Tasks;
+using Blauhaus.Domain.TestHelpers.MockBuilders.Client.DtoCaches;
+using Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests.Base;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 {
-    public class DtoPublishedTests : BaseSignalRClientTest<SignalRDtoClient<MyDto, Guid>>
+    public class DtoPublishedTests : BaseSignalRDtoClientTest
     {
         private MyDto _dto = null!;
 
@@ -16,21 +18,9 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             base.Setup();
 
             _dto = new MyDto();
+
         }
-
-        [Test]
-        public async Task IF_hub_invocation_succeeds_SHOULD_invoke_handlers()
-        { 
-            //Arrange
-            await Sut.InitializeAsync();
-
-            //Act
-            await MockSignalRConnectionProxy.MockPublishDtoAsync(_dto);
-
-            //Assert
-            MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(_dto));
-        }
-
+         
         [Test]
         public async Task SHOULD_notify_Subscribers()
         {

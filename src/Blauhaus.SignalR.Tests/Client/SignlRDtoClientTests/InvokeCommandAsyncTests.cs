@@ -7,12 +7,13 @@ using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Tests.Base;
+using Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 {
-    public class InvokeCommandAsyncTests : BaseSignalRClientTest<SignalRDtoClient<MyDto, Guid>>
+    public class InvokeCommandAsyncTests : BaseSignalRDtoClientTest
     {
         private MyCommand _command = null!;
         private IDictionary<string, string> _headers = null!;
@@ -57,7 +58,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
         }
         
         [Test]
-        public async Task IF_hub_invocation_succeeds_SHOULD_invoke_handlers()
+        public async Task IF_hub_invocation_succeeds_SHOULD_update_cache()
         {
             //Arrange
             var dto = new MyDto();
@@ -67,7 +68,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             await ExecuteAsync();
 
             //Assert
-            MockMyDtoHandler.Mock.Verify(x => x.HandleAsync(dto));
+            MockDtoCache.Mock.Verify(x => x.HandleAsync(dto));
         }
 
         [Test]

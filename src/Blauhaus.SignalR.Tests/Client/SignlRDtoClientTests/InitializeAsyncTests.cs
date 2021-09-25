@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Tests.Base;
+using Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Moq;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 {
-    public class InitializeAsyncTests : BaseSignalRClientTest<SignalRDtoClient<MyDto, Guid>>
+    public class InitializeAsyncTests : BaseSignalRDtoClientTest
     {
         
         private IDictionary<string, string> _headers = null!;

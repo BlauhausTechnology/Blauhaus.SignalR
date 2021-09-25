@@ -15,10 +15,11 @@
   <ItemGroup>
     <Compile Include=".Ioc\ISignalRClientConfig.cs" />
     <Compile Include=".Ioc\ServiceCollectionExtensions.cs" />
+    <Compile Include="Clients\.Base\BaseSignalRDtoClient.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.6.18" />
+    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.6.19" />
     <PackageReference Include="Blauhaus.ClientActors" Version="0.9.1" />
     <PackageReference Include="Blauhaus.Common.Utils" Version="1.11.11" />
     <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.11.11" />

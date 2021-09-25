@@ -6,6 +6,7 @@ using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.DeviceServices.TestHelpers.MockBuilders;
 using Blauhaus.Domain.Abstractions.DtoHandlers;
 using Blauhaus.Domain.TestHelpers.Extensions;
+using Blauhaus.Domain.TestHelpers.MockBuilders.Client.DtoCaches;
 using Blauhaus.Domain.TestHelpers.MockBuilders.Client.DtoHandlers;
 using Blauhaus.SignalR.Client.Connection.Proxy;
 using Blauhaus.SignalR.Tests.MockBuilders;
@@ -25,14 +26,12 @@ namespace Blauhaus.SignalR.Tests.Base
             AddService(MockSignalRConnectionProxy.Object);
             AddService(MockAnalyticsService.Object);
             AddService(MockConnectivityService.Object);
-            
-            AddService<Func<Guid, Task<IDtoHandler<MyDto>>>>(x => id => Task.FromResult(MockMyDtoHandler.Object));
+             
         }
 
         protected SignalRConnectionProxyMockBuilder MockSignalRConnectionProxy => AddMock<SignalRConnectionProxyMockBuilder, ISignalRConnectionProxy>().Invoke();
         protected AnalyticsServiceMockBuilder MockAnalyticsService => AddMock<AnalyticsServiceMockBuilder, IAnalyticsService>().Invoke();
         protected ConnectivityServiceMockBuilder MockConnectivityService => AddMock<ConnectivityServiceMockBuilder, IConnectivityService>().Invoke();
-
-        protected DtoHandlerMockBuilder<MyDto, Guid> MockMyDtoHandler => Mocks.AddMockDtoHandler<MyDto, Guid>().Invoke();
+         
     }
 }
