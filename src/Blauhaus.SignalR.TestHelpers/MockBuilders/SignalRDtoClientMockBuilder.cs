@@ -1,14 +1,14 @@
-﻿using Blauhaus.Errors;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using Blauhaus.Errors;
+using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.TestHelpers.Builders.Base;
 using Blauhaus.TestHelpers.MockBuilders;
 using Moq;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System;
-using Blauhaus.Responses;
 
-namespace Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients
+namespace Blauhaus.SignalR.TestHelpers.MockBuilders
 {
     public class SignalRDtoClientMockBuilder<TDto> : BaseSignalRDtoClientMockBuilder<SignalRDtoClientMockBuilder<TDto>, ISignalRDtoClient<TDto>, TDto> where TDto : class
     {

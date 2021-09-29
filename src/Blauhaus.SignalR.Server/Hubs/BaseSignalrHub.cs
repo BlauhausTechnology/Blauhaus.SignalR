@@ -37,7 +37,8 @@ namespace Blauhaus.SignalR.Server.Hubs
             TCommand command, 
             IDictionary<string, string> headers, 
             Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,
-            Func<Guid, IVoidAuthenticatedCommandHandler<TCommand, IConnectedUser>> handlerResolver)
+            Func<Guid, IVoidAuthenticatedCommandHandler<TCommand, IConnectedUser>> handlerResolver) 
+                where TCommand : notnull
         {
             using var _ = AnalyticsService.StartRequestOperation(this, typeof(TCommand).Name, headers);
             try
@@ -54,7 +55,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             }
             catch (Exception e)
             {
-                return AnalyticsService.LogExceptionResponse(this, e, Errors.Errors.Unexpected(e.Message), command.ToObjectDictionary());
+                return AnalyticsService.LogExceptionResponse(this, e, Error.Unexpected(e.Message), command.ToObjectDictionary());
             }
         }
 
@@ -79,7 +80,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             }
             catch (Exception e)
             {
-                return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), command.ToObjectDictionary());
+                return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Error.Unexpected(e.Message), command.ToObjectDictionary());
             }
         }
 
@@ -104,7 +105,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             }
             catch (Exception e)
             {
-                return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), command.ToObjectDictionary());
+                return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Error.Unexpected(e.Message), command.ToObjectDictionary());
             }
         }
          
