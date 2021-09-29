@@ -1,6 +1,6 @@
 ﻿using System;
 using Blauhaus.SignalR.Abstractions.Client;
-using Blauhaus.SignalR.TestHelpers.MockBuilders.SignalRClients;
+using Blauhaus.SignalR.TestHelpers.MockBuilders;
 using Blauhaus.TestHelpers;
 
 namespace Blauhaus.SignalR.TestHelpers.Extensions
