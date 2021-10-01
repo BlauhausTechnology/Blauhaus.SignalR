@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Blauhaus.Common.Abstractions;
-using Blauhaus.Domain.Abstractions.CommandHandlers;
 using Blauhaus.Domain.Abstractions.DtoCaches;
 using Blauhaus.Domain.Abstractions.DtoHandlers;
-using Blauhaus.Domain.Abstractions.Entities;
-using Blauhaus.Domain.Abstractions.Sync;
 using Blauhaus.Domain.Client.DtoCaches;
-using Blauhaus.Domain.Client.Ioc;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Client.Connection;
@@ -19,29 +15,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Blauhaus.SignalR.Client.Ioc
 {
     public static class ServiceCollectionExtensions
-    {
-        ////Sync
-        //public static IServiceCollection AddSignalRSyncDtoClient<TDto, TId, TSyncDtoCache>(this IServiceCollection services) 
-        //    where TDto : class, IClientEntity<TId> 
-        //    where TId : IEquatable<TId>
-        //    where TSyncDtoCache : class, ISyncDtoCache<TDto, TId>
-        //{
-        //    services.TryAddSingleton<ISignalRSyncDtoClient<TDto, TId>, SignalRSyncDtoClient<TDto, TId>>();
-        //    services.TryAddSingleton<ICommandHandler<DtoBatch<TDto, TId>, DtoSyncCommand>>(sp => sp.GetRequiredService<ISignalRSyncDtoClient<TDto, TId>>());
-             
-        //    //for the AppLifecycleManager to resolve
-        //    services.AddSingleton<ISignalRDtoClient>(sp => sp.GetRequiredService<ISignalRSyncDtoClient<TDto, TId>>());
-
-        //    //for sync manager to resolve
-        //    services.AddDtoSyncHandler<TDto, TId>();
-
-        //    //for dto cache to resolve
-        //    services.AddDtoHandler<TDto, TId, TSyncDtoCache>();
-            
-        //    return services;
-        //} 
-
-
+    { 
         //Client  
         public static IServiceCollection AddSignalRDtoClient<TDto, TId>(this IServiceCollection services, Func<IServiceProvider, TId, Task<IDtoHandler<TDto>>> resolver) 
             where TDto : class, IHasId<TId> where TId : IEquatable<TId>

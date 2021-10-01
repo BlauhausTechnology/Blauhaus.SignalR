@@ -3,7 +3,7 @@ using Blauhaus.Domain.Abstractions.Entities;
 
 namespace Blauhaus.SignalR.Tests.TestObjects
 {
-    public class MyDto : ISyncClientEntity<Guid>
+    public class MyDto : IClientEntity<Guid>
     {
         public MyDto(Guid? id = null)
         {
@@ -14,6 +14,5 @@ namespace Blauhaus.SignalR.Tests.TestObjects
         
         public EntityState EntityState { get; set; }
         public long ModifiedAtTicks { get; set;}
-        public SyncState SyncState { get; set; }
     }
 }
