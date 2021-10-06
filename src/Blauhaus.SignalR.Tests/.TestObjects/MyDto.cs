@@ -13,6 +13,7 @@ namespace Blauhaus.SignalR.Tests.TestObjects
         public string Name { get; set; }
         
         public EntityState EntityState { get; set; }
-        public long ModifiedAtTicks { get; set;}
+        public long ModifiedAtTicks { get; set; }
+
     }
 }
