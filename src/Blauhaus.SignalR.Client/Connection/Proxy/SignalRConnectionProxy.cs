@@ -52,10 +52,10 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             {
                 options.AccessTokenProvider = () => Task.FromResult(accessToken.Token);
 
-                if (config.BypassAndroidSSLErrors && runtimePlatform.Equals(RuntimePlatform.Android))
+                if (config.BypassSSLErrors)
                 {
                     //https://github.com/xamarin/xamarin-android/issues/6351
-                    _analyticsService.Trace(this, "SSL errors on Android will be bypassed... ");
+                    _analyticsService.Trace(this, "SSL errors will be bypassed... ");
 
                     options.HttpMessageHandlerFactory = (message) =>
                     {

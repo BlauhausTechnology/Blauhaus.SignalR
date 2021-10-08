@@ -5,6 +5,6 @@
         string HubUrl { get; }
         bool IsAutoReconnectEnabled { get; }
         bool IsTraceLoggingRequired { get; }
-        bool BypassAndroidSSLErrors { get; }
+        bool BypassSSLErrors { get; }
     }
 }

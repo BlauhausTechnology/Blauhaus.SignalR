@@ -11,12 +11,12 @@
             HubUrl = hubUrl;
             IsAutoReconnectEnabled = isAutoReconnectEnabled;
             IsTraceLoggingRequired = isTraceLoggingRequired;
-            BypassAndroidSSLErrors = bypassAndroidSslErrors;
+            BypassSSLErrors = bypassAndroidSslErrors;
         }
 
         public string HubUrl { get; }
         public bool IsAutoReconnectEnabled { get; protected set; }
         public bool IsTraceLoggingRequired { get; protected set; }
-        public bool BypassAndroidSSLErrors { get; protected set; }
+        public bool BypassSSLErrors { get; protected set; }
     }
 }
