@@ -19,25 +19,55 @@ namespace Blauhaus.SignalR.Server.Hubs
     {
         protected readonly IServiceLocator ServiceLocator;
         protected readonly IAnalyticsService AnalyticsService;
-        private readonly IAuthenticatedUserFactory _authenticatedUserFactory; 
+        private readonly IConnectedUserFactory _userFactory;
 
         protected BaseSignalRHub(
             IServiceLocator serviceLocator, 
             IAnalyticsService analyticsService,
-            IAuthenticatedUserFactory authenticatedUserFactory)
+            IConnectedUserFactory userFactory)
         {
             ServiceLocator = serviceLocator;
             AnalyticsService = analyticsService;
-            _authenticatedUserFactory = authenticatedUserFactory; 
+            _userFactory = userFactory;
+        }
+
+
+        protected async Task<Response> HandleVoidCommandAsync<TCommand>(
+            TCommand command, 
+            IDictionary<string, string> headers, 
+            Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,
+            Func<Guid, IVoidAuthenticatedCommandHandler<TCommand, IConnectedUser>> handlerResolver, 
+            string? operationName = null) 
+                where TCommand : notnull
+        {
+            using var _ = AnalyticsService.StartRequestOperation(this, operationName ?? typeof(TCommand).Name, headers);
+            try
+            {
+                var connectedUser = GetConnectedUser();
+                var id = idResolver.Compile().Invoke(command, connectedUser);
+                var handler = handlerResolver.Invoke(id);
+
+                return await handler.HandleAsync(command, connectedUser);
+            }
+            catch (ErrorException error)
+            {
+                return AnalyticsService.TraceErrorResponse(this, error.Error, command.ToObjectDictionary());
+            }
+            catch (Exception e)
+            {
+                return AnalyticsService.LogExceptionResponse(this, e, Error.Unexpected(e.Message), command.ToObjectDictionary());
+            }
         }
 
         protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TCommand>(
             TCommand command, 
             IDictionary<string, string> headers, 
             Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,
-            Func<Guid, IAuthenticatedCommandHandler<TResponse, TCommand, IConnectedUser>> handlerResolver)
+            Func<Guid, IAuthenticatedCommandHandler<TResponse, TCommand, IConnectedUser>> handlerResolver, 
+            string? operationName = null) 
+                where TCommand : notnull
         {
-            using var _ = AnalyticsService.StartRequestOperation(this, typeof(TCommand).Name, headers);
+            using var _ = AnalyticsService.StartRequestOperation(this, operationName ?? typeof(TCommand).Name, headers);
             try
             {
                 var connectedUser = GetConnectedUser();
@@ -52,27 +82,13 @@ namespace Blauhaus.SignalR.Server.Hubs
             }
             catch (Exception e)
             {
-                return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Errors.Errors.Unexpected(e.Message), command.ToObjectDictionary());
+                return AnalyticsService.LogExceptionResponse<TResponse>(this, e, Error.Unexpected(e.Message), command.ToObjectDictionary());
             }
-        }
-
+        } 
+         
         protected IConnectedUser GetConnectedUser()
         {
-            
-            var deviceIdentifier = Context.GetHttpContext().Request.Query["device"];
-            if (string.IsNullOrEmpty(deviceIdentifier))
-            {
-                throw new InvalidOperationException("No device identifier");
-            }
-
-            var getUserResult = _authenticatedUserFactory.ExtractFromClaimsPrincipal(Context.User ?? throw new InvalidOperationException("Invalid user in Context"));
-            if (getUserResult.IsFailure)
-            {
-                throw new InvalidOperationException("No connected user");
-            }
-
-            var authenticatedUser = getUserResult.Value;
-            return new ConnectedUser(authenticatedUser, deviceIdentifier, Context.ConnectionId);
+            return _userFactory.ExtractFromHubContext(Context); 
         }
     }
 }

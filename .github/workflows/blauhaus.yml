@@ -5,14 +5,14 @@ on:
     - release/*
 
 jobs:
-
   build:
      runs-on: ubuntu-latest
      steps:
+     - uses: actions/checkout@v2
      - uses: actions/setup-dotnet@v1
-       with: 
-         dotnet-version: '5.0.x' 
-     - uses: actions/checkout@v1
+       with:
+         dotnet-version: '6.0.x'
+         include-prerelease: true
      - name: Set Version
        run: |
         npm install @actions/core --save
