@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Blauhaus.SignalR.Abstractions.Sync;
-using Blauhaus.SignalR.Client;
 using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.Client.Connection.Proxy;
 using Blauhaus.SignalR.Tests.TestObjects;

@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.AccessToken;
+using Blauhaus.Common.ValueObjects.BuildConfigs;
 using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
 using Blauhaus.SignalR.Client.Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Client.Connection.Proxy
 {
@@ -17,6 +20,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         private readonly HubConnection _hub;
 
         public SignalRConnectionProxy(
+            IBuildConfig buildConfig,
             IRuntimePlatform runtimePlatform,
             ISignalRClientConfig config,
             IAuthenticatedAccessToken accessToken,
@@ -34,10 +38,34 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
 
             var hubUrl = $"{config.HubUrl}?device={deviceInfoService.DeviceUniqueIdentifier}";
             _analyticsService.Trace(this, $"Constructing SignalR hub connection proxy for url {hubUrl}");
+
+            if (buildConfig.Equals(BuildConfig.Debug) && config.IsTraceLoggingRequired)
+            {
+                builder.ConfigureLogging(logging =>
+                {
+                    logging.AddDebug();
+                    logging.SetMinimumLevel(LogLevel.Trace);
+                });
+            }
  
             builder.WithUrl(hubUrl, options =>
             {
                 options.AccessTokenProvider = () => Task.FromResult(accessToken.Token);
+
+                if (config.BypassSSLErrors)
+                {
+                    //https://github.com/xamarin/xamarin-android/issues/6351
+                    _analyticsService.Trace(this, "SSL errors will be bypassed... ");
+
+                    options.HttpMessageHandlerFactory = (message) =>
+                    {
+                        if (message is HttpClientHandler clientHandler)
+                            // bypass SSL certificate
+                            clientHandler.ServerCertificateCustomValidationCallback +=
+                                (sender, certificate, chain, sslPolicyErrors) => true;
+                        return message;
+                    };
+                }
             });
 
             _hub = builder.Build();
