@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blauhaus.Auth.Abstractions" Version="0.12.3" />
-    <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.12.3" />
-    <PackageReference Include="Blauhaus.Domain.Abstractions" Version="1.5.10" />
+    <PackageReference Include="Blauhaus.Auth.Abstractions" Version="0.12.4" />
+    <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.12.5" />
+    <PackageReference Include="Blauhaus.Domain.Abstractions" Version="1.5.11" />
   </ItemGroup>
 
   <ItemGroup>
