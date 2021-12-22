@@ -20,7 +20,7 @@ namespace Blauhaus.SignalR.Client.Clients.Base
         where TId : IEquatable<TId>
         where TDtoCache : IDtoCache<TDto, TId>
     {
-        protected readonly SemaphoreSlim Locker = new SemaphoreSlim(1); 
+        protected readonly SemaphoreSlim Locker = new(1); 
         protected readonly ISignalRConnectionProxy Connection;
         
         protected readonly IAnalyticsService AnalyticsService;
