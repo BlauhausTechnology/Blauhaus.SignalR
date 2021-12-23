@@ -145,15 +145,15 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
         public async Task IF_connection_throws_error_exception_SHOULD_return_Error()
         {
             //Arrange
-            var e = new ErrorException(Errors.Errors.Cancelled);
+            var e = new ErrorException(Error.Cancelled);
             MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<MyDto>>(e);
 
             //Act
             var result = await ExecuteAsync();
 
             //Assert
-            Assert.That(result.Error.Equals(Errors.Errors.Cancelled));
-            MockAnalyticsService.VerifyTrace(Errors.Errors.Cancelled.ToString(), LogSeverity.Error);
+            Assert.That(result.Error.Equals(Error.Cancelled));
+            MockAnalyticsService.VerifyTrace(Error.Cancelled.ToString(), LogSeverity.Error);
         } 
     }
 }
