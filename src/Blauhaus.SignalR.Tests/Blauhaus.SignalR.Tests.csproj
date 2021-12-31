@@ -18,9 +18,9 @@
 
   <ItemGroup>
     <PackageReference Include="Blauhaus.DeviceServices.TestHelpers" Version="1.0.13" />
-    <PackageReference Include="Blauhaus.Domain.TestHelpers" Version="1.6.36" />
+    <PackageReference Include="Blauhaus.Domain.TestHelpers" Version="1.7.2" />
     <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
   </ItemGroup>
 
