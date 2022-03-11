@@ -4,6 +4,7 @@ using Blauhaus.SignalR.Server.Auth;
 using Blauhaus.SignalR.Server.Proxy;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Blauhaus.SignalR.Server.Ioc
 {
@@ -11,8 +12,8 @@ namespace Blauhaus.SignalR.Server.Ioc
     {
         public static IServiceCollection AddSignalRHub<THub>(this IServiceCollection services) where THub : Hub
         {
-            services.AddScoped<IHubContextProxy, HubContextProxy<THub>>();
-            services.AddScoped<IConnectedUserFactory, ConnectedUserFactory>();
+            services.TryAddTransient<IHubContextProxy, HubContextProxy<THub>>();
+            services.TryAddTransient<IConnectedUserFactory, ConnectedUserFactory>();
             return services;
         }
     }

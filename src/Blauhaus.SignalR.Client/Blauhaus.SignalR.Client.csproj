@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>netstandard2.0</TargetFramework>
-	  <LangVersion>9</LangVersion>
+	  <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+	  <LangVersion>latest</LangVersion>
 	  <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -20,13 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.7.12" />
+    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.7.16" />
     <PackageReference Include="Blauhaus.ClientActors" Version="0.10.9" />
-    <PackageReference Include="Blauhaus.Common.Utils" Version="1.12.15" />
-    <PackageReference Include="Blauhaus.Common.Abstractions" Version="1.12.15" />
+    <PackageReference Include="Blauhaus.Common.Utils" Version="2.1.0" />
+    <PackageReference Include="Blauhaus.Common.Abstractions" Version="2.1.0" />
     <PackageReference Include="Blauhaus.DeviceServices.Abstractions" Version="1.0.16" />
-    <PackageReference Include="Blauhaus.Domain.Client" Version="1.7.3" /> 
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.1" /> 
+    <PackageReference Include="Blauhaus.Domain.Client" Version="1.7.10" /> 
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.3" /> 
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" /> 
   </ItemGroup>
 
