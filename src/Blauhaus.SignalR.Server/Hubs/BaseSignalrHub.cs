@@ -15,14 +15,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Server.Hubs
 {
-    public abstract class BaseSignalRHub<THub> : Hub where THub : BaseSignalRHub<THub>
+    public abstract class BaseSignalRHub : Hub 
     {
-        protected readonly IAnalyticsLogger<THub> Logger;
+        protected readonly IAnalyticsLogger Logger;
         protected readonly IServiceLocator ServiceLocator;
         protected  readonly IConnectedUserFactory UserFactory;
 
         protected BaseSignalRHub(
-            IAnalyticsLogger<THub> logger,
+            IAnalyticsLogger logger,
             IServiceLocator serviceLocator, 
             IConnectedUserFactory userFactory)
         {
@@ -119,7 +119,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             if (messageTemplate == null)
             {
                 messageTemplate = "Hub handled command {CommandType} for response {ResponseType}";
-                args = new object[] { typeof(TCommand).Name, typeof(TResponse).Name };
+                args = new object[] { typeof(TCommand).Name, typeof(TIResponse).Name };
             }
 
             using var _ = Logger.BeginTimedScope(LogLevel.Trace, messageTemplate, args);

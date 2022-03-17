@@ -24,7 +24,7 @@ namespace Blauhaus.SignalR.Client.Clients.Base
         where TDtoCache : IDtoCache<TDto, TId>
     {
         protected readonly SemaphoreSlim Locker = new(1);
-        protected readonly IAnalyticsLogger<TClient> Logger;
+        protected readonly IAnalyticsLogger Logger;
         private readonly IAnalyticsContext _analyticsContext;
         protected readonly ISignalRConnectionProxy Connection;
         
@@ -34,7 +34,7 @@ namespace Blauhaus.SignalR.Client.Clients.Base
         private IDisposable? _connectToken;
 
         protected BaseSignalRDtoClient(
-            IAnalyticsLogger<TClient> logger,
+            IAnalyticsLogger logger,
             IAnalyticsContext analyticsContext,
             IConnectivityService connectivityService,
             TDtoCache dtoCache,
