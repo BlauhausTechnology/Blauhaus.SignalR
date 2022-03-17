@@ -4,8 +4,6 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions;
 using Blauhaus.Analytics.Abstractions.Extensions;
-using Blauhaus.Analytics.Abstractions.Service;
-using Blauhaus.Auth.Abstractions.Services;
 using Blauhaus.Domain.Abstractions.CommandHandlers;
 using Blauhaus.Errors;
 using Blauhaus.Ioc.Abstractions;
@@ -89,7 +87,6 @@ namespace Blauhaus.SignalR.Server.Hubs
 
             using var _ = Logger.BeginTimedScope(LogLevel.Trace, messageTemplate, args);
 
-
             try
             {
                 var connectedUser = GetConnectedUser();
@@ -97,6 +94,46 @@ namespace Blauhaus.SignalR.Server.Hubs
                 var handler = handlerResolver.Invoke(id);
 
                 return await handler.HandleAsync(command, connectedUser);
+            }
+            catch (ErrorException error)
+            {
+                return Logger.LogErrorResponse<TResponse>(error.Error);
+            }
+            catch (Exception e)
+            {
+                return Logger.LogErrorResponse<TResponse>(Error.Unexpected(e.Message), e);
+            }
+        } 
+         
+        //this is to allow internal return values to be IModel but still send a Model result to the client because SignalR doesn't support interfaces
+        protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TIResponse, TCommand, TId>(
+            TCommand command, 
+            Dictionary<string, object> headers, 
+            Expression<Func<TCommand, IConnectedUser, TId>> idResolver,
+            Func<TId, IAuthenticatedCommandHandler<TIResponse, TCommand, IConnectedUser>> handlerResolver, 
+            string? messageTemplate = null, params object[] args) 
+                where TCommand : notnull
+                where TResponse : TIResponse
+        {
+            Logger.SetValues(headers);
+            if (messageTemplate == null)
+            {
+                messageTemplate = "Hub handled command {CommandType} for response {ResponseType}";
+                args = new object[] { typeof(TCommand).Name, typeof(TResponse).Name };
+            }
+
+            using var _ = Logger.BeginTimedScope(LogLevel.Trace, messageTemplate, args);
+
+            try
+            {
+                var connectedUser = GetConnectedUser();
+                var id = idResolver.Compile().Invoke(command, connectedUser);
+                var handler = handlerResolver.Invoke(id);
+
+                var response = await handler.HandleAsync(command, connectedUser);
+                return response.IsSuccess 
+                    ? Response.Success((TResponse)response.Value!) 
+                    : Response.Failure<TResponse>(response.Error);
             }
             catch (ErrorException error)
             {
