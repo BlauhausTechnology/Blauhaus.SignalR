@@ -35,7 +35,7 @@ namespace Blauhaus.SignalR.Server.Hubs
         protected async Task<Response> HandleVoidCommandAsync<TCommand, TId>(
             TCommand command, 
             Dictionary<string, object> headers, 
-            Expression<Func<TCommand, IConnectedUser, TId>> idResolver,
+            Func<TCommand, IConnectedUser, TId> idResolver,
             Func<TId, IVoidAuthenticatedCommandHandler<TCommand, IConnectedUser>> handlerResolver, 
             string? messageTemplate = null, params object[] args) 
                 where TCommand : notnull
@@ -52,7 +52,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             try
             {
                 var connectedUser = GetConnectedUser();
-                var id = idResolver.Compile().Invoke(command, connectedUser);
+                var id = idResolver.Invoke(command, connectedUser);
                 var handler = handlerResolver.Invoke(id);
 
                 Logger.SetValue("UserId", connectedUser.UserId);
@@ -73,7 +73,7 @@ namespace Blauhaus.SignalR.Server.Hubs
         protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TCommand, TId>(
             TCommand command, 
             Dictionary<string, object> headers, 
-            Expression<Func<TCommand, IConnectedUser, TId>> idResolver,
+            Func<TCommand, IConnectedUser, TId> idResolver,
             Func<TId, IAuthenticatedCommandHandler<TResponse, TCommand, IConnectedUser>> handlerResolver, 
             string? messageTemplate = null, params object[] args) 
                 where TCommand : notnull
@@ -90,7 +90,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             try
             {
                 var connectedUser = GetConnectedUser();
-                var id = idResolver.Compile().Invoke(command, connectedUser);
+                var id = idResolver.Invoke(command, connectedUser);
                 var handler = handlerResolver.Invoke(id);
 
                 return await handler.HandleAsync(command, connectedUser);
@@ -109,7 +109,7 @@ namespace Blauhaus.SignalR.Server.Hubs
         protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TIResponse, TCommand, TId>(
             TCommand command, 
             Dictionary<string, object> headers, 
-            Expression<Func<TCommand, IConnectedUser, TId>> idResolver,
+            Func<TCommand, IConnectedUser, TId> idResolver,
             Func<TId, IAuthenticatedCommandHandler<TIResponse, TCommand, IConnectedUser>> handlerResolver, 
             string? messageTemplate = null, params object[] args) 
                 where TCommand : notnull
@@ -127,7 +127,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             try
             {
                 var connectedUser = GetConnectedUser();
-                var id = idResolver.Compile().Invoke(command, connectedUser);
+                var id = idResolver.Invoke(command, connectedUser);
                 var handler = handlerResolver.Invoke(id);
 
                 var response = await handler.HandleAsync(command, connectedUser);
