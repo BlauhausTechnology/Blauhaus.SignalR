@@ -34,11 +34,11 @@ namespace Blauhaus.SignalR.Server.Hubs
         }
 
 
-        protected async Task<Response> HandleVoidCommandAsync<TCommand>(
+        protected async Task<Response> HandleVoidCommandAsync<TCommand, TId>(
             TCommand command, 
             Dictionary<string, object> headers, 
-            Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,
-            Func<Guid, IVoidAuthenticatedCommandHandler<TCommand, IConnectedUser>> handlerResolver, 
+            Expression<Func<TCommand, IConnectedUser, TId>> idResolver,
+            Func<TId, IVoidAuthenticatedCommandHandler<TCommand, IConnectedUser>> handlerResolver, 
             string? messageTemplate = null, params object[] args) 
                 where TCommand : notnull
         {
@@ -72,11 +72,11 @@ namespace Blauhaus.SignalR.Server.Hubs
             }
         }
 
-        protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TCommand>(
+        protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TCommand, TId>(
             TCommand command, 
             Dictionary<string, object> headers, 
-            Expression<Func<TCommand, IConnectedUser, Guid>> idResolver,
-            Func<Guid, IAuthenticatedCommandHandler<TResponse, TCommand, IConnectedUser>> handlerResolver, 
+            Expression<Func<TCommand, IConnectedUser, TId>> idResolver,
+            Func<TId, IAuthenticatedCommandHandler<TResponse, TCommand, IConnectedUser>> handlerResolver, 
             string? messageTemplate = null, params object[] args) 
                 where TCommand : notnull
         {
