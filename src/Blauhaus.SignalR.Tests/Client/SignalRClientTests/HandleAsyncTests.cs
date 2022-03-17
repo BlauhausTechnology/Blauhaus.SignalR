@@ -7,6 +7,7 @@ using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Tests.Client.SignalRClientTests.Base;
 using Blauhaus.SignalR.Tests.TestObjects;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
@@ -19,12 +20,12 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             base.Setup();
 
             _command = new MyCommand();
-            _headers = new Dictionary<string, string> {["Key"] = "Value"};
-            MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
+            _headers = new Dictionary<string, object> {["Key"] = "Value"};
+            MockAnalyticsContext.Where_GetAllValues_returns(_headers);
         }
 
         private MyCommand _command = null!;
-        private IDictionary<string, string> _headers = null!;
+        private Dictionary<string, object> _headers = null!;
 
         public class NoReturnValue : HandleAsyncTests
         {
@@ -60,13 +61,13 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             public async Task IF_hub_invocation_fails_SHOULD_return_it()
             {
                 //Arrange
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Failure(AuthErrors.NotAuthenticated));
+                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Failure(AuthError.NotAuthenticated));
 
                 //Act
                 var result = await ExecuteAsync();
 
                 //Assert
-                Assert.That(result.Error == AuthErrors.NotAuthenticated);
+                Assert.That(result.Error == AuthError.NotAuthenticated);
             }
 
             [Test]
@@ -80,7 +81,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
 
                 //Assert
                 Assert.That(result.Error == SignalRErrors.NoInternet);
-                MockAnalyticsService.VerifyTrace("SignalR hub could not be invoked because there is no internet connection", LogSeverity.Warning);
+                MockLogger.VerifyLog("SignalR hub could not be invoked because there is no internet connection");
             }
 
             [Test]
@@ -94,8 +95,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
                 var result = await ExecuteAsync();
 
                 //Assert
-                Assert.That(result.Error == SignalRErrors.InvocationFailure(e));
-                MockAnalyticsService.VerifyLogExceptionWithMessage("Something bad happened");
+                MockLogger.VerifyLogErrorResponse(SignalRErrors.InvocationFailure(e), result, e);
             }
         }
 
@@ -141,13 +141,13 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             public async Task IF_hub_invocation_fails_SHOULD_return_it()
             {
                 //Arrange
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Failure<MyResponse>(AuthErrors.NotAuthenticated));
+                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Failure<MyResponse>(AuthError.NotAuthenticated));
 
                 //Act
                 var result = await ExecuteAsync();
 
                 //Assert
-                Assert.That(result.Error == AuthErrors.NotAuthenticated);
+                Assert.That(result.Error == AuthError.NotAuthenticated);
             }
 
             [Test]
@@ -160,8 +160,8 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
                 var result = await ExecuteAsync();
 
                 //Assert
-                Assert.That(result.Error == SignalRErrors.NoInternet);
-                MockAnalyticsService.VerifyTrace("SignalR hub could not be invoked because there is no internet connection", LogSeverity.Warning);
+                MockLogger.VerifyLog("SignalR hub could not be invoked because there is no internet connection", LogLevel.Warning);
+                Assert.That(result.Error, Is.EqualTo(SignalRErrors.NoInternet));
             }
 
             [Test]
@@ -175,8 +175,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
                 var result = await ExecuteAsync();
 
                 //Assert
-                Assert.That(result.Error == SignalRErrors.InvocationFailure(e));
-                MockAnalyticsService.VerifyLogExceptionWithMessage("Something bad happened");
+                MockLogger.VerifyLogErrorResponse(SignalRErrors.InvocationFailure(e), result, e);
             }
         }
     }

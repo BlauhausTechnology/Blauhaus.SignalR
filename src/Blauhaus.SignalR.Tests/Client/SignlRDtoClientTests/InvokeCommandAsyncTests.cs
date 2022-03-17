@@ -16,15 +16,15 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
     public class InvokeCommandAsyncTests : BaseSignalRDtoClientTest
     {
         private MyCommand _command = null!;
-        private IDictionary<string, string> _headers = null!;
+        private Dictionary<string, object> _headers = null!;
         
         public override void Setup()
         {
             base.Setup();
 
             _command = new MyCommand();
-            _headers = new Dictionary<string, string>{["Key"] = "Value"};
-            MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
+            _headers = new Dictionary<string, object>{["Key"] = "Value"};
+            MockAnalyticsContext.Where_GetAllValues_returns(_headers);
             MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(new List<MyDto>()));
         }
         
@@ -123,7 +123,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
 
             //Assert
             Assert.That(result.Error == SignalRErrors.NoInternet);
-            MockAnalyticsService.VerifyTrace("SignalR hub could not be invoked because there is no internet connection", LogSeverity.Warning);
+            MockLogger.VerifyLog("SignalR hub could not be invoked because there is no internet connection");
         }
         
         [Test]
@@ -137,8 +137,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             var result = await ExecuteAsync();
 
             //Assert
-            Assert.That(result.Error.Equals(SignalRErrors.InvocationFailure(e)));
-            MockAnalyticsService.VerifyLogExceptionWithMessage("Something bad happened");
+            MockLogger.VerifyLogErrorResponse(SignalRErrors.InvocationFailure(e), result, e);
         } 
         
         [Test]
@@ -152,8 +151,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             var result = await ExecuteAsync();
 
             //Assert
-            Assert.That(result.Error.Equals(Error.Cancelled));
-            MockAnalyticsService.VerifyTrace(Error.Cancelled.ToString(), LogSeverity.Error);
+            MockLogger.VerifyLogErrorResponse(Error.Cancelled, result);
         } 
     }
 }

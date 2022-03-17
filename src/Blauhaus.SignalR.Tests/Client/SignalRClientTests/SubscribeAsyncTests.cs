@@ -4,16 +4,16 @@ using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Tests.Client.SignalRClientTests.Base;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
 namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
 {
     public class SubscribeAsyncTests : BaseSignalRClientTest
     {
-      
 
         [Test]
-        public async Task WHEN_connection_starts_reconnecting_due_to_exception_SHOULD_log_warning_and_publish_state()
+        public async Task WHEN_connection_starts_reconnecting_due_to_exception_SHOULD_publish_state()
         {
             //Arrang
             var exception = new Exception("foo");
@@ -23,12 +23,11 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Reconnecting, exception);
             
             //Assert
-            MockAnalyticsService.VerifyTrace($"SignalR client hub Reconnecting due to exception: {exception.Message}", LogSeverity.Warning);
             Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Reconnecting));
         }
         
         [Test]
-        public async Task WHEN_connection_disconnects_due_to_exception_SHOULD_log_warning_and_publish_state()
+        public async Task WHEN_connection_disconnects_due_to_exception_SHOULD_publish_state()
         {
             //Arrang
             var exception = new Exception("foo");
@@ -38,7 +37,6 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Disconnected, exception);
             
             //Assert
-            MockAnalyticsService.VerifyTrace($"SignalR client hub Disconnected due to exception: {exception.Message}", LogSeverity.Warning);
             Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Disconnected));
         }
         
@@ -52,7 +50,6 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Disconnected);
             
             //Assert
-            MockAnalyticsService.VerifyTrace($"SignalR client hub Disconnected");
             Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Disconnected));
         }
         
@@ -67,7 +64,6 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Connected);
             
             //Assert
-            MockAnalyticsService.VerifyTrace($"SignalR client hub Connected");
             Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Connected));
         }
         
@@ -83,7 +79,6 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Connected);
             
             //Assert
-            MockAnalyticsService.VerifyTrace($"SignalR client hub Reconnected");
             Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Reconnected));
         }
     }

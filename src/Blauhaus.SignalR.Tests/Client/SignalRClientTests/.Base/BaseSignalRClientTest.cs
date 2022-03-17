@@ -14,7 +14,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests.Base
         protected List<SignalRConnectionState> StateChanges = null!;
         protected Func<SignalRConnectionState, Task> Handler = null!;
         protected MockBuilder<ISignalRDtoClientRegistry> SignalRClientRegistry = null!;
-
+        
         public override void Setup()
         {
             base.Setup();

@@ -11,9 +11,8 @@
   </ItemGroup>
 
     <ItemGroup>
-	    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.7.16" />
 	    <PackageReference Include="Blauhaus.Ioc.Abstractions" Version="1.4.3" />
-	    <PackageReference Include="Blauhaus.Responses" Version="0.4.4" />
+	    <PackageReference Include="Blauhaus.Responses" Version="0.4.6" />
 	    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.16.0" />
     </ItemGroup>
 

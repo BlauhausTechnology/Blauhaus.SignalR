@@ -13,15 +13,15 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
     public class InitializeAsyncTests : BaseSignalRDtoClientTest
     {
         
-        private IDictionary<string, string> _headers = null!;
+        private Dictionary<string, object> _headers = null!;
          
         public override void Setup()
         {
             base.Setup();
 
-            _headers = new Dictionary<string, string>{["Key"] = "Value"};
-            MockAnalyticsService.With(x => x.AnalyticsOperationHeaders, _headers);
-             
+            _headers = new Dictionary<string, object>{["Key"] = "Value"};
+            MockAnalyticsContext.Where_GetAllValues_returns(_headers);
+
         }
 
         [Test]

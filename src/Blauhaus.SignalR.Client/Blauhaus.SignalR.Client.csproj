@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="1.7.16" />
     <PackageReference Include="Blauhaus.ClientActors" Version="0.10.9" />
     <PackageReference Include="Blauhaus.Common.Utils" Version="2.1.0" />
     <PackageReference Include="Blauhaus.Common.Abstractions" Version="2.1.0" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Blauhaus.Analytics.Abstractions;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.ClientActors.Actors;
@@ -11,32 +12,37 @@ using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Client;
 using Blauhaus.SignalR.Client.Connection.Proxy;
+using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Client.Clients.Base
 {
     
-    public abstract class BaseSignalRDtoClient<TDto, TId, TDtoCache> : BaseActor, ISignalRDtoClient<TDto>
+    public abstract class BaseSignalRDtoClient<TClient, TDto, TId, TDtoCache> : BaseActor, ISignalRDtoClient<TDto>
+        where TClient :BaseSignalRDtoClient<TClient, TDto, TId, TDtoCache>
         where TDto : class, IHasId<TId> 
         where TId : IEquatable<TId>
         where TDtoCache : IDtoCache<TDto, TId>
     {
-        protected readonly SemaphoreSlim Locker = new(1); 
+        protected readonly SemaphoreSlim Locker = new(1);
+        protected readonly IAnalyticsLogger<TClient> Logger;
+        private readonly IAnalyticsContext _analyticsContext;
         protected readonly ISignalRConnectionProxy Connection;
         
-        protected readonly IAnalyticsService AnalyticsService;
         protected readonly IConnectivityService ConnectivityService;
         protected readonly TDtoCache DtoCache;
 
         private IDisposable? _connectToken;
 
         protected BaseSignalRDtoClient(
-            IAnalyticsService analyticsService,
+            IAnalyticsLogger<TClient> logger,
+            IAnalyticsContext analyticsContext,
             IConnectivityService connectivityService,
             TDtoCache dtoCache,
             ISignalRConnectionProxy connection)
         {
+            Logger = logger;
+            _analyticsContext = analyticsContext;
             Connection = connection;
-            AnalyticsService = analyticsService;
             ConnectivityService = connectivityService;
             DtoCache = dtoCache;
         }
@@ -54,11 +60,11 @@ namespace Blauhaus.SignalR.Client.Clients.Base
 
                 _connectToken = Connection.Subscribe<TDto>(methodName, async dto =>
                 {
-                    AnalyticsService.Debug($"Received {typeof(TDto).Name}");
+                    Logger.LogTrace("SignalRDtoClient received {DtoType}", typeof(TDto).Name);
                     await HandleIncomingDtoAsync(dto);
                 });
                             
-                AnalyticsService.Debug($"Initialized SignalR Dto Client for {typeof(TDto).Name} as {methodName}");
+                Logger.LogDebug("Initialized SignalR Dto Client for {DtoType} with callback {Callback}",typeof(TDto).Name, methodName);
             }
         }
 
@@ -73,19 +79,18 @@ namespace Blauhaus.SignalR.Client.Clients.Base
         { 
             if (!ConnectivityService.IsConnectedToInternet)
             {
-                AnalyticsService.TraceWarning(this, "SignalR hub could not be invoked because there is no internet connection");
+                Logger.LogWarning("SignalR hub could not be invoked because there is no internet connection");
                 return Response.Failure<TDto>(SignalRErrors.NoInternet);
             }
             
             await Locker.WaitAsync();
             try
             {
-                var result = await Connection.InvokeAsync<Response<TDto>>($"Handle{typeof(TCommand).Name}Async", command, AnalyticsService.AnalyticsOperationHeaders);
+                var result = await Connection.InvokeAsync<Response<TDto>>($"Handle{typeof(TCommand).Name}Async", command, _analyticsContext.GetAllValues());
 
                 if (result.IsSuccess)
                 {
-                    AnalyticsService.Debug($"Successfully handled {typeof(TCommand).Name} and received {typeof(TDto).Name} result");
-
+                    Logger.LogDebug("Successfully handled {CommandType} and received {DtoType} result", typeof(TCommand).Name, typeof(TDto).Name);
                     await HandleIncomingDtoAsync(result.Value);
                 }
 
@@ -93,11 +98,11 @@ namespace Blauhaus.SignalR.Client.Clients.Base
             }
             catch (ErrorException errorException)
             {
-                return AnalyticsService.TraceErrorResponse<TDto>(this, errorException.Error, command.ToObjectDictionary());
+                return Logger.LogErrorResponse<TDto>(errorException.Error);
             }
             catch (Exception e)
             {
-                return AnalyticsService.LogExceptionResponse<TDto>(this, e, SignalRErrors.InvocationFailure(e), command.ToObjectDictionary());
+                return Logger.LogErrorResponse<TDto>(SignalRErrors.InvocationFailure(e), e);
             }
             finally
             {

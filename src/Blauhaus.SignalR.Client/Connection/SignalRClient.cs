@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Blauhaus.Analytics.Abstractions;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Common.Utils.Disposables;
@@ -10,6 +11,7 @@ using Blauhaus.SignalR.Client.Connection.Proxy;
 using Blauhaus.SignalR.Client.Connection.Registry;
 using Blauhaus.SignalR.Client.Extensions;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Client.Connection
 {
@@ -17,18 +19,21 @@ namespace Blauhaus.SignalR.Client.Connection
     {
         private HubConnectionState _previousState;
         
-        private readonly IAnalyticsService _analyticsService;
+        private readonly IAnalyticsLogger<SignalRClient> _logger;
+        private readonly IAnalyticsContext _analyticsContext;
         private readonly ISignalRConnectionProxy _connectionProxy;
         private readonly ISignalRDtoClientRegistry _signalRDtoClientRegistry;
         private readonly IConnectivityService _connectivityService;
 
         public SignalRClient(
-            IAnalyticsService analyticsService,
+            IAnalyticsLogger<SignalRClient> logger,
+            IAnalyticsContext analyticsContext,
             ISignalRConnectionProxy connectionProxy,
             ISignalRDtoClientRegistry signalRDtoClientRegistry,
             IConnectivityService connectivityService)
         {
-            _analyticsService = analyticsService;
+            _logger = logger;
+            _analyticsContext = analyticsContext;
             _connectionProxy = connectionProxy;
             _signalRDtoClientRegistry = signalRDtoClientRegistry;
             _connectivityService = connectivityService;
@@ -43,7 +48,7 @@ namespace Blauhaus.SignalR.Client.Connection
 
         public async Task DisconnectAsync()
         {
-            _analyticsService.Trace(this, "SignalR connection disconnecting on request");
+            _logger.LogTrace("SignalR connection disconnecting on request");
             await UpdateSubscribersAsync(SignalRConnectionState.Disconnecting);
             await _connectionProxy.StopAsync();
             await UpdateSubscribersAsync(SignalRConnectionState.Disconnected);
@@ -58,17 +63,16 @@ namespace Blauhaus.SignalR.Client.Connection
         {
             if (!_connectivityService.IsConnectedToInternet)
             {
-                _analyticsService.TraceWarning(this, "SignalR hub could not be invoked because there is no internet connection");
+                _logger.LogWarning("SignalR hub could not be invoked because there is no internet connection");
                 return Response.Failure(SignalRErrors.NoInternet);
             }
             try
             {
-                return await _connectionProxy.InvokeAsync<Response>($"Handle{typeof(TCommand).Name}Async", command, _analyticsService.AnalyticsOperationHeaders);
+                return await _connectionProxy.InvokeAsync<Response>($"Handle{typeof(TCommand).Name}Async", command, _analyticsContext.GetAllValues());
             }
             catch (Exception e)
             {
-                return _analyticsService.LogExceptionResponse(this, e, SignalRErrors.InvocationFailure(e), 
-                    command.ToObjectDictionary("Command"));
+                return _logger.LogErrorResponse(SignalRErrors.InvocationFailure(e), e);
             }
         }
         
@@ -76,47 +80,45 @@ namespace Blauhaus.SignalR.Client.Connection
         {
             if (!_connectivityService.IsConnectedToInternet)
             {
-                _analyticsService.TraceWarning(this, "SignalR hub could not be invoked because there is no internet connection");
+                _logger.LogWarning("SignalR hub could not be invoked because there is no internet connection");
                 return Response.Failure<TResponse>(SignalRErrors.NoInternet);
             }
             try
             {
-                return await _connectionProxy.InvokeAsync<Response<TResponse>>($"Handle{typeof(TCommand).Name}Async", command, _analyticsService.AnalyticsOperationHeaders);
+                return await _connectionProxy.InvokeAsync<Response<TResponse>>($"Handle{typeof(TCommand).Name}Async", command, _analyticsContext.GetAllValues());
             }
             catch (Exception e)
             {
-                return _analyticsService.LogExceptionResponse<TResponse>(this, e, SignalRErrors.InvocationFailure(e), 
-                    command.ToObjectDictionary("Command"));
+                return _logger.LogErrorResponse<TResponse>(SignalRErrors.InvocationFailure(e), e);
             }
         }
 
         
         private async void OnHubStateChanged(object sender, ClientConnectionStateChangeEventArgs eventArgs)
         {
-            var clientState = eventArgs.State.ToConnectionState(_previousState);
+            var connectionState = eventArgs.State.ToConnectionState(_previousState);
             var exception = eventArgs.Exception;
              
-            var traceMessage = $"SignalR client hub {clientState}";
             
-            if (clientState == SignalRConnectionState.Reconnecting && exception != null)
+            if (connectionState == SignalRConnectionState.Reconnecting && exception != null)
             {
-                _analyticsService.TraceWarning(this, $"{traceMessage} due to exception: {exception.Message}");
+                _logger.LogWarning("SignalR client hub {ConnectionState} due to exception {@Exception}", connectionState, exception);
             }
 
-            else if (clientState == SignalRConnectionState.Disconnected)
+            else if (connectionState == SignalRConnectionState.Disconnected)
             {
-                _analyticsService.Trace(this, traceMessage);
+                _logger.LogTrace("SignalR client hub {ConnectionState}", connectionState);
                 if (exception != null)
                 {
-                    _analyticsService.TraceWarning(this, $"{traceMessage} due to exception: {exception.Message}");
+                    _logger.LogWarning("SignalR client hub {ConnectionState} due to exception {@Exception}", connectionState, exception);
                 }
             }
             else
             {
-                _analyticsService.Trace(this, traceMessage);
+                _logger.LogTrace("SignalR client hub {ConnectionState}", connectionState);
             }
 
-            await UpdateSubscribersAsync(clientState);
+            await UpdateSubscribersAsync(connectionState);
 
             _previousState = eventArgs.State;
         }

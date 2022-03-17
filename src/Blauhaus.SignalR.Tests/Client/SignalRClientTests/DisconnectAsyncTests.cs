@@ -24,7 +24,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             await Sut.DisconnectAsync();
             
             //Assert
-            MockAnalyticsService.VerifyTrace("SignalR connection disconnecting on request");
+            MockLogger.VerifyLog("SignalR connection disconnecting on request");
         }
         
         [Test]
