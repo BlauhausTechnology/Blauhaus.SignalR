@@ -105,6 +105,7 @@ namespace Blauhaus.SignalR.Server.Hubs
             }
         } 
          
+
         //this is to allow internal return values to be IModel but still send a Model result to the client because SignalR doesn't support interfaces
         protected async Task<Response<TResponse>> HandleCommandAsync<TResponse, TIResponse, TCommand, TId>(
             TCommand command, 
