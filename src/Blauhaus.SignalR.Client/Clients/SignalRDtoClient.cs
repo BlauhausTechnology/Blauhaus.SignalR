@@ -10,7 +10,7 @@ using Blauhaus.SignalR.Client.Connection.Proxy;
 namespace Blauhaus.SignalR.Client.Clients
 {
 
-    public class SignalRDtoClient<TDto, TId> : BaseSignalRDtoClient<SignalRDtoClient<TDto, TId>, TDto, TId, IDtoCache<TDto, TId>> where TId : IEquatable<TId> where TDto : class, IHasId<TId>
+    public class SignalRDtoClient<TDto, TId> : BaseSignalRDtoClient<TDto, TId, IDtoCache<TDto, TId>> where TId : IEquatable<TId> where TDto : class, IHasId<TId>
     {
         public SignalRDtoClient(
             IAnalyticsLogger<SignalRDtoClient<TDto, TId>> logger, 

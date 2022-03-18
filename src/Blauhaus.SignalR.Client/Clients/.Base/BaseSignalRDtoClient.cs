@@ -17,8 +17,7 @@ using Microsoft.Extensions.Logging;
 namespace Blauhaus.SignalR.Client.Clients.Base
 {
     
-    public abstract class BaseSignalRDtoClient<TClient, TDto, TId, TDtoCache> : BaseActor, ISignalRDtoClient<TDto>
-        where TClient :BaseSignalRDtoClient<TClient, TDto, TId, TDtoCache>
+    public abstract class BaseSignalRDtoClient<TDto, TId, TDtoCache> : BaseActor, ISignalRDtoClient<TDto>
         where TDto : class, IHasId<TId> 
         where TId : IEquatable<TId>
         where TDtoCache : IDtoCache<TDto, TId>
