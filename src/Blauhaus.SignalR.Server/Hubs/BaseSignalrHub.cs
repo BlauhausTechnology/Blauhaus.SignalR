@@ -32,7 +32,9 @@ namespace Blauhaus.SignalR.Server.Hubs
         }
 
 
-        protected async Task<Response> HandleVoidCommandAsync<TCommand, TId>(
+
+
+        protected async Task<Response> HandleCommandAsync<TCommand, TId>(
             TCommand command, 
             Dictionary<string, object> headers, 
             Func<TCommand, IConnectedUser, TId> idResolver,
@@ -52,11 +54,11 @@ namespace Blauhaus.SignalR.Server.Hubs
             try
             {
                 var connectedUser = GetConnectedUser();
-                var id = idResolver.Invoke(command, connectedUser);
-                var handler = handlerResolver.Invoke(id);
-
                 Logger.SetValue("UserId", connectedUser.UserId);
                 Logger.SetValue("ConnectionId", connectedUser.CurrentConnectionId);
+
+                var id = idResolver.Invoke(command, connectedUser);
+                var handler = handlerResolver.Invoke(id);
 
                 return await handler.HandleAsync(command, connectedUser);
             }
@@ -90,6 +92,9 @@ namespace Blauhaus.SignalR.Server.Hubs
             try
             {
                 var connectedUser = GetConnectedUser();
+                Logger.SetValue("UserId", connectedUser.UserId);
+                Logger.SetValue("ConnectionId", connectedUser.CurrentConnectionId);
+
                 var id = idResolver.Invoke(command, connectedUser);
                 var handler = handlerResolver.Invoke(id);
 
@@ -128,6 +133,9 @@ namespace Blauhaus.SignalR.Server.Hubs
             try
             {
                 var connectedUser = GetConnectedUser();
+                Logger.SetValue("UserId", connectedUser.UserId);
+                Logger.SetValue("ConnectionId", connectedUser.CurrentConnectionId);
+
                 var id = idResolver.Invoke(command, connectedUser);
                 var handler = handlerResolver.Invoke(id);
 
@@ -145,7 +153,6 @@ namespace Blauhaus.SignalR.Server.Hubs
                 return Logger.LogErrorResponse<TResponse>(Error.Unexpected(e.Message), e);
             }
         } 
-         
         protected IConnectedUser GetConnectedUser()
         {
             return UserFactory.ExtractFromHubContext(Context); 
