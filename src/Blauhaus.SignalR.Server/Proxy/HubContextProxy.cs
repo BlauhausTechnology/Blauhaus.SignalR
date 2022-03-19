@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Blauhaus.Analytics.Abstractions;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
+using Blauhaus.Errors;
 using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Server;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Server.Proxy
 {
     public class HubContextProxy<THub> : IHubContextProxy where THub : Hub
     {
-        private readonly IAnalyticsService _analyticsService;
+        private readonly IAnalyticsLogger<THub> _logger;
         private readonly IHubContext<THub> _hubContext;
 
         public HubContextProxy(
-            IAnalyticsService analyticsService,
+            IAnalyticsLogger<THub> logger,
             IHubContext<THub> hubContext)
         {
-            _analyticsService = analyticsService;
+            _logger = logger;
             _hubContext = hubContext;
         }
          
@@ -25,11 +28,12 @@ namespace Blauhaus.SignalR.Server.Proxy
         {
             try
             {
+                _logger.LogTrace("Publishing Dto {DtoType} to connection {ConnectionId}", typeof(TDto).Name, connectiondId);
                 await _hubContext.Clients.Client(connectiondId).SendAsync($"Publish{typeof(TDto).Name}Async", dto);
             }
             catch (Exception e)
             {
-                return _analyticsService.LogExceptionResponse(this, e, Errors.Errors.Unexpected(e.Message));
+                return _logger.LogErrorResponse(Error.Unexpected(e.Message), e);
             }
             return Response.Success();
         }

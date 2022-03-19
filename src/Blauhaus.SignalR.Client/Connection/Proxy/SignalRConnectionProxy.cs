@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Blauhaus.Analytics.Abstractions;
 using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Analytics.Abstractions.Service;
 using Blauhaus.Auth.Abstractions.AccessToken;
@@ -10,24 +11,24 @@ using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
 using Blauhaus.SignalR.Client.Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Client.Connection.Proxy
 {
     public class SignalRConnectionProxy : ISignalRConnectionProxy
     {
-        private readonly IAnalyticsService _analyticsService;
+        private readonly IAnalyticsLogger<ISignalRConnectionProxy> _logger;
         private readonly HubConnection _hub;
 
         public SignalRConnectionProxy(
-            IBuildConfig buildConfig,
-            IRuntimePlatform runtimePlatform,
+            IAnalyticsLogger<ISignalRConnectionProxy> logger,
+            IServiceProvider serviceProvider,
             ISignalRClientConfig config,
             IAuthenticatedAccessToken accessToken,
-            IDeviceInfoService deviceInfoService,
-            IAnalyticsService analyticsService)
+            IDeviceInfoService deviceInfoService)
         {
-            _analyticsService = analyticsService;
+            _logger = logger;
 
             var builder = new HubConnectionBuilder();
 
@@ -37,16 +38,18 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             }
 
             var hubUrl = $"{config.HubUrl}?device={deviceInfoService.DeviceUniqueIdentifier}";
-            _analyticsService.Trace(this, $"Constructing SignalR hub connection proxy for url {hubUrl}");
+            _logger.LogDebug("Constructing SignalR hub connection proxy for url {ApiEndpoint}", hubUrl);
 
-            if (buildConfig.Equals(BuildConfig.Debug) && config.IsTraceLoggingRequired)
+            var loggingProviders = serviceProvider.GetServices<ILoggerProvider>();
+            
+            builder.ConfigureLogging(logging =>
             {
-                builder.ConfigureLogging(logging =>
+                foreach (var provider in loggingProviders)
                 {
-                    logging.AddDebug();
-                    logging.SetMinimumLevel(LogLevel.Trace);
-                });
-            }
+                    _logger.LogTrace("Adding Custom logging provider {LoggingProvider}", provider.GetType().Name);
+                    logging.AddProvider(provider);
+                }
+            });
  
             builder.WithUrl(hubUrl, options =>
             {
@@ -55,7 +58,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
                 if (config.BypassSSLErrors)
                 {
                     //https://github.com/xamarin/xamarin-android/issues/6351
-                    _analyticsService.Trace(this, "SSL errors will be bypassed... ");
+                    _logger.LogTrace("SSL errors will be bypassed... ");
 
                     options.HttpMessageHandlerFactory = (message) =>
                     {
@@ -86,7 +89,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if (_hub.State != HubConnectionState.Connected)
             {
-                _analyticsService.TraceWarning(this, $"SignalR client is {_hub.State} so cannot call server. Reconnecting...");
+                _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
                 await ConnectAsync();
             }
             return await _hub.InvokeAsync<TDto>(methodName, parameter);
@@ -96,7 +99,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if (_hub.State != HubConnectionState.Connected)
             {
-                _analyticsService.TraceWarning(this, $"SignalR client is {_hub.State} so cannot call server. Reconnecting...");
+                _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
                 await ConnectAsync();
             } 
             
@@ -107,7 +110,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if (_hub.State != HubConnectionState.Connected)
             {
-                _analyticsService.TraceWarning(this, $"SignalR client is {_hub.State} so cannot call server. Reconnecting...");
+                _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
                 await ConnectAsync();
             }
             await _hub.InvokeAsync(methodName, parameter);
@@ -117,7 +120,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if (_hub.State != HubConnectionState.Connected)
             {
-                _analyticsService.TraceWarning(this, $"SignalR client is {_hub.State} so cannot call server. Reconnecting...");
+                _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
                 await ConnectAsync();
             }
             await  _hub.InvokeAsync(methodName, parameter1, parameter2);
@@ -125,7 +128,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
 
         public IDisposable Subscribe<TDto>(string methodName, Func<TDto, Task> handler)
         {
-            _analyticsService.Debug($"Subscription added for {methodName} returning {typeof(TDto).Name}");
+            _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
             return _hub.On<TDto>(methodName, async dto =>
             {
                 await handler.Invoke(dto);
@@ -158,7 +161,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         public Task StopAsync() => _hub.StopAsync(CancellationToken.None);
         public ValueTask DisposeAsync()
         {
-            _analyticsService.Trace(this, "SignalR connection disposing...");
+            _logger.LogDebug("SignalR client disposing");
             _hub.Reconnecting -= OnReconnecting;
             _hub.Reconnected -= OnReconnected;
             _hub.Closed -= OnClosed;
