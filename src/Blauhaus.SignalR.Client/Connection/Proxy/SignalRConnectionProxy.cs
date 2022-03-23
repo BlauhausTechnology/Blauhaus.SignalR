@@ -89,7 +89,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if (_hub.State != HubConnectionState.Connected)
             {
-                _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
+                _logger.LogDebug("SignalR client is {ConnectionState} so cannot invoke {MethodName}. Reconnecting...", _hub.State, methodName);
                 await ConnectAsync();
             }
             return await _hub.InvokeAsync<TDto>(methodName, parameter);
@@ -99,7 +99,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if (_hub.State != HubConnectionState.Connected)
             {
-                _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
+                _logger.LogDebug("SignalR client is {ConnectionState} so cannot invoke {MethodName}. Reconnecting...", _hub.State, methodName);
                 await ConnectAsync();
             } 
             
@@ -110,7 +110,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if (_hub.State != HubConnectionState.Connected)
             {
-                _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
+                _logger.LogDebug("SignalR client is {ConnectionState} so cannot invoke {MethodName}. Reconnecting...", _hub.State, methodName);
                 await ConnectAsync();
             }
             await _hub.InvokeAsync(methodName, parameter);
@@ -120,7 +120,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if (_hub.State != HubConnectionState.Connected)
             {
-                _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
+                _logger.LogDebug("SignalR client is {ConnectionState} so cannot invoke {MethodName}. Reconnecting...", _hub.State, methodName);
                 await ConnectAsync();
             }
             await  _hub.InvokeAsync(methodName, parameter1, parameter2);
@@ -128,7 +128,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
 
         public IDisposable Subscribe<TDto>(string methodName, Func<TDto, Task> handler)
         {
-            _logger.LogDebug("SignalR client is {ConnectionState} so cannot call server. Reconnecting...", _hub.State);
+            
             return _hub.On<TDto>(methodName, async dto =>
             {
                 await handler.Invoke(dto);
