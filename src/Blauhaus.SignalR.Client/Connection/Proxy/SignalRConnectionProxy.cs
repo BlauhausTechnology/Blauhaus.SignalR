@@ -129,7 +129,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         public IDisposable Subscribe<TDto>(string methodName, Func<TDto, Task> handler)
         {
             
-            return _hub.On<TDto>(methodName, async dto =>
+            return _hub.On<TDto>(methodName, async (TDto dto) =>
             {
                 await handler.Invoke(dto);
             });
