@@ -4,16 +4,21 @@ using Blauhaus.Responses;
 using Blauhaus.SignalR.Abstractions.Auth;
 using Microsoft.AspNetCore.SignalR;
 using System;
+using Blauhaus.Analytics.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Blauhaus.SignalR.Server.Auth
 {
     public class ConnectedUserFactory : IConnectedUserFactory
     {
+        private readonly IAnalyticsLogger<ConnectedUserFactory> _logger;
         private readonly IAuthenticatedUserFactory _authenticatedUserFactory;
 
         public ConnectedUserFactory(
+            IAnalyticsLogger<ConnectedUserFactory> logger,
             IAuthenticatedUserFactory authenticatedUserFactory)
         {
+            _logger = logger;
             _authenticatedUserFactory = authenticatedUserFactory;
         }
 
@@ -22,6 +27,7 @@ namespace Blauhaus.SignalR.Server.Auth
             var deviceIdentifier = context.GetHttpContext().Request.Query["device"];
             if (string.IsNullOrEmpty(deviceIdentifier))
             {
+                _logger.LogWarning("No device identifier was found in the Request Context");
                 throw new InvalidOperationException("No device identifier");
             }
 
