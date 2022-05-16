@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using Blauhaus.Auth.Abstractions.User;
+using Blauhaus.Auth.Common.UserFactory;
 using Blauhaus.Errors;
 using Blauhaus.Errors.Extensions;
 using Blauhaus.SignalR.Abstractions.Auth;
@@ -17,7 +18,7 @@ namespace Blauhaus.SignalR.Server.Auth
                 : base(authenticatedUser)
         {
             if (authenticatedUser.UserId == Guid.Empty)
-                throw new ErrorException(Errors.Errors.RequiredValue<IConnectedUser>(x => x.UserId));
+                throw new ErrorException(Error.RequiredValue<IConnectedUser>(x => x.UserId));
 
             CurrentDeviceIdentifier = currentDeviceIdentifier.ThrowIfNullOrWhiteSpace<IConnectedUser>(x => x.CurrentDeviceIdentifier);
             CurrentConnectionId = currentConnectionId.ThrowIfNullOrWhiteSpace<IConnectedUser>(x => x.CurrentConnectionId);
