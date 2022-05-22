@@ -13,7 +13,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
         {
             With(x => x.EmailAddress, Guid.NewGuid() + "@freever.com");
             With(x => x.UserClaims, new List<UserClaim>());
-            With(x => x.Claims, new Dictionary<string, string>());
+            With(x => x.Properties, new Dictionary<string, string>());
             With(x => x.CurrentConnectionId, Guid.NewGuid().ToString());
             With(x => x.CurrentDeviceIdentifier, Guid.NewGuid().ToString());
             With(x => x.UserId, Guid.NewGuid());
