@@ -4,7 +4,9 @@ using Blauhaus.Common.Abstractions;
 using Blauhaus.Domain.Abstractions.DtoCaches;
 using Blauhaus.Domain.Abstractions.DtoHandlers;
 using Blauhaus.Domain.Client.DtoCaches;
+using Blauhaus.SignalR.Abstractions.Auth;
 using Blauhaus.SignalR.Abstractions.Client;
+using Blauhaus.SignalR.Client.Auth;
 using Blauhaus.SignalR.Client.Clients;
 using Blauhaus.SignalR.Client.Connection;
 using Blauhaus.SignalR.Client.Connection.Proxy;
@@ -44,7 +46,7 @@ namespace Blauhaus.SignalR.Client.Ioc
             services.TryAddSingleton<ISignalRConnectionProxy, SignalRConnectionProxy>();
             services.TryAddSingleton<ISignalRClient, SignalRClient>();
             services.TryAddSingleton<ISignalRDtoClientRegistry, SignalRDtoClientRegistry>();
-
+            services.TryAddSingleton<IAccessTokenProvider, DefaultAccessTokenProvider>();
             return services;
         }
           

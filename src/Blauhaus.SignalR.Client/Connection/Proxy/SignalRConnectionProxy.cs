@@ -9,6 +9,7 @@ using Blauhaus.Auth.Abstractions.AccessToken;
 using Blauhaus.Common.ValueObjects.BuildConfigs;
 using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
+using Blauhaus.SignalR.Abstractions.Auth;
 using Blauhaus.SignalR.Client.Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             IAnalyticsLogger<ISignalRConnectionProxy> logger,
             IServiceProvider serviceProvider,
             ISignalRClientConfig config,
-            IAuthenticatedAccessToken accessToken,
+            IAccessTokenProvider accessTokenProvider,
             IDeviceInfoService deviceInfoService)
         {
             _logger = logger;
@@ -53,7 +54,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
  
             builder.WithUrl(hubUrl, options =>
             {
-                options.AccessTokenProvider = () => Task.FromResult(accessToken.Token);
+                options.AccessTokenProvider = () => accessTokenProvider.GetAccessTokenAsync();
 
                 if (config.BypassSSLErrors)
                 {
