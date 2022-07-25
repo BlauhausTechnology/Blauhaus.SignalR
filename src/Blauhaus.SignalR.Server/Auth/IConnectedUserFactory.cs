@@ -7,6 +7,6 @@ namespace Blauhaus.SignalR.Server.Auth
 {
     public interface IConnectedUserFactory
     {
-        IConnectedUser ExtractFromHubContext(HubCallerContext context);
+        Response<IConnectedUser> ExtractFromHubContext(HubCallerContext context);
     }
 }

@@ -7,5 +7,6 @@ namespace Blauhaus.SignalR.Abstractions.Auth
         string UniqueId { get; }
         string CurrentDeviceIdentifier { get; }
         string CurrentConnectionId { get; }
+        string CurrentIpAddress { get; }
     }
 }

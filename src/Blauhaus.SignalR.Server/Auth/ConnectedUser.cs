@@ -14,12 +14,14 @@ namespace Blauhaus.SignalR.Server.Auth
         public ConnectedUser(
             IAuthenticatedUser authenticatedUser, 
             string currentDeviceIdentifier, 
-            string currentConnectionId) 
+            string currentConnectionId, 
+            string currentIpAddress) 
                 : base(authenticatedUser)
         {
             if (authenticatedUser.UserId == Guid.Empty)
                 throw new ErrorException(Error.RequiredValue<IConnectedUser>(x => x.UserId));
-
+            
+            CurrentIpAddress = currentIpAddress;
             CurrentDeviceIdentifier = currentDeviceIdentifier.ThrowIfNullOrWhiteSpace<IConnectedUser>(x => x.CurrentDeviceIdentifier);
             CurrentConnectionId = currentConnectionId.ThrowIfNullOrWhiteSpace<IConnectedUser>(x => x.CurrentConnectionId);
             
@@ -29,5 +31,6 @@ namespace Blauhaus.SignalR.Server.Auth
         public string UniqueId { get; }
         public string CurrentDeviceIdentifier { get; }
         public string CurrentConnectionId { get; }
+        public string CurrentIpAddress { get; }
     }
 }

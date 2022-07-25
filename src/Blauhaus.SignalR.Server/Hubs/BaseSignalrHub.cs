@@ -31,9 +31,6 @@ namespace Blauhaus.SignalR.Server.Hubs
             UserFactory = userFactory;
         }
 
-
-
-
         protected async Task<Response> HandleCommandAsync<TCommand, TId>(
             TCommand command, 
             Dictionary<string, object> headers, 
@@ -53,7 +50,13 @@ namespace Blauhaus.SignalR.Server.Hubs
             
             try
             {
-                var connectedUser = GetConnectedUser();
+                var connectedUserResult = GetConnectedUser();
+                if (connectedUserResult.IsFailure)
+                {
+                    return Response.Failure(connectedUserResult.Error);
+                }
+                var connectedUser = connectedUserResult.Value;
+
                 Logger.SetValue("UserId", connectedUser.UserId);
                 Logger.SetValue("ConnectionId", connectedUser.CurrentConnectionId);
 
@@ -91,7 +94,13 @@ namespace Blauhaus.SignalR.Server.Hubs
 
             try
             {
-                var connectedUser = GetConnectedUser();
+                var connectedUserResult = GetConnectedUser();
+                if (connectedUserResult.IsFailure)
+                {
+                    return Response.Failure<TResponse>(connectedUserResult.Error);
+                }
+                var connectedUser = connectedUserResult.Value;
+
                 Logger.SetValue("UserId", connectedUser.UserId);
                 Logger.SetValue("ConnectionId", connectedUser.CurrentConnectionId);
 
@@ -132,7 +141,13 @@ namespace Blauhaus.SignalR.Server.Hubs
 
             try
             {
-                var connectedUser = GetConnectedUser();
+                var connectedUserResult = GetConnectedUser();
+                if (connectedUserResult.IsFailure)
+                {
+                    return Response.Failure<TResponse>(connectedUserResult.Error);
+                }
+                var connectedUser = connectedUserResult.Value;
+
                 Logger.SetValue("UserId", connectedUser.UserId);
                 Logger.SetValue("ConnectionId", connectedUser.CurrentConnectionId);
 
@@ -153,7 +168,7 @@ namespace Blauhaus.SignalR.Server.Hubs
                 return Logger.LogErrorResponse<TResponse>(Error.Unexpected(e.Message), e);
             }
         } 
-        protected IConnectedUser GetConnectedUser()
+        protected Response<IConnectedUser> GetConnectedUser()
         {
             return UserFactory.ExtractFromHubContext(Context); 
         }
