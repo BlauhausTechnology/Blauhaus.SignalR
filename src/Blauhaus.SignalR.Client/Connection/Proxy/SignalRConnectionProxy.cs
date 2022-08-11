@@ -159,7 +159,12 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
 
         public HubConnectionState CurrentState => _hub.State;
         public string ConnectionId => _hub.ConnectionId;
-        public Task StopAsync() => _hub.StopAsync(CancellationToken.None);
+
+        public async Task StopAsync()
+        {
+            _logger.LogDebug("SignalR client stopping");
+            await _hub.StopAsync(CancellationToken.None);
+        }
         public ValueTask DisposeAsync()
         {
             _logger.LogDebug("SignalR client disposing");
