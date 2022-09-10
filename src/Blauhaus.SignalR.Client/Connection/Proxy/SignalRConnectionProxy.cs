@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions;
+using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
 using Blauhaus.SignalR.Abstractions.Auth;
 using Blauhaus.SignalR.Client.Ioc;
@@ -66,17 +67,20 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
 
                 if (_config.BypassSSLErrors)
                 {
-                    //https://github.com/xamarin/xamarin-android/issues/6351
-                    _logger.LogTrace("SSL errors will be bypassed... ");
-
-                    options.HttpMessageHandlerFactory = (message) =>
+                    if (_deviceInfoService.Platform.Equals(RuntimePlatform.Android))
                     {
-                        if (message is HttpClientHandler clientHandler)
-                            // bypass SSL certificate
-                            clientHandler.ServerCertificateCustomValidationCallback +=
-                                (sender, certificate, chain, sslPolicyErrors) => true;
-                        return message;
-                    };
+                        //https://github.com/xamarin/xamarin-android/issues/6351
+                        _logger.LogTrace("SSL errors will be bypassed... ");
+
+                        options.HttpMessageHandlerFactory = (message) =>
+                        {
+                            if (message is HttpClientHandler clientHandler)
+                                // bypass SSL certificate
+                                clientHandler.ServerCertificateCustomValidationCallback +=
+                                    (sender, certificate, chain, sslPolicyErrors) => true;
+                            return message;
+                        };
+                    }
                 }
             });
 
