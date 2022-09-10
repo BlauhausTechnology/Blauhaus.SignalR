@@ -3,11 +3,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions;
-using Blauhaus.Analytics.Abstractions.Extensions;
-using Blauhaus.Analytics.Abstractions.Service;
-using Blauhaus.Auth.Abstractions.AccessToken;
-using Blauhaus.Common.ValueObjects.BuildConfigs;
-using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
 using Blauhaus.SignalR.Abstractions.Auth;
 using Blauhaus.SignalR.Client.Ioc;
@@ -20,8 +15,13 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
     public class SignalRConnectionProxy : ISignalRConnectionProxy
     {
         private readonly IAnalyticsLogger<ISignalRConnectionProxy> _logger;
-        private readonly HubConnection _hub;
-
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ISignalRClientConfig _config;
+        private readonly IAccessTokenProvider _accessTokenProvider;
+        private readonly IDeviceInfoService _deviceInfoService;
+        private HubConnection? _hub;
+        private HubConnection Hub => _hub ?? throw new InvalidOperationException("HubConnection must be initialized before use");
+        
         public SignalRConnectionProxy(
             IAnalyticsLogger<ISignalRConnectionProxy> logger,
             IServiceProvider serviceProvider,
@@ -30,18 +30,26 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             IDeviceInfoService deviceInfoService)
         {
             _logger = logger;
-
+            _serviceProvider = serviceProvider;
+            _config = config;
+            _accessTokenProvider = accessTokenProvider;
+            _deviceInfoService = deviceInfoService;
+        }
+         
+        public async Task InitializeAsync()
+        {
             var builder = new HubConnectionBuilder();
 
-            if (config.IsAutoReconnectEnabled)
+            if (_config.IsAutoReconnectEnabled)
             {
                 builder.WithAutomaticReconnect();
             }
 
-            var hubUrl = $"{config.HubUrl}?device={deviceInfoService.DeviceUniqueIdentifier}";
+            var deviceId = await _deviceInfoService.GetDeviceIdentifierAsync();
+            var hubUrl = $"{_config.HubUrl}?device={deviceId}";
             _logger.LogDebug("Constructing SignalR hub connection proxy for url {ApiEndpoint}", hubUrl);
 
-            var loggingProviders = serviceProvider.GetServices<ILoggerProvider>();
+            var loggingProviders = _serviceProvider.GetServices<ILoggerProvider>();
             
             builder.ConfigureLogging(logging =>
             {
@@ -54,9 +62,9 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
  
             builder.WithUrl(hubUrl, options =>
             {
-                options.AccessTokenProvider = () => accessTokenProvider.GetAccessTokenAsync();
+                options.AccessTokenProvider = () => _accessTokenProvider.GetAccessTokenAsync();
 
-                if (config.BypassSSLErrors)
+                if (_config.BypassSSLErrors)
                 {
                     //https://github.com/xamarin/xamarin-android/issues/6351
                     _logger.LogTrace("SSL errors will be bypassed... ");
@@ -78,59 +86,59 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             _hub.Reconnected += OnReconnected;
             _hub.Closed += OnClosed;
         }
-         
+        
         private async Task ConnectAsync()
         {
             await OnReconnecting(null);
-            await _hub.StartAsync();
-            await OnReconnected(_hub.ConnectionId);
+            await Hub.StartAsync();
+            await OnReconnected(Hub.ConnectionId);
         }
 
         public async Task<TDto> InvokeAsync<TDto>(string methodName, object parameter)
         {
-            if (_hub.State != HubConnectionState.Connected)
+            if (Hub.State != HubConnectionState.Connected)
             {
                 _logger.LogDebug("SignalR client is {ConnectionState} so cannot invoke {MethodName}. Reconnecting...", _hub.State, methodName);
                 await ConnectAsync();
             }
-            return await _hub.InvokeAsync<TDto>(methodName, parameter);
+            return await Hub.InvokeAsync<TDto>(methodName, parameter);
         }
 
         public async Task<TDto> InvokeAsync<TDto>(string methodName, object parameter1, object parameter2)
         {
-            if (_hub.State != HubConnectionState.Connected)
+            if (Hub.State != HubConnectionState.Connected)
             {
                 _logger.LogDebug("SignalR client is {ConnectionState} so cannot invoke {MethodName}. Reconnecting...", _hub.State, methodName);
                 await ConnectAsync();
             } 
             
-            return await _hub.InvokeAsync<TDto>(methodName, parameter1, parameter2);
+            return await Hub.InvokeAsync<TDto>(methodName, parameter1, parameter2);
         }
 
         public async Task InvokeAsync(string methodName, object parameter)
         {
-            if (_hub.State != HubConnectionState.Connected)
+            if (Hub.State != HubConnectionState.Connected)
             {
                 _logger.LogDebug("SignalR client is {ConnectionState} so cannot invoke {MethodName}. Reconnecting...", _hub.State, methodName);
                 await ConnectAsync();
             }
-            await _hub.InvokeAsync(methodName, parameter);
+            await Hub.InvokeAsync(methodName, parameter);
         }
 
         public async Task InvokeAsync(string methodName, object parameter1, object parameter2)
         {
-            if (_hub.State != HubConnectionState.Connected)
+            if (Hub.State != HubConnectionState.Connected)
             {
                 _logger.LogDebug("SignalR client is {ConnectionState} so cannot invoke {MethodName}. Reconnecting...", _hub.State, methodName);
                 await ConnectAsync();
             }
-            await  _hub.InvokeAsync(methodName, parameter1, parameter2);
+            await  Hub.InvokeAsync(methodName, parameter1, parameter2);
         }
 
         public IDisposable Subscribe<TDto>(string methodName, Func<TDto, Task> handler)
         {
             
-            return _hub.On<TDto>(methodName, async (TDto dto) =>
+            return Hub.On<TDto>(methodName, async (TDto dto) =>
             {
                 await handler.Invoke(dto);
             });
@@ -157,22 +165,23 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             return Task.CompletedTask;
         }
 
-        public HubConnectionState CurrentState => _hub.State;
-        public string ConnectionId => _hub.ConnectionId;
+        public HubConnectionState CurrentState => Hub.State;
+        public string ConnectionId => Hub.ConnectionId;
 
         public async Task StopAsync()
         {
             _logger.LogDebug("SignalR client stopping");
-            await _hub.StopAsync(CancellationToken.None);
+            await Hub.StopAsync(CancellationToken.None);
         }
         public ValueTask DisposeAsync()
         {
             _logger.LogDebug("SignalR client disposing");
-            _hub.Reconnecting -= OnReconnecting;
-            _hub.Reconnected -= OnReconnected;
-            _hub.Closed -= OnClosed;
-            return _hub.DisposeAsync();
+            Hub.Reconnecting -= OnReconnecting;
+            Hub.Reconnected -= OnReconnected;
+            Hub.Closed -= OnClosed;
+            return Hub.DisposeAsync();
         }
+
     }
 
   

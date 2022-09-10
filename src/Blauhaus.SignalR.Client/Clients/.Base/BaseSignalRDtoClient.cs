@@ -46,9 +46,10 @@ namespace Blauhaus.SignalR.Client.Clients.Base
             DtoCache = dtoCache;
         }
         
-        public Task InitializeAsync()
+        public async Task InitializeAsync()
         {
-            return InvokeAsync(EnsureSubscribedToIncomingDtos);
+            await Connection.InitializeAsync();
+            EnsureSubscribedToIncomingDtos();
         }
 
         private void EnsureSubscribedToIncomingDtos()

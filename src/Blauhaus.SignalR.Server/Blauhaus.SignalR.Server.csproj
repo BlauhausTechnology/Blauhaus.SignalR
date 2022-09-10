@@ -11,9 +11,9 @@
   </ItemGroup>
 
     <ItemGroup>
-	    <PackageReference Include="Blauhaus.Auth.Common" Version="0.16.3" />
+	    <PackageReference Include="Blauhaus.Auth.Common" Version="0.16.6" />
 	    <PackageReference Include="Blauhaus.Ioc.Abstractions" Version="1.5.1" />
-	    <PackageReference Include="Blauhaus.Responses" Version="0.4.8" />
+	    <PackageReference Include="Blauhaus.Responses" Version="0.4.11" />
 	    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     </ItemGroup>
 

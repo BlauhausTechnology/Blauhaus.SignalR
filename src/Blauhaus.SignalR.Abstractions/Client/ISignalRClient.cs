@@ -4,7 +4,7 @@ using Blauhaus.Responses;
 
 namespace Blauhaus.SignalR.Abstractions.Client
 {
-    public interface ISignalRClient : IAsyncPublisher<SignalRConnectionState>
+    public interface ISignalRClient : IAsyncPublisher<SignalRConnectionState>, IAsyncInitializable
     {
         Task InitializeAllClientsAsync();
         Task<Response> HandleVoidCommandAsync<TCommand>(TCommand command) where TCommand : notnull;

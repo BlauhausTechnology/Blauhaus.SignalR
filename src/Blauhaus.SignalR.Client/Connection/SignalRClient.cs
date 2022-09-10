@@ -123,5 +123,9 @@ namespace Blauhaus.SignalR.Client.Connection
             _previousState = eventArgs.State;
         }
 
+        public async Task InitializeAsync()
+        {
+            await _connectionProxy.InitializeAsync();
+        }
     }
 }
