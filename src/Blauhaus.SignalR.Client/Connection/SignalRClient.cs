@@ -24,6 +24,7 @@ namespace Blauhaus.SignalR.Client.Connection
         private readonly ISignalRConnectionProxy _connectionProxy;
         private readonly ISignalRDtoClientRegistry _signalRDtoClientRegistry;
         private readonly IConnectivityService _connectivityService;
+        private readonly Task _connectionTask;
 
         public SignalRClient(
             IAnalyticsLogger<SignalRClient> logger,
@@ -38,12 +39,17 @@ namespace Blauhaus.SignalR.Client.Connection
             _signalRDtoClientRegistry = signalRDtoClientRegistry;
             _connectivityService = connectivityService;
 
+            _connectionTask = _connectionProxy.InitializeAsync();
             _connectionProxy.StateChanged += OnHubStateChanged;
         }
         
-        public Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler, Func<SignalRConnectionState, bool>? filter = null)
+        public async Task<IDisposable> SubscribeAsync(Func<SignalRConnectionState, Task> handler, Func<SignalRConnectionState, bool>? filter = null)
         {
-            return Task.FromResult(AddSubscriber(handler, filter));
+            if (!_connectionTask.IsCompleted)
+            {
+                await _connectionTask;
+            }
+            return AddSubscriber(handler, filter);
         }
 
         public async Task DisconnectAsync()
@@ -54,9 +60,13 @@ namespace Blauhaus.SignalR.Client.Connection
             await UpdateSubscribersAsync(SignalRConnectionState.Disconnected);
         }
 
-        public Task InitializeAllClientsAsync()
+        public async Task InitializeAllClientsAsync()
         {
-            return _signalRDtoClientRegistry.InitializeAllClientsAsync();
+            if (!_connectionTask.IsCompleted)
+            {
+                await _connectionTask;
+            }
+            await _signalRDtoClientRegistry.InitializeAllClientsAsync();
         }
 
         public async Task<Response> HandleVoidCommandAsync<TCommand>(TCommand command) where TCommand : notnull
@@ -68,6 +78,9 @@ namespace Blauhaus.SignalR.Client.Connection
             }
             try
             {
+                if (!_connectionTask.IsCompleted) 
+                    await _connectionTask;
+                
                 return await _connectionProxy.InvokeAsync<Response>($"Handle{typeof(TCommand).Name}Async", command, _analyticsContext.GetAllValues());
             }
             catch (Exception e)
@@ -85,6 +98,9 @@ namespace Blauhaus.SignalR.Client.Connection
             }
             try
             {
+                if (!_connectionTask.IsCompleted) 
+                    await _connectionTask;
+                
                 return await _connectionProxy.InvokeAsync<Response<TResponse>>($"Handle{typeof(TCommand).Name}Async", command, _analyticsContext.GetAllValues());
             }
             catch (Exception e)
@@ -125,7 +141,8 @@ namespace Blauhaus.SignalR.Client.Connection
 
         public async Task InitializeAsync()
         {
-            await _connectionProxy.InitializeAsync();
+            if (!_connectionTask.IsCompleted) 
+                await _connectionTask;
         }
     }
 }
