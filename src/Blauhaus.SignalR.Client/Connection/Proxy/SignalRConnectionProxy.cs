@@ -46,56 +46,60 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
          
         public async Task InitializeAsync()
         {
-            var builder = new HubConnectionBuilder();
-
-            if (_config.IsAutoReconnectEnabled)
+            if(_hub is null)
             {
-                builder.WithAutomaticReconnect();
-            }
+                var builder = new HubConnectionBuilder();
 
-            var deviceId = await _deviceInfoService.GetDeviceIdentifierAsync();
-            var hubUrl = $"{_config.HubUrl}?device={deviceId}";
-            _logger.LogDebug("Constructing SignalR hub connection proxy for url {ApiEndpoint}", hubUrl);
-
-            var loggingProviders = _serviceProvider.GetServices<ILoggerProvider>();
-            
-            builder.ConfigureLogging(logging =>
-            {
-                foreach (var provider in loggingProviders)
+                if (_config.IsAutoReconnectEnabled)
                 {
-                    _logger.LogTrace("Adding Custom logging provider {LoggingProvider}", provider.GetType().Name);
-                    logging.AddProvider(provider);
+                    builder.WithAutomaticReconnect();
                 }
-            });
- 
-            builder.WithUrl(hubUrl, options =>
-            {
-                options.AccessTokenProvider = () => _accessTokenProvider.GetAccessTokenAsync();
 
-                if (_config.BypassSSLErrors)
+                var deviceId = await _deviceInfoService.GetDeviceIdentifierAsync();
+                var hubUrl = $"{_config.HubUrl}?device={deviceId}";
+                _logger.LogDebug("Constructing SignalR hub connection proxy for url {ApiEndpoint}", hubUrl);
+
+                var loggingProviders = _serviceProvider.GetServices<ILoggerProvider>();
+                
+                builder.ConfigureLogging(logging =>
                 {
-                    if (_deviceInfoService.Platform.Equals(RuntimePlatform.Android))
+                    foreach (var provider in loggingProviders)
                     {
-                        //https://github.com/xamarin/xamarin-android/issues/6351
-                        _logger.LogTrace("SSL errors will be bypassed... ");
-
-                        options.HttpMessageHandlerFactory = (message) =>
-                        {
-                            if (message is HttpClientHandler clientHandler)
-                                // bypass SSL certificate
-                                clientHandler.ServerCertificateCustomValidationCallback +=
-                                    (sender, certificate, chain, sslPolicyErrors) => true;
-                            return message;
-                        };
+                        _logger.LogTrace("Adding Custom logging provider {LoggingProvider}", provider.GetType().Name);
+                        logging.AddProvider(provider);
                     }
-                }
-            });
+                });
+     
+                builder.WithUrl(hubUrl, options =>
+                {
+                    options.AccessTokenProvider = () => _accessTokenProvider.GetAccessTokenAsync();
 
-            _hub = builder.Build();
+                    if (_config.BypassSSLErrors)
+                    {
+                        if (_deviceInfoService.Platform.Equals(RuntimePlatform.Android))
+                        {
+                            //https://github.com/xamarin/xamarin-android/issues/6351
+                            _logger.LogTrace("SSL errors will be bypassed... ");
+
+                            options.HttpMessageHandlerFactory = (message) =>
+                            {
+                                if (message is HttpClientHandler clientHandler)
+                                    // bypass SSL certificate
+                                    clientHandler.ServerCertificateCustomValidationCallback +=
+                                        (sender, certificate, chain, sslPolicyErrors) => true;
+                                return message;
+                            };
+                        }
+                    }
+                });
+
+                _hub = builder.Build();
+                
+                _hub.Reconnecting += OnReconnecting;
+                _hub.Reconnected += OnReconnected;
+                _hub.Closed += OnClosed;
+            }
             
-            _hub.Reconnecting += OnReconnecting;
-            _hub.Reconnected += OnReconnected;
-            _hub.Closed += OnClosed;
         }
         
         private async Task ConnectAsync()
