@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Blauhaus.Auth.Abstractions.User;
+using Blauhaus.Auth.TestHelpers.MockBuilders;
 using Blauhaus.Common.Utils.Extensions;
 using Blauhaus.SignalR.Abstractions.Auth;
 using Blauhaus.TestHelpers.MockBuilders;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders
 {
-    public class ConnectedUserMockBuilder : BaseMockBuilder<ConnectedUserMockBuilder, IConnectedUser>
+    public class ConnectedUserMockBuilder : BaseAuthenticatedUserMockBuilder<ConnectedUserMockBuilder, IConnectedUser>
     {
         public ConnectedUserMockBuilder()
         {
@@ -18,13 +19,7 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
             With(x => x.UserId, Guid.NewGuid());
             Mock.Setup(x => x.UniqueId).Returns(() => $"{Mock.Object.UserId}|{Mock.Object.CurrentDeviceIdentifier}");
         }
-        
-        public ConnectedUserMockBuilder With_UserId(Guid userId)
-        {
-            With(x => x.UserId, userId);
-            return this;
-        }
-        
+         
         public ConnectedUserMockBuilder With_DeviceIdentifier(string deviceIdentifier)
         {
             With(x => x.CurrentDeviceIdentifier, deviceIdentifier);
