@@ -12,7 +12,6 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
         public ConnectedUserMockBuilder()
         {
             With(x => x.EmailAddress, Guid.NewGuid() + "@freever.com");
-            With(x => x.UserClaims, new List<UserClaim>());
             With(x => x.Properties, new Dictionary<string, string>());
             With(x => x.CurrentConnectionId, Guid.NewGuid().ToString());
             With(x => x.CurrentDeviceIdentifier, Guid.NewGuid().ToString());
@@ -37,13 +36,6 @@ namespace Blauhaus.SignalR.TestHelpers.MockBuilders
             With(x => x.CurrentConnectionId, connectionId);
             return this;
         }
-        
-        public ConnectedUserMockBuilder With_Claim(UserClaim claim)
-        {
-            Mock.Setup(x => x.HasClaim(claim.Name)).Returns(true);
-            Mock.Setup(x => x.HasClaimValue(claim.Name, claim.Value)).Returns(true);
-            With(x => x.UserClaims, new List<UserClaim>{claim});
-            return this;
-        }
+         
     }
 }

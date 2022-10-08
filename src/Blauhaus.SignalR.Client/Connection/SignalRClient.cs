@@ -110,7 +110,7 @@ namespace Blauhaus.SignalR.Client.Connection
         }
 
         
-        private async void OnHubStateChanged(object sender, ClientConnectionStateChangeEventArgs eventArgs)
+        private async void OnHubStateChanged(object? sender, ClientConnectionStateChangeEventArgs eventArgs)
         {
             var connectionState = eventArgs.State.ToConnectionState(_previousState);
             var exception = eventArgs.Exception;

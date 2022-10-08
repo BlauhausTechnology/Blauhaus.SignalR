@@ -166,13 +166,13 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         public IDisposable On<TDto>(string methodName, Action<TDto> handler) => Hub.On(methodName, handler);
 
         public event EventHandler<ClientConnectionStateChangeEventArgs>? StateChanged;
-        private Task OnClosed(Exception e)
+        private Task OnClosed(Exception? e)
         {
             StateChanged?.Invoke(this, new ClientConnectionStateChangeEventArgs(HubConnectionState.Disconnected, e));
             return Task.CompletedTask;
         }
 
-        private Task OnReconnected(string arg)
+        private Task OnReconnected(string? arg)
         {
             StateChanged?.Invoke(this, new ClientConnectionStateChangeEventArgs(HubConnectionState.Connected, null));
             return Task.CompletedTask;
@@ -185,7 +185,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         }
 
         public HubConnectionState CurrentState => Hub.State;
-        public string ConnectionId => Hub.ConnectionId;
+        public string ConnectionId => Hub.ConnectionId ?? "Unknown";
 
         public async Task StopAsync()
         {
