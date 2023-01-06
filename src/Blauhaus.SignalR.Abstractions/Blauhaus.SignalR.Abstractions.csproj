@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+	  <TargetFrameworks>netstandard2.0;net7.0</TargetFrameworks>
 	  <LangVersion>latest</LangVersion>
 	  <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="2.0.0" />
-    <PackageReference Include="Blauhaus.Auth.Abstractions" Version="1.0.0" />
-    <PackageReference Include="Blauhaus.Common.Abstractions" Version="2.1.21" />
+    <PackageReference Include="Blauhaus.Analytics.Abstractions" Version="2.0.2" />
+    <PackageReference Include="Blauhaus.Auth.Abstractions" Version="1.0.1" />
+    <PackageReference Include="Blauhaus.Common.Abstractions" Version="2.2.7" />
     <PackageReference Include="Blauhaus.Domain.Abstractions" Version="2.0.0" />
   </ItemGroup>
 
