@@ -102,12 +102,15 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
             
         }
         
-        private async Task ConnectAsync()
+        public async Task ConnectAsync()
         {
-            await OnReconnecting(null);
             var hub = await GetHubAsync();
-            await hub.StartAsync();
-            await OnReconnected(hub.ConnectionId);
+            if (hub.State != HubConnectionState.Connected)
+            {
+                await OnReconnecting(null);
+                await hub.StartAsync();
+                await OnReconnected(hub.ConnectionId);
+            }
         }
 
         public async Task<TDto> InvokeAsync<TDto>(string methodName, object parameter)
