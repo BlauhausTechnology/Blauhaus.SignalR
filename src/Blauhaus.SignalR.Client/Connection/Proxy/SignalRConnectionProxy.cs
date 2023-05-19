@@ -74,23 +74,20 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
                 {
                     options.AccessTokenProvider = () => _accessTokenProvider.GetAccessTokenAsync();
 
-                    if (_config.BypassSSLErrors)
-                    {
-                        if (_deviceInfoService.Platform.Equals(RuntimePlatform.Android))
-                        {
-                            //https://github.com/xamarin/xamarin-android/issues/6351
-                            _logger.LogTrace("SSL errors will be bypassed... ");
+                    if (!_config.BypassSSLErrors) return;
+                    if (_deviceInfoService.Platform.Equals(RuntimePlatform.iOS)) return;
 
-                            options.HttpMessageHandlerFactory = (message) =>
-                            {
-                                if (message is HttpClientHandler clientHandler)
-                                    // bypass SSL certificate
-                                    clientHandler.ServerCertificateCustomValidationCallback +=
-                                        (sender, certificate, chain, sslPolicyErrors) => true;
-                                return message;
-                            };
-                        }
-                    }
+                    //https://github.com/xamarin/xamarin-android/issues/6351
+                    _logger.LogTrace("SSL errors will be bypassed... ");
+
+                    options.HttpMessageHandlerFactory = (message) =>
+                    {
+                        if (message is HttpClientHandler clientHandler)
+                            // bypass SSL certificate
+                            clientHandler.ServerCertificateCustomValidationCallback +=
+                                (sender, certificate, chain, sslPolicyErrors) => true;
+                        return message;
+                    };
                 });
 
                 _hub = builder.Build();
