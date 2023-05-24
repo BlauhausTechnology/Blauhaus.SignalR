@@ -76,7 +76,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
 
                     if (!_config.BypassSSLErrors) return;
                     
-                    if (_deviceInfoService.Platform.Equals(RuntimePlatform.Windows) ||
+                    if (_deviceInfoService.Platform.Equals(RuntimePlatform.UWP) ||
                         _deviceInfoService.Platform.Equals(RuntimePlatform.Android))
                     {
                         //https://github.com/xamarin/xamarin-android/issues/6351
