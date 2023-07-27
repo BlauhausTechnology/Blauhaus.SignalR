@@ -4,7 +4,8 @@ using Blauhaus.Analytics.TestHelpers.MockBuilders;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.DeviceServices.TestHelpers.MockBuilders;
 using Blauhaus.SignalR.Client.Connection.Proxy;
-using Blauhaus.SignalR.Tests.MockBuilders;
+using Blauhaus.SignalR.TestHelpers.MockBuilders;
+using Blauhaus.SignalR.Tests.TestObjects;
 using Blauhaus.TestHelpers.BaseTests;
 using NUnit.Framework;
 
@@ -17,13 +18,13 @@ namespace Blauhaus.SignalR.Tests.Base
         {
             base.Cleanup();
 
-            AddService(MockSignalRConnectionProxy.Object);
+            AddService(MockSignalRDtoConnectionProxy.Object);
             AddService(MockConnectivityService.Object);
             AddService(MockAnalyticsContext.Object);
             AddService(MockLogger.Object);
         }
 
-        protected SignalRConnectionProxyMockBuilder MockSignalRConnectionProxy => AddMock<SignalRConnectionProxyMockBuilder, ISignalRConnectionProxy>().Invoke();
+        protected SignalRDtoConnectionProxyMockBuilder<MyDto> MockSignalRDtoConnectionProxy => AddMock<SignalRDtoConnectionProxyMockBuilder<MyDto>, ISignalRConnectionProxy>().Invoke();
         protected ConnectivityServiceMockBuilder MockConnectivityService => AddMock<ConnectivityServiceMockBuilder, IConnectivityService>().Invoke();
         protected AnalyticsContextMockBuilder MockAnalyticsContext => AddMock<AnalyticsContextMockBuilder, IAnalyticsContext>().Invoke();
         protected AnalyticsLoggerMockBuilder<TSut> MockLogger => AddMock<AnalyticsLoggerMockBuilder<TSut>, IAnalyticsLogger<TSut>>().Invoke();

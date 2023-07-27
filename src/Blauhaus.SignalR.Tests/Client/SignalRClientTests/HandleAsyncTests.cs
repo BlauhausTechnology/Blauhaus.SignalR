@@ -41,14 +41,14 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
                 await ExecuteAsync();
 
                 //Assert
-                MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response>("HandleMyCommandAsync", _command, _headers));
+                MockSignalRDtoConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response>("HandleMyCommandAsync", _command, _headers));
             }
 
             [Test]
             public async Task IF_hub_invocation_succeeds_SHOULD_return_it()
             {
                 //Arrange
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success());
+                MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Success());
 
                 //Act
                 var result = await ExecuteAsync();
@@ -61,7 +61,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             public async Task IF_hub_invocation_fails_SHOULD_return_it()
             {
                 //Arrange
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Failure(AuthError.NotAuthenticated));
+                MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Failure(AuthError.NotAuthenticated));
 
                 //Act
                 var result = await ExecuteAsync();
@@ -89,7 +89,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             {
                 //Arrange
                 var e = new Exception("Something bad happened");
-                MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response>(e);
+                MockSignalRDtoConnectionProxy.Where_InvokeAsync_throws<Response>(e);
 
                 //Act
                 var result = await ExecuteAsync();
@@ -120,14 +120,14 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
                 await ExecuteAsync();
 
                 //Assert
-                MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<MyResponse>>("HandleMyCommandAsync", _command, _headers));
+                MockSignalRDtoConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<MyResponse>>("HandleMyCommandAsync", _command, _headers));
             }
 
             [Test]
             public async Task IF_hub_invocation_succeeds_SHOULD_return_it()
             {
                 //Arrange
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(_myResponse));
+                MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Success(_myResponse));
 
                 //Act
                 var result = await ExecuteAsync();
@@ -141,7 +141,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             public async Task IF_hub_invocation_fails_SHOULD_return_it()
             {
                 //Arrange
-                MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Failure<MyResponse>(AuthError.NotAuthenticated));
+                MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Failure<MyResponse>(AuthError.NotAuthenticated));
 
                 //Act
                 var result = await ExecuteAsync();
@@ -169,7 +169,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             {
                 //Arrange
                 var e = new Exception("Something bad happened");
-                MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<MyResponse>>(e);
+                MockSignalRDtoConnectionProxy.Where_InvokeAsync_throws<Response<MyResponse>>(e);
 
                 //Act
                 var result = await ExecuteAsync();

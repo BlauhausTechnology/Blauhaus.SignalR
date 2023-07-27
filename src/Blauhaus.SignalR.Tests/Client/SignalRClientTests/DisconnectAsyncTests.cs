@@ -14,7 +14,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             await Sut.DisconnectAsync();
             
             //Assert
-            MockSignalRConnectionProxy.Mock.Verify(x => x.StopAsync());
+            MockSignalRDtoConnectionProxy.Mock.Verify(x => x.StopAsync());
         }
         
         [Test]

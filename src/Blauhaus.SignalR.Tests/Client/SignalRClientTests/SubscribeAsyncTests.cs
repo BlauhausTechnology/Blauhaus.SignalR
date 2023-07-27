@@ -20,7 +20,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             await Sut.SubscribeAsync(Handler);
             
             //Act
-            MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Reconnecting, exception);
+            MockSignalRDtoConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Reconnecting, exception);
             
             //Assert
             Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Reconnecting));
@@ -34,7 +34,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             await Sut.SubscribeAsync(Handler);
             
             //Act
-            MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Disconnected, exception);
+            MockSignalRDtoConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Disconnected, exception);
             
             //Assert
             Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Disconnected));
@@ -47,7 +47,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
             await Sut.SubscribeAsync(Handler);
             
             //Act
-            MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Disconnected);
+            MockSignalRDtoConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Disconnected);
             
             //Assert
             Assert.That(StateChanges[0], Is.EqualTo(SignalRConnectionState.Disconnected));
@@ -58,10 +58,10 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
         {
             //Arrang
             await Sut.SubscribeAsync(Handler);
-            MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Disconnected);
+            MockSignalRDtoConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Disconnected);
             
             //Act
-            MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Connected);
+            MockSignalRDtoConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Connected);
             
             //Assert
             Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Connected));
@@ -73,10 +73,10 @@ namespace Blauhaus.SignalR.Tests.Client.SignalRClientTests
         {
             //Arrang
             await Sut.SubscribeAsync(Handler);
-            MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Reconnecting);
+            MockSignalRDtoConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Reconnecting);
             
             //Act
-            MockSignalRConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Connected);
+            MockSignalRDtoConnectionProxy.Raise_ClientConnectionStateChange(HubConnectionState.Connected);
             
             //Assert
             Assert.That(StateChanges[1], Is.EqualTo(SignalRConnectionState.Reconnected));

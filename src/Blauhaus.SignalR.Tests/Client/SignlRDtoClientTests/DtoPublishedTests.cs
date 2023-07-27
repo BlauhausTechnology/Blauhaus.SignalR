@@ -33,7 +33,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             });
 
             //Act
-            await MockSignalRConnectionProxy.MockPublishDtoAsync(_dto);
+            await MockSignalRDtoConnectionProxy.MockPublishDtoAsync(_dto);
 
             //Assert
             Assert.That(incomingDto!.Id, Is.EqualTo(_dto.Id));
@@ -52,7 +52,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             token.Dispose();
 
             //Act
-            await MockSignalRConnectionProxy.MockPublishDtoAsync(_dto);
+            await MockSignalRDtoConnectionProxy.MockPublishDtoAsync(_dto);
 
             //Assert
             Assert.That(incomingDto, Is.Null);

@@ -25,7 +25,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             _command = new MyCommand();
             _headers = new Dictionary<string, object>{["Key"] = "Value"};
             MockAnalyticsContext.Where_GetAllValues_returns(_headers);
-            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(new List<MyDto>()));
+            MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Success(new List<MyDto>()));
         }
         
         private Task<Response<MyDto>> ExecuteAsync()
@@ -40,7 +40,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             await ExecuteAsync();
 
             //Assert
-            MockSignalRConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<MyDto>>("HandleMyCommandAsync", _command, _headers));
+            MockSignalRDtoConnectionProxy.Mock.Verify(x => x.InvokeAsync<Response<MyDto>>("HandleMyCommandAsync", _command, _headers));
         }
         
         [Test]
@@ -48,7 +48,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
         {
             //Arrange
             var dto = new MyDto();
-            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
+            MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
 
             //Act
             var result = await ExecuteAsync();
@@ -62,7 +62,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
         {
             //Arrange
             var dto = new MyDto();
-            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
+            MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
 
             //Act
             await ExecuteAsync();
@@ -77,7 +77,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             //Arrange
             var dto = new MyDto();
             MyDto? incomingDto = null;
-            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
+            MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
             await Sut.SubscribeAsync(x =>
             {
                 incomingDto = x;
@@ -96,7 +96,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
         {
             //Arrange
             var dto = new MyDto();
-            MockSignalRConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
+            MockSignalRDtoConnectionProxy.Where_InvokeAsync_returns(Response.Success(dto));
             MyDto? incomingDto = null;
             var token = await Sut.SubscribeAsync(x =>
             {
@@ -131,7 +131,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
         {
             //Arrange
             var e = new Exception("Something bad happened");
-            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<MyDto>>(e);
+            MockSignalRDtoConnectionProxy.Where_InvokeAsync_throws<Response<MyDto>>(e);
 
             //Act
             var result = await ExecuteAsync();
@@ -145,7 +145,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
         {
             //Arrange
             var e = new ErrorException(Error.Cancelled);
-            MockSignalRConnectionProxy.Where_InvokeAsync_throws<Response<MyDto>>(e);
+            MockSignalRDtoConnectionProxy.Where_InvokeAsync_throws<Response<MyDto>>(e);
 
             //Act
             var result = await ExecuteAsync();

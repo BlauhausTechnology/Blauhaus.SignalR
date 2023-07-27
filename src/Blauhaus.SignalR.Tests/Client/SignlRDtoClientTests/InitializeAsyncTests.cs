@@ -33,7 +33,7 @@ namespace Blauhaus.SignalR.Tests.Client.SignlRDtoClientTests
             await Sut.InitializeAsync();
             
             //Assert 
-            MockSignalRConnectionProxy.Mock.Verify(x => x.Subscribe("PublishMyDtoAsync", It.IsAny<Func<MyDto, Task>>()), Times.Once);
+            MockSignalRDtoConnectionProxy.Mock.Verify(x => x.Subscribe("PublishMyDtoAsync", It.IsAny<Func<MyDto, Task>>()), Times.Once);
         }
          
     }
