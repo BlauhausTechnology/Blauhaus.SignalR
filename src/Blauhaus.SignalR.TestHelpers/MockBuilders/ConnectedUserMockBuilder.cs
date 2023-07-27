@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Blauhaus.Auth.Abstractions.User;
 using Blauhaus.Auth.TestHelpers.MockBuilders;
-using Blauhaus.Common.Utils.Extensions;
 using Blauhaus.SignalR.Abstractions.Auth;
-using Blauhaus.TestHelpers.MockBuilders;
 
 namespace Blauhaus.SignalR.TestHelpers.MockBuilders
 {

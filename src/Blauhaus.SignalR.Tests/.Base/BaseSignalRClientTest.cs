@@ -4,7 +4,7 @@ using Blauhaus.Analytics.TestHelpers.MockBuilders;
 using Blauhaus.DeviceServices.Abstractions.Connectivity;
 using Blauhaus.DeviceServices.TestHelpers.MockBuilders;
 using Blauhaus.SignalR.Client.Connection.Proxy;
-using Blauhaus.SignalR.TestHelpers.MockBuilders;
+using Blauhaus.SignalR.TestHelpers.MockBuilders.ConnectionProxies;
 using Blauhaus.SignalR.Tests.TestObjects;
 using Blauhaus.TestHelpers.BaseTests;
 using NUnit.Framework;

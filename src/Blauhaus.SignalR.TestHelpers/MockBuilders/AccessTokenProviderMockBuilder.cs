@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Blauhaus.SignalR.Abstractions.Auth;
+﻿using Blauhaus.SignalR.Abstractions.Auth;
 using Blauhaus.TestHelpers.MockBuilders;
 using Moq;
 
