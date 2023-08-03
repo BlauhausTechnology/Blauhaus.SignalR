@@ -3,8 +3,10 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blauhaus.Analytics.Abstractions;
+using Blauhaus.Analytics.Abstractions.Extensions;
 using Blauhaus.Common.ValueObjects.RuntimePlatforms;
 using Blauhaus.DeviceServices.Abstractions.DeviceInfo;
+using Blauhaus.Errors;
 using Blauhaus.SignalR.Abstractions.Auth;
 using Blauhaus.SignalR.Client.Ioc;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -55,7 +57,7 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
                     builder.WithAutomaticReconnect();
                 }
 
-                var deviceId = await _deviceInfoService.GetDeviceIdentifierAsync();
+                string deviceId = await _deviceInfoService.GetDeviceIdentifierAsync();
                 var hubUrl = $"{_config.HubUrl}?device={deviceId}";
                 _logger.LogDebug("Constructing SignalR hub connection proxy for url {ApiEndpoint}", hubUrl);
 
@@ -105,11 +107,23 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         public async Task ConnectAsync()
         {
             var hub = await GetHubAsync();
-            if (hub.State != HubConnectionState.Connected)
+            if (hub.State == HubConnectionState.Disconnected)
             {
-                await OnReconnecting(null);
-                await hub.StartAsync();
-                await OnReconnected(hub.ConnectionId);
+                _logger.LogDebug("Hub is disconnected. Connecting...");
+                try
+                {
+                    await OnReconnecting(null);
+                    await hub.StartAsync();
+                    await OnReconnected(hub.ConnectionId);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(Error.Unexpected("SignalR hub failed to connect"), e);
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Cannot connect because HubConnectionState is not Disconnected but {HubConnectionState}", hub.State);
             }
         }
 
