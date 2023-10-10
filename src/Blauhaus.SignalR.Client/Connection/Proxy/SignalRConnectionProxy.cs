@@ -50,6 +50,13 @@ namespace Blauhaus.SignalR.Client.Connection.Proxy
         {
             if(_hub is null)
             {
+
+                if (string.IsNullOrEmpty(_config.HubUrl))
+                {
+                    _logger.LogWarning("No HubUrl exists in config: SignalR connection will not be established");
+                    return;
+                }
+
                 var builder = new HubConnectionBuilder();
 
                 if (_config.IsAutoReconnectEnabled)
